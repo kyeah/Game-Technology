@@ -39,8 +39,9 @@ PATH: /usr/local/games
 PATH: /home/kyeh/bin
 PATH: /home/kyeh/.rvm/bin
 PATH: /home/kyeh/bin/gibo
-PATH: /home/kyeh/UserProgs/android-studio/bin
-PATH: /UserProgs/genymotion
+PATH: /home/kyeh/Programs/idea/bin
+PATH: /home/kyeh/Programs/android-studio/bin
+PATH: /Programs/genymotion
 
 
 ## ----------- ##
