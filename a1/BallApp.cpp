@@ -14,6 +14,7 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
+#include <bullet/btBulletDynamicsCommon.h>
 #include "BallApp.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
@@ -56,9 +57,7 @@ void BallApp::createScene(void)
   Ogre::Plane bPlane(Ogre::Vector3::UNIT_Y, 0);
   Ogre::Plane tPlane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0);
   Ogre::Plane farPlane(Ogre::Vector3::UNIT_Z, 0);
-  Ogre::Plane nearPlane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0);
-
-  
+  Ogre::Plane nearPlane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0);  
 
   Ogre::MeshManager::getSingleton().createPlane("ground",
                                                 Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
