@@ -1,0 +1,3 @@
+Switching from OGRE 1.8 to 1.7:
+1) Comment out fixed pipeline setting in ogre.cfg
+2) Change plugin folder in plugins.cfg

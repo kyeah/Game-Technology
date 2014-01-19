@@ -2,3 +2,5 @@
 *#
 *.o
 *.log
+*autom4te.cache/
+*m4/
