@@ -1,4 +1,5 @@
 #include <btBulletDynamicsCommon.h>
+#include <OgreEntity.h>
 
 class Physics {
   btDefaultCollisionConfiguration* collisionConfiguration;
@@ -10,14 +11,16 @@ class Physics {
   std::map<std::string, btRigidBody *> physicsAccessors;
 
  public:
-  Physics(void) {
-    collisionConfiguration = new btDefaultCollisionConfiguration();
-    dispatcher = new btCollisionDispatcher(collisionConfiguration);
-    overlappingPairCache = new btDbvtBroadphase();
-    solver = new btSequentialImpulseConstraintSolver();
-    dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-    dynamicsWorld->setGravity(btVector3(0,-9.8,0));
-  }
-  
+  Physics( btVector3 gravity = btVector3(0,-98,0) );
+
   btDiscreteDynamicsWorld *getDynamicsWorld() { return dynamicsWorld; }
+  btRigidBody* addRigidBox(Ogre::Entity* entity, Ogre::SceneNode* node, 
+                           btScalar mass=0.0f, btScalar rest=0.0f, btVector3 localInertia=btVector3(0,0,0), 
+                           btVector3 origin=btVector3(0,0,0), btQuaternion *rotation=0);;
+  btRigidBody* addRigidSphere(Ogre::Entity* entity, Ogre::SceneNode* node, 
+                              btScalar mass=0.0f, btScalar rest=0.0f, btVector3 localInertia=btVector3(0,0,0), 
+                              btVector3 origin=btVector3(0,0,0), btQuaternion *rotation=0);
+  btRigidBody* addRigidBody(Ogre::Entity* entity, Ogre::SceneNode* node, btCollisionShape *rigidShape,
+                            btScalar mass=0.0f, btScalar rest=0.0f, btVector3 localInertia=btVector3(0,0,0), 
+                            btVector3 origin=btVector3(0,0,0), btQuaternion *rotation=0);
 };

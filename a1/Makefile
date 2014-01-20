@@ -101,7 +101,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_BallApp_OBJECTS = BallApp-BaseApplication.$(OBJEXT) \
-	BallApp-BallApp.$(OBJEXT)
+	BallApp-BallApp.$(OBJEXT) BallApp-Physics.$(OBJEXT)
 BallApp_OBJECTS = $(am_BallApp_OBJECTS)
 am__DEPENDENCIES_1 =
 BallApp_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -322,7 +322,7 @@ top_srcdir = .
 ACLOCAL_AMFLAGS = -I m4
 noinst_HEADERS = BaseApplication.h BallApp.h Physics.h
 BallApp_CPPFLAGS = -I$(top_srcdir) -I/usr/local/include/bullet
-BallApp_SOURCES = BaseApplication.cpp BallApp.cpp
+BallApp_SOURCES = BaseApplication.cpp BallApp.cpp Physics.cpp
 BallApp_CXXFLAGS = $(OGRE_CFLAGS) $(OIS_CFLAGS)
 BallApp_LDADD = $(OGRE_LIBS) $(OIS_LIBS) -lboost_system -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
 EXTRA_DIST = buildit makeit
@@ -443,6 +443,7 @@ distclean-compile:
 
 include ./$(DEPDIR)/BallApp-BallApp.Po
 include ./$(DEPDIR)/BallApp-BaseApplication.Po
+include ./$(DEPDIR)/BallApp-Physics.Po
 
 .cpp.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -492,6 +493,20 @@ BallApp-BallApp.obj: BallApp.cpp
 #	$(AM_V_CXX)source='BallApp.cpp' object='BallApp-BallApp.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(BallApp_CPPFLAGS) $(CPPFLAGS) $(BallApp_CXXFLAGS) $(CXXFLAGS) -c -o BallApp-BallApp.obj `if test -f 'BallApp.cpp'; then $(CYGPATH_W) 'BallApp.cpp'; else $(CYGPATH_W) '$(srcdir)/BallApp.cpp'; fi`
+
+BallApp-Physics.o: Physics.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(BallApp_CPPFLAGS) $(CPPFLAGS) $(BallApp_CXXFLAGS) $(CXXFLAGS) -MT BallApp-Physics.o -MD -MP -MF $(DEPDIR)/BallApp-Physics.Tpo -c -o BallApp-Physics.o `test -f 'Physics.cpp' || echo '$(srcdir)/'`Physics.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/BallApp-Physics.Tpo $(DEPDIR)/BallApp-Physics.Po
+#	$(AM_V_CXX)source='Physics.cpp' object='BallApp-Physics.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(BallApp_CPPFLAGS) $(CPPFLAGS) $(BallApp_CXXFLAGS) $(CXXFLAGS) -c -o BallApp-Physics.o `test -f 'Physics.cpp' || echo '$(srcdir)/'`Physics.cpp
+
+BallApp-Physics.obj: Physics.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(BallApp_CPPFLAGS) $(CPPFLAGS) $(BallApp_CXXFLAGS) $(CXXFLAGS) -MT BallApp-Physics.obj -MD -MP -MF $(DEPDIR)/BallApp-Physics.Tpo -c -o BallApp-Physics.obj `if test -f 'Physics.cpp'; then $(CYGPATH_W) 'Physics.cpp'; else $(CYGPATH_W) '$(srcdir)/Physics.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/BallApp-Physics.Tpo $(DEPDIR)/BallApp-Physics.Po
+#	$(AM_V_CXX)source='Physics.cpp' object='BallApp-Physics.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(BallApp_CPPFLAGS) $(CPPFLAGS) $(BallApp_CXXFLAGS) $(CXXFLAGS) -c -o BallApp-Physics.obj `if test -f 'Physics.cpp'; then $(CYGPATH_W) 'Physics.cpp'; else $(CYGPATH_W) '$(srcdir)/Physics.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

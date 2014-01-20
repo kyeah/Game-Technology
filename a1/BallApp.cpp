@@ -39,33 +39,6 @@ void BallApp::createCamera(void) {
   mCamera->setPosition(0,100,900);
 }
 
-void createTransform(Ogre::Entity* entity, Ogre::SceneNode* newNode, Physics* mPhysics) {
-  //create the new shape, and tell the physics that is a Box
-  btCollisionShape *newRigidShape = new btSphereShape(btScalar(125));
- 
-  //set the initial position and transform. For this demo, we set the tranform to be none
-  btTransform startTransform;
-  startTransform.setIdentity();
-  startTransform.setRotation(btQuaternion(1.0f, 1.0f, 1.0f, 0));
- 
-  //set the mass of the object. a mass of "0" means that it is an immovable object
-  btScalar mass = 0.0f;
-  btVector3 localInertia(0,0,0);
- 
-  startTransform.setOrigin(btVector3(20,100,0));
-  newRigidShape->calculateLocalInertia(mass, localInertia);
- 
-  //actually contruvc the body and add it to the dynamics world
-  btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
- 
-  btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, newRigidShape, localInertia);
-  btRigidBody *body = new btRigidBody(rbInfo);
-  body->setRestitution(1);
-  body->setUserPointer(newNode);
- 
-  mPhysics->getDynamicsWorld()->addRigidBody(body);
-}
-
 //-------------------------------------------------------------------------------------
 void BallApp::createScene(void)
 {
@@ -73,16 +46,17 @@ void BallApp::createScene(void)
   mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
   // Balls
+  /*
   Ogre::Entity* eBall = mSceneMgr->createEntity("Ball", "sphere.mesh");
   eBall->setMaterialName("Ogre/Eyes");
   eBall->setCastShadows(true);
-  Ogre::SceneNode* ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("BallNode", Ogre::Vector3(0,100,0));
+  Ogre::SceneNode* ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("BallNode");
   ballNode->attachObject(eBall);
 
-  createTransform(eBall, ballNode, mPhysics);
+  mPhysics->addRigidSphere(eBall, ballNode, 0.0f, 1.0f);
+  */
 
   // Environment
-
   Ogre::Plane lPlane(Ogre::Vector3::UNIT_X, 0);
   Ogre::Plane rPlane(Ogre::Vector3::NEGATIVE_UNIT_X, 0);
   Ogre::Plane bPlane(Ogre::Vector3::UNIT_Y, 0);
@@ -101,23 +75,8 @@ void BallApp::createScene(void)
   groundNode->attachObject(eGround);
 
   // Ground Physics
-  btScalar groundMass(0.1);
-  btVector3 localGroundInertia(0,0,0);
-  btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.0), btScalar(50.0), btScalar(50.0)));
-
-  btTransform groundTransform;
-  groundTransform.setIdentity();
-  groundTransform.setOrigin(btVector3(0, 0, 0));
-  btDefaultMotionState *groundMotionState = new btDefaultMotionState(groundTransform);
-
-  groundShape->calculateLocalInertia(groundMass, localGroundInertia);
-
-  btRigidBody::btRigidBodyConstructionInfo
-    groundRBInfo(groundMass, groundMotionState, groundShape, localGroundInertia);
-  btRigidBody *groundBody = new btRigidBody(groundRBInfo);
-
-  //add the body to the dynamics world
-  mPhysics->getDynamicsWorld()->addRigidBody(groundBody);
+  btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(1500.0), btScalar(0.0), btScalar(1500.0)));
+  mPhysics->addRigidBox(eGround, groundNode, 0.0f, 1.0f);
 
   // Physics Test
   Ogre::Entity *entity = mSceneMgr->createEntity("testCubeEnt", "cube.mesh");
@@ -125,32 +84,7 @@ void BallApp::createScene(void)
   newNode->attachObject(entity);
 
   // Create the new shape, and tell the physics that is a Box
-  btCollisionShape *newRigidShape = new btSphereShape(btScalar(50));
-
-  //  btCollisionShape *newRigidShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-  //  mPhysics->getCollisionShapes().push_back(newRigidShape);
-
-  // Set the initial position and transform. For this demo, we set the tranform to be none
-  btTransform startTransform;
-  startTransform.setIdentity();
-  startTransform.setRotation(btQuaternion(1.0f, 1.0f, 0.0f, 0));
-
-  // Set the mass of the object. a mass of "0" means that it is an immovable object
-  btScalar mass = 0.1f;
-  btVector3 localInertia(0,0,0);
-
-  startTransform.setOrigin(btVector3(0,300,0));
-  newRigidShape->calculateLocalInertia(mass, localInertia);
-
-  // Construct the body and add it to the dynamics world
-  btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
-
-  btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, newRigidShape, localInertia);
-  btRigidBody *body = new btRigidBody(rbInfo);
-  body->setRestitution(1);
-  body->setUserPointer(newNode);
-
-  mPhysics->getDynamicsWorld()->addRigidBody(body);
+  mPhysics->addRigidBox(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(0,300,0), new btQuaternion(1.0f, 1.0f, 0, 0));
   
   // Lights
   Ogre::Light* pLight = mSceneMgr->createLight( "PointLight" );
