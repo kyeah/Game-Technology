@@ -70,41 +70,51 @@ void BallApp::createScene(void)
   mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.05f, 0));
   mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
-  // Balls
-  /*
-  Ogre::Entity* eBall = mSceneMgr->createEntity("Ball", "sphere.mesh");
-  eBall->setMaterialName("Ogre/Eyes");
-  eBall->setCastShadows(true);
-  Ogre::SceneNode* ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("BallNode");
-  ballNode->attachObject(eBall);
+  // Boxed Environment
+  Ogre::Plane planes[] = {
+    Ogre::Plane(Ogre::Vector3::UNIT_X, 0),
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_X, 0),
+    Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0),
+    Ogre::Plane(Ogre::Vector3::UNIT_Z, 0),
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0)
+  };
 
-  mPhysics->addRigidSphere(eBall, ballNode, 0.0f, 1.0f);
-  */
+  std::string pNames[] = {
+    "leftWall", "rightWall", "ground", "ceiling", "farWall", "nearWall"
+  };
 
-  // Environment
-  Ogre::Plane lPlane(Ogre::Vector3::UNIT_X, 0);
-  Ogre::Plane rPlane(Ogre::Vector3::NEGATIVE_UNIT_X, 0);
-  Ogre::Plane bPlane(Ogre::Vector3::UNIT_Y, 0);
-  Ogre::Plane tPlane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0);
-  Ogre::Plane farPlane(Ogre::Vector3::UNIT_Z, 0);
-  Ogre::Plane nearPlane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0);
+  Ogre::Vector3 up[] = {
+    Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Y, 
+    Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Z, 
+    Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_X
+  };
 
-  Ogre::MeshManager::getSingleton().createPlane("ground",
-                                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                bPlane, 1500, 1500, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+  for (int i = 0; i < 6; i++) {
+    Ogre::MeshManager::getSingleton().createPlane(pNames[i],
+                                                  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                  planes[i], 1500, 1500, 20, 20, true, 1, 5, 5, up[i]);
 
-  Ogre::Entity* eGround = mSceneMgr->createEntity("Ground", "ground");
-  eGround->setMaterialName("Examples/Rockwall");
-  eGround->setCastShadows(false);
-  Ogre::SceneNode* groundNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("GroundNode");
-  groundNode->attachObject(eGround);
-
-  // Ground Physics
-  btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(1500.0), btScalar(0.0), btScalar(1500.0)));
-  mPhysics->addRigidBox(eGround, groundNode, 0.0f, 0.3f);
-
-  // Physics Test
-  createBox("testCubeEnt", "testNode", 0, 300, 0);
+    Ogre::Entity* entity = mSceneMgr->createEntity(pNames[i], pNames[i]);
+    if (pNames[i] == "ground") {
+      entity->setMaterialName("Examples/Rockwall");
+    }
+    entity->setCastShadows(false);
+    
+    Ogre::SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode(pNames[i]);
+    node->attachObject(entity);
+    
+    btVector3 pos[] = {
+      btVector3(-750,0,0),
+      btVector3(750,0,0),
+      btVector3(0,-750,0),
+      btVector3(0,750,0),
+      btVector3(0,0,-750),
+      btVector3(0,0,750),
+    };
+    
+    mPhysics->addRigidBox(entity, node, 0.0f, 0.3f, btVector3(0,0,0), pos[i]);  
+  }
   
   // Lights
   Ogre::Light* pLight = mSceneMgr->createLight( "PointLight" );
