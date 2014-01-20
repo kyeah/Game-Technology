@@ -18,6 +18,7 @@ This source file is part of the
 #define __BallApp_h_
 
 #include "BaseApplication.h"
+#include "Physics.h"
 
 class BallApp : public BaseApplication
 {
@@ -29,11 +30,15 @@ public:
     Ogre::Timer * getTimer(void) { return mTimer; }
     OIS::Mouse * getMouse(void) { return mMouse; }
     OIS::Keyboard * getKeyboard(void) { return mKeyboard; }
+
+    bool frameStarted(const Ogre::FrameEvent &evt);
 protected:
     virtual void createScene(void);
     void createCamera(void);
+
     Ogre::Timer *mTimer;
-    Ogre::Plane walls[4];
+    //    Ogre::Plane walls[4];
+    Physics *mPhysics;
 };
 
 #endif // #ifndef __BallApp_h_

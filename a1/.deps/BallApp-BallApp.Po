@@ -988,7 +988,7 @@ BallApp-BallApp.o: BallApp.cpp /usr/include/stdc-predef.h \
  /usr/local/include/OGRE/OgreBorderPanelOverlayElement.h \
  /usr/local/include/OGRE/OgrePanelOverlayElement.h \
  /usr/local/include/OGRE/OgreTextAreaOverlayElement.h \
- /usr/local/include/OGRE/SdkCameraMan.h
+ /usr/local/include/OGRE/SdkCameraMan.h Physics.h
 
 /usr/include/stdc-predef.h:
 
@@ -3169,3 +3169,5 @@ BaseApplication.h:
 /usr/local/include/OGRE/OgreTextAreaOverlayElement.h:
 
 /usr/local/include/OGRE/SdkCameraMan.h:
+
+Physics.h:

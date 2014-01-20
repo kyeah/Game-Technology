@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS= -I m4
-noinst_HEADERS= BaseApplication.h BallApp.h
+noinst_HEADERS= BaseApplication.h BallApp.h Physics.h
 
 bin_PROGRAMS= BallApp
 BallApp_CPPFLAGS= -I$(top_srcdir) -I/usr/local/include/bullet
