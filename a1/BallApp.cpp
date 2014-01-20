@@ -25,7 +25,7 @@
 //-------------------------------------------------------------------------------------
 BallApp::BallApp(void)
 {
-  mPhysics = new Physics();
+  mPhysics = new Physics(btVector3(0,-490,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
 }
@@ -37,6 +37,31 @@ BallApp::~BallApp(void)
 void BallApp::createCamera(void) {
   BaseApplication::createCamera();
   mCamera->setPosition(0,100,900);
+}
+
+void BallApp::createBox(std::string entName, std::string nodeName, int x, int y, int z) {
+  Ogre::Entity *entity = mSceneMgr->createEntity(entName, "sphere.mesh");
+  entity->setCastShadows(true);
+  
+  Ogre::SceneNode *newNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(nodeName);
+  newNode->attachObject(entity);
+
+  mPhysics->addRigidSphere(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(x,y,z), new btQuaternion(1.0f, 1.0f, 0, 0))->setLinearVelocity(btVector3(rand() % 120 - 60, 500, rand() % 80 - 40));
+}
+
+bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+  static int boxID;
+  
+  if(id == OIS::MB_Left) {
+    std::stringstream ss;
+    ss << "myBox" << boxID;
+    std::string ent = ss.str();
+    ss << "node";
+    createBox(ent, ss.str(), 20, 400, 0);
+    boxID++;
+  }
+  
+  return BaseApplication::mouseReleased(arg, id);
 }
 
 //-------------------------------------------------------------------------------------
@@ -76,15 +101,10 @@ void BallApp::createScene(void)
 
   // Ground Physics
   btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(1500.0), btScalar(0.0), btScalar(1500.0)));
-  mPhysics->addRigidBox(eGround, groundNode, 0.0f, 1.0f);
+  mPhysics->addRigidBox(eGround, groundNode, 0.0f, 0.3f);
 
   // Physics Test
-  Ogre::Entity *entity = mSceneMgr->createEntity("testCubeEnt", "cube.mesh");
-  Ogre::SceneNode *newNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("testNode");
-  newNode->attachObject(entity);
-
-  // Create the new shape, and tell the physics that is a Box
-  mPhysics->addRigidBox(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(0,300,0), new btQuaternion(1.0f, 1.0f, 0, 0));
+  createBox("testCubeEnt", "testNode", 0, 300, 0);
   
   // Lights
   Ogre::Light* pLight = mSceneMgr->createLight( "PointLight" );
@@ -135,6 +155,7 @@ bool BallApp::frameStarted(const Ogre::FrameEvent &evt) {
       }
     }
   }
+
   return result;
 }
 

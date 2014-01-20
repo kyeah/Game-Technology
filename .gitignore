@@ -2,5 +2,8 @@
 *#
 *.o
 *.log
-*autom4te.cache/
-*m4/
+a1/.deps/
+a1/autom4te.cache/
+a1/m4/
+a1/.
+a1/BallApp

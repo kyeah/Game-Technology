@@ -32,9 +32,12 @@ public:
     OIS::Keyboard * getKeyboard(void) { return mKeyboard; }
 
     bool frameStarted(const Ogre::FrameEvent &evt);
+
 protected:
     virtual void createScene(void);
     void createCamera(void);
+    void createBox(std::string entName, std::string nodeName, int x, int y, int z);
+    bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
