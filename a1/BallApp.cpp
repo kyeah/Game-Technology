@@ -63,14 +63,18 @@ bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
   } else if (id == OIS::MB_Right) {
     static int gravity = 0;
     btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
-    if (gravity == 0 || gravity == 2)
+    if (gravity == 0) {
       world->setGravity(btVector3(0,0,0));
-    else if (gravity == 1)
+      mDetailsPanel->setParamValue(3, "Off");
+    } else if (gravity == 1) {
       world->setGravity(btVector3(0,980,0));
-    else if (gravity == 3)
+      mDetailsPanel->setParamValue(3, "Upward");
+    } else if (gravity == 2) {
       world->setGravity(btVector3(0,-980,0));
+      mDetailsPanel->setParamValue(3, "Downward");
+    }
 
-    gravity = (gravity+1)%4;
+    gravity = (gravity+1)%3;
   }
   
   return BaseApplication::mouseReleased(arg, id);

@@ -119,7 +119,7 @@ void BaseApplication::createFrameListener(void)
 
     // create a params panel for displaying sample details
     Ogre::StringVector items;
-    items.push_back("cam.pX");
+    /*    items.push_back("cam.pX");
     items.push_back("cam.pY");
     items.push_back("cam.pZ");
     items.push_back("");
@@ -127,14 +127,17 @@ void BaseApplication::createFrameListener(void)
     items.push_back("cam.oX");
     items.push_back("cam.oY");
     items.push_back("cam.oZ");
-    items.push_back("");
+    items.push_back("");*/
     items.push_back("Filtering");
     items.push_back("Poly Mode");
+    items.push_back("");
+    items.push_back("Gravity");
 
     mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
-    mDetailsPanel->setParamValue(9, "Bilinear");
-    mDetailsPanel->setParamValue(10, "Solid");
-    mDetailsPanel->hide();
+    mDetailsPanel->setParamValue(0, "Bilinear");
+    mDetailsPanel->setParamValue(1, "Solid");
+    mDetailsPanel->setParamValue(3, "Downward");
+    //    mDetailsPanel->hide();
 
     mRoot->addFrameListener(this);
 }
@@ -269,13 +272,13 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         mCameraMan->frameRenderingQueued(evt);   // if dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())   // if details panel is visible, then update its contents
         {
-            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));
+          /*            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
             mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
             mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
             mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
             mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
-            mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
+            mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));*/
         }
     }
 
