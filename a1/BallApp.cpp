@@ -25,7 +25,7 @@
 //-------------------------------------------------------------------------------------
 BallApp::BallApp(void)
 {
-  mPhysics = new Physics(btVector3(0,-490,0));
+  mPhysics = new Physics(btVector3(0,-980,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
 }
@@ -36,7 +36,8 @@ BallApp::~BallApp(void)
 
 void BallApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(0,100,900);
+  mCamera->setPosition(3500,-700,-3500);
+  mCamera->lookAt(-500,-350,500);
 }
 
 void BallApp::createBox(std::string entName, std::string nodeName, int x, int y, int z) {
@@ -57,8 +58,19 @@ bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
     ss << "myBox" << boxID;
     std::string ent = ss.str();
     ss << "node";
-    createBox(ent, ss.str(), 20, 400, 0);
+    createBox(ent, ss.str(), -500, -300, 500);
     boxID++;
+  } else if (id == OIS::MB_Right) {
+    static int gravity = 0;
+    btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
+    if (gravity == 0 || gravity == 2)
+      world->setGravity(btVector3(0,0,0));
+    else if (gravity == 1)
+      world->setGravity(btVector3(0,980,0));
+    else if (gravity == 3)
+      world->setGravity(btVector3(0,-980,0));
+
+    gravity = (gravity+1)%4;
   }
   
   return BaseApplication::mouseReleased(arg, id);
@@ -89,11 +101,24 @@ void BallApp::createScene(void)
     Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Z, 
     Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_X
   };
+  
+  int l,w,h;
+  l = w = h = 3000;
+  
+  btVector3 pos[] = {
+    btVector3(-w/2,0,0),
+    btVector3(w/2,0,0),
+    btVector3(0,-h/2,0),
+    btVector3(0,h/2,0),
+    btVector3(0,0,-l/2),
+    btVector3(0,0,l/2),
+  };
+    
 
   for (int i = 0; i < 6; i++) {
     Ogre::MeshManager::getSingleton().createPlane(pNames[i],
                                                   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                  planes[i], 1500, 1500, 20, 20, true, 1, 5, 5, up[i]);
+                                                  planes[i], l, w, 20, 20, true, 1, 5, 5, up[i]);
 
     Ogre::Entity* entity = mSceneMgr->createEntity(pNames[i], pNames[i]);
     if (pNames[i] == "ground") {
@@ -103,17 +128,8 @@ void BallApp::createScene(void)
     
     Ogre::SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode(pNames[i]);
     node->attachObject(entity);
-    
-    btVector3 pos[] = {
-      btVector3(-750,0,0),
-      btVector3(750,0,0),
-      btVector3(0,-750,0),
-      btVector3(0,750,0),
-      btVector3(0,0,-750),
-      btVector3(0,0,750),
-    };
-    
-    mPhysics->addRigidBox(entity, node, 0.0f, 0.3f, btVector3(0,0,0), pos[i]);  
+
+    mPhysics->addRigidBox(entity, node, 0.0f, 0.95f, btVector3(0,0,0), pos[i]);  
   }
   
   // Lights
