@@ -25,7 +25,7 @@
 //-------------------------------------------------------------------------------------
 BallApp::BallApp(void)
 {
-  mPhysics = new Physics(btVector3(0,-980,0));
+  mPhysics = new Physics(btVector3(0,0,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
 }
@@ -40,28 +40,44 @@ void BallApp::createCamera(void) {
   mCamera->lookAt(-500,-350,500);
 }
 
-void BallApp::createBox(std::string entName, std::string nodeName, int x, int y, int z) {
+void BallApp::createBox(int x, int y, int z, int vx, int vy, int vz) {
+  static int boxID;
+  
+  std::stringstream ss;
+  ss << "myBox" << boxID;
+  std::string ent = ss.str();
+  ss << "node";
+  boxID++;
+  
+  createBox(ent, ss.str(), x, y, z, vx, vy, vz);
+}
+
+void BallApp::createBox(std::string entName, std::string nodeName, 
+                        int x, int y, int z,
+                        int vx, int vy, int vz) {
+  
   Ogre::Entity *entity = mSceneMgr->createEntity(entName, "sphere.mesh");
   entity->setCastShadows(true);
   
   Ogre::SceneNode *newNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(nodeName);
   newNode->attachObject(entity);
 
-  mPhysics->addRigidSphere(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(x,y,z), new btQuaternion(1.0f, 1.0f, 0, 0))->setLinearVelocity(btVector3(rand() % 120 - 60, 500, rand() % 80 - 40));
+  mPhysics->addRigidSphere(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(x,y,z), new btQuaternion(1.0f, 1.0f, 0, 0))->setLinearVelocity(btVector3(vx, vy, vz));
+
+  /* Change Entity Color
+  entity->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0)->setAmbient(0,1,0);
+  entity->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0)->setDiffuse(0,1,0,0);
+  entity->setMaterialName(entity->getSubEntity(0)->getMaterial()->getName());*/
 }
 
 bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-  static int boxID;
-  
-  if(id == OIS::MB_Left) {
-    std::stringstream ss;
-    ss << "myBox" << boxID;
-    std::string ent = ss.str();
-    ss << "node";
-    createBox(ent, ss.str(), -500, -300, 500);
-    boxID++;
+  if(id == OIS::MB_Left) { 
+   
+    createBox(-500, -300, 500,
+              rand() % 120 - 60, 500, rand() % 80 - 40);
+
   } else if (id == OIS::MB_Right) {
-    static int gravity = 0;
+    static int gravity = 1;
     btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
     if (gravity == 0) {
       world->setGravity(btVector3(0,0,0));
@@ -151,13 +167,17 @@ void BallApp::createScene(void)
 
   Ogre::Light* sLight = mSceneMgr->createLight("SpotLight");
   sLight->setType(Ogre::Light::LT_SPOTLIGHT);
-  sLight->setDiffuseColour(0, 0, 1.0);
-  sLight->setSpecularColour(0, 0, 1.0);
+  sLight->setDiffuseColour(0, 0, 1);
+  sLight->setSpecularColour(0, 0, 1);
 
   sLight->setDirection(-1, -1, 0);
   sLight->setPosition(Ogre::Vector3(0, 400, 200));
 
   sLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));
+
+  for (int i = 0; i < 30; i++)
+    createBox(-500, -300, 500,
+              rand() % 20 - 10, 20, rand() % 20 - 10);
 }
 
 bool BallApp::frameStarted(const Ogre::FrameEvent &evt) {
