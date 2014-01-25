@@ -40,19 +40,19 @@ void BallApp::createCamera(void) {
   mCamera->lookAt(-500,-350,500);
 }
 
-void BallApp::createBox(int x, int y, int z, int vx, int vy, int vz) {
-  static int boxID;
+void BallApp::createBall(int x, int y, int z, int vx, int vy, int vz) {
+  static int ballID;
   
   std::stringstream ss;
-  ss << "myBox" << boxID;
+  ss << "myBall" << ballID;
   std::string ent = ss.str();
   ss << "node";
-  boxID++;
+  ballID++;
   
-  createBox(ent, ss.str(), x, y, z, vx, vy, vz);
+  createBall(ent, ss.str(), x, y, z, vx, vy, vz);
 }
 
-void BallApp::createBox(std::string entName, std::string nodeName, 
+void BallApp::createBall(std::string entName, std::string nodeName, 
                         int x, int y, int z,
                         int vx, int vy, int vz) {
   
@@ -64,16 +64,18 @@ void BallApp::createBox(std::string entName, std::string nodeName,
 
   mPhysics->addRigidSphere(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(x,y,z), new btQuaternion(1.0f, 1.0f, 0, 0))->setLinearVelocity(btVector3(vx, vy, vz));
 
-  /* Change Entity Color
-  entity->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0)->setAmbient(0,1,0);
-  entity->getSubEntity(0)->getMaterial()->getTechnique(0)->getPass(0)->setDiffuse(0,1,0,0);
-  entity->setMaterialName(entity->getSubEntity(0)->getMaterial()->getName());*/
+  // Change Entity Color
+  Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
+  Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
+  pass->setDiffuse(0,1,0,0.1);
+  pass->setSpecular(1,1,1,0.4);
+  entity->setMaterialName(mat->getName());
 }
 
 bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(id == OIS::MB_Left) { 
    
-    createBox(-500, -300, 500,
+    createBall(-500, -300, 500,
               rand() % 120 - 60, 500, rand() % 80 - 40);
 
   } else if (id == OIS::MB_Right) {
@@ -175,8 +177,8 @@ void BallApp::createScene(void)
 
   sLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));
 
-  for (int i = 0; i < 30; i++)
-    createBox(-500, -300, 500,
+  for (int i = 0; i < 4; i++)
+    createBall(-500, -300, 500,
               rand() % 20 - 10, 20, rand() % 20 - 10);
 }
 

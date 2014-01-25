@@ -36,8 +36,8 @@ public:
 protected:
     virtual void createScene(void);
     void createCamera(void);
-    void createBox(int x, int y, int z, int vx, int vy, int vz);
-    void createBox(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
+    void createBall(int x, int y, int z, int vx, int vy, int vz);
+    void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     Ogre::Timer *mTimer;
