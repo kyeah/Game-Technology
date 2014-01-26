@@ -136,7 +136,7 @@ void BaseApplication::createFrameListener(void)
     mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
     mDetailsPanel->setParamValue(0, "Bilinear");
     mDetailsPanel->setParamValue(1, "Solid");
-    mDetailsPanel->setParamValue(3, "Downward");
+    mDetailsPanel->setParamValue(3, "Off");
     //    mDetailsPanel->hide();
 
     mRoot->addFrameListener(this);

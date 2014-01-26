@@ -179,7 +179,7 @@ void BallApp::createScene(void)
 
   for (int i = 0; i < 4; i++)
     createBall(-500, -300, 500,
-              rand() % 20 - 10, 20, rand() % 20 - 10);
+              rand() % 300 - 150, 300, rand() % 300 - 150);
 }
 
 bool BallApp::frameStarted(const Ogre::FrameEvent &evt) {
