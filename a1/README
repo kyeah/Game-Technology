@@ -1,0 +1,8 @@
+CS354R - Assignment 1 (Ball Room)
+=================================
+
+BUILDING
+=================================
+1. Edit plugins.cfg so that the correct PluginsFolder variable is used.
+2. Edit Makefile.am and make sure BallApp_CPPFLAGS is pointing to your bullet installation folder.
+3. If building on OGRE 1.7, ensure that ogre.cfg does not exist or that the Fixed_Pipeline setting is removed before running the BallApp executable.

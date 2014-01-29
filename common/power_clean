@@ -1,0 +1,1 @@
+rm -r aclocal.m4 autom4te.cache/ *.o config.guess config.h.in config.log config.status config.sub depcomp install-sh libtool ltmain.sh m4/ Makefile Makefile.in missing Ogre.log stamp-h1 .deps/ .libs/ configure
