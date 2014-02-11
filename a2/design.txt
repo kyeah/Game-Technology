@@ -1,19 +1,18 @@
-Alyssa Sallean, Kevin Yeh, Patrick Greyson
+Alyssa Sallean, Kevin Yeh, Patrick Grayson
 
 Game Layout:
-	- Game will be like wall ball
-	- scoring rules: consecutive hits will be one point and if you miss score goes back to zero
-	- GUI control: mouse clicks (right and left) for swinging right and left and asdw for movement around the court. It will look like the room from assignment one, with the walls looking like a raquetball court (pics from gregory?). There will be a dude with a racket (the dude himself may not be an actual dude). 
-	- whooshing sound for ball moving, bonk sound for ball hitting something?
-	- speed up the ball as your points increase (ie, making it harder as you go) 
-	- special spaces that give you more points when you hit them
-    
+	- Game will be like wall ball/arcade racquetball
+	- Scoring rules: consecutive hits will be one point; missing the wall will reset the score to 0.
+	- GUI control: mouse clicks (right and left) for swinging right and left and wasd for movement around the court. It will look like the room from assignment one, with the walls looking like a raquetball court (pics from gregory?). There will be a dude with a flat racket (the dude himself may not be an actual dude). 
+	- Whooshing sound for ball moving, bonk sound for ball collisions
+	- Start with basic physics, and speed up the ball as your points increase (ie, making it harder as you go) 
+	- Special spaces give you more points when you hit them
+
 Software Architecture Plan:
-	The software architecture will be similar to that in assignment 1.  We will use the sample BaseApplication.h and .cpp files along with necessary Bullet files.  The bulk of the application itself will be contained in a single .cpp file.  The game loop will be part of the simulation loop.  Our object structure will also be similar to assignment 1, with a single ball bouncing around a room composed of planes.
-The only addition will be a user-controlled, racquet-weilding character.  Bullet will be used to check for collisions between the ball and any part of the user character or racquet.
+	The software architecture will be similar to that in assignment 1.  We will use the sample BaseApplication.h and .cpp files along with necessary Bullet helper files.  The bulk of the application itself will be contained in a single .cpp file.  The game loop will be part of the simulation loop.  Our object structure will also be similar to assignment 1, with a single ball bouncing around a room composed of planes. 
+	The only addition will be a user-controlled, racquet-wielding character.  Bullet will be used to check for collisions between the ball and any part of the user character or racquet. SDL will be used as a sound system.
 
 Division of Labor:
-	- Kevin Yeh: Bullet collision detection between ball and racket and walls
+	- Kevin Yeh: Bullet collision detection between ball, racket and walls
    	- Alyssa Sallean:  look, texturing, sound effects, keyboard input
 	- Patrick Grayson: heads-up-display and scoring system
-
