@@ -1,0 +1,14 @@
+verall design of your game. What are the scoring rules? How will it look (this may be pretty simple). What will the GUI control do and look like. What is your plan for sound (again, probably simple). Other aspects of the game play. Note that even if you're just going to emulate an existing game like handball, squash, or raquetball, these have different rules, use balls with different masses and restitution coefficients, and different striking implements. Specify all this. If you want to get fancy and add obstacles, or goals, or other things to customize your game, specify. There is a bigger design space here than may appear at first glance.
+
+- Game will be like raquetball
+- scoring rules: consecutive hits will be one point and if you miss score goes back to zero
+- GUI control: mouse clicks (right and left) for swinging right and left and asdw for movement around the court. It will look like the room from assignment one, with the walls looking like a raquetball court (pics from gregory?). There will be a dude with a racket (the dude himself may not be an actual dude). 
+- whooshing sound for ball moving, bonk sound for ball hitting something?
+- Questions: 
+	+ does ball speed up as your points increase (ie, making it harder as you go) or does it speed up based off of actual physics?
+	+ should we even call it raquetball? If its just like ball-hit-wall for as long as you can we may have more flexibility to be creative if we don't call it raquetball
+
+Software architecture and plan. At a high level, what does your software architecture look like? What is the game loop, part of the rendering loop, part of the simulation loop, separate? What object structure do you contemplate building? How will you keep track of game state? Relatively speaking, how much work do you estimate there will be to incorporate each of the various required capabilities. Can this be done by the deadline? If not, can you scale back to meet the deadline? When will you know?
+
+Division of labor. Specifically, in terms of the delivered capabilities and the architecture you contemplate, who is responsible for which parts of the code? What are the interfaces that will be used to allow people to effectively work in parallel on these parts?
+
