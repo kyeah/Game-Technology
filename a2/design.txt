@@ -1,21 +1,18 @@
-Overall design of your game. What are the scoring rules? How will it look (this may be pretty simple). What will the GUI control do and look like. What is your plan for sound (again, probably simple). Other aspects of the game play. Note that even if you're just going to emulate an existing game like handball, squash, or raquetball, these have different rules, use balls with different masses and restitution coefficients, and different striking implements. Specify all this. If you want to get fancy and add obstacles, or goals, or other things to customize your game, specify. There is a bigger design space here than may appear at first glance.
+Alyssa Sallean, Kevin Yeh, Patrick Grayson
 
-- Game will be like raquetball
-- scoring rules: consecutive hits will be one point and if you miss score goes back to zero
-- GUI control: mouse clicks (right and left) for swinging right and left and asdw for movement around the court. It will look like the room from assignment one, with the walls looking like a raquetball court (pics from gregory?). There will be a dude with a racket (the dude himself may not be an actual dude). 
-- whooshing sound for ball moving, bonk sound for ball hitting something?
-- Questions: 
-	+ does ball speed up as your points increase (ie, making it harder as you go) or does it speed up based off of actual physics?
-	+ should we even call it raquetball? If its just like ball-hit-wall for as long as you can we may have more flexibility to be creative if we don't call it raquetball
+Game Layout:
+	- Game will be like wall ball/arcade racquetball
+	- Scoring rules: consecutive hits will be one point; missing the wall will reset the score to 0.
+	- GUI control: mouse clicks (right and left) for swinging right and left and wasd for movement around the court. It will look like the room from assignment one, with the walls looking like a raquetball court (pics from gregory?). There will be a dude with a flat racket (the dude himself may not be an actual dude). 
+	- Whooshing sound for ball moving, bonk sound for ball collisions
+	- Start with basic physics, and speed up the ball as your points increase (ie, making it harder as you go) 
+	- Special spaces give you more points when you hit them
 
-Software architecture and plan. At a high level, what does your software architecture look like? What is the game loop, part of the rendering loop, part of the simulation loop, separate? What object structure do you contemplate building? How will you keep track of game state? Relatively speaking, how much work do you estimate there will be to incorporate each of the various required capabilities. Can this be done by the deadline? If not, can you scale back to meet the deadline? When will you know?
-    
-    The software architecture will be similar to that in assignment 1.  We will use the sample BaseApplication.h and .cpp files along with necessary Bullet files.  The bulk of the application itself will be contained in a single .cpp file.  The game loop will be part of the simulation loop.  Our object structure will also be similar to assignment 1, with a single ball bouncing around a room composed of planes.
-The only addition will be a user-controlled, racquet-weilding character.  Bullet will be used to check for collisions between the ball and any part of the user character or racquet.
+Software Architecture Plan:
+	The software architecture will be similar to that in assignment 1.  We will use the sample BaseApplication.h and .cpp files along with necessary Bullet helper files.  The bulk of the application itself will be contained in a single .cpp file.  The game loop will be part of the simulation loop.  Our object structure will also be similar to assignment 1, with a single ball bouncing around a room composed of planes. 
+	The only addition will be a user-controlled, racquet-wielding character.  Bullet will be used to check for collisions between the ball and any part of the user character or racquet. SDL will be used as a sound system.
 
-
-
-Division of labor. Specifically, in terms of the delivered capabilities and the architecture you contemplate, who is responsible for which parts of the code? What are the interfaces that will be used to allow people to effectively work in parallel on these parts?
-
-    Kevin Yeh will work on the Bullet collision detection between the ball and the character, since he used Bullet for the previous assignment and is most familiar with it.  Alyssa Sallean will work on lighting for the scene.  Patrick Grayson will work on the game's HUD and scoring system.
-
+Division of Labor:
+	- Kevin Yeh: Bullet collision detection between ball, racket and walls
+   	- Alyssa Sallean:  look, texturing, sound effects, keyboard input
+	- Patrick Grayson: heads-up-display and scoring system
