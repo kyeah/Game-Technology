@@ -16,3 +16,7 @@ Division of Labor:
 	- Kevin Yeh: Bullet collision detection between ball, racket and walls
    	- Alyssa Sallean:  look, texturing, sound effects, keyboard input
 	- Patrick Grayson: heads-up-display and scoring system
+
+Design Clarifications:
+       - The camera can either be a static shot encompassing the entirety of the world, or an over-the-shoulder camera angle.
+       - Our implementation of the bullet physics engine and SDL sound engine will be abstracted away into a Simulator class and a base GameObject class. This GameObject class will be extended as necessary to provide unique properties for different shapes/meshes, textures, weights, restitutions, and sound effects. We may have a separate class for game logic, such as updating scores and reacting to user inputs. Our main class will delegate tasks to other classes, e.g. calling the game and simulation loops. The game loop will rely on collision detection and respond with appropriate actions.
