@@ -67,3 +67,7 @@ btRigidBody* Physics::addRigidBody(Ogre::Entity* entity, Ogre::SceneNode* node, 
   getDynamicsWorld()->addRigidBody(body);
   return body;
 }
+
+void Physics::addBody(btRigidBody *body) {
+  getDynamicsWorld()->addRigidBody(body);
+}

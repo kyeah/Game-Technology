@@ -19,6 +19,7 @@ This source file is part of the
 
 #include "BaseApplication.h"
 #include "Physics.h"
+#include "RacquetObject.h"
 
 class RacquetApp : public BaseApplication
 {
@@ -39,11 +40,13 @@ protected:
     void createRacquet(std::string, std::string, int, int, int);
     void createBall(int x, int y, int z, int vx, int vy, int vz);
     void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
+    bool keyPressed( const OIS::KeyEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
+    Racquet *mRacquet;
 };
 
 #endif // #ifndef __RacquetApp_h_

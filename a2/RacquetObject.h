@@ -1,3 +1,5 @@
+#ifndef __RACQUETOBJECT_H__
+#define __RACQUETOBJECT_H__
 #include "GameObject.h"
 
 class Ball : GameObject {
@@ -26,4 +28,7 @@ class Racquet : GameObject {
           btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), 
           btScalar mass=0.0f, btScalar rest=0.95f, 
           btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
+
+  void move();
 };
+#endif

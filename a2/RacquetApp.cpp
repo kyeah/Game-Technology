@@ -41,6 +41,14 @@ void RacquetApp::createCamera(void) {
   mCamera->lookAt(-500,-350,500);
 }
 
+bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
+  if (arg.key == OIS::KC_Y) {
+    mRacquet->move();
+  }
+ 
+  return BaseApplication::keyPressed(arg);
+}
+
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(id == OIS::MB_Left) { 
    
@@ -146,13 +154,15 @@ void RacquetApp::createScene(void)
 
   sLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));
 
-  new Racquet(mSceneMgr, 0, mPhysics,
+  mRacquet = new Racquet(mSceneMgr, 0, mPhysics,
               btVector3(100, 100, 50));
-
+  
+  /*
   for (int i = 0; i < 4; i++)
     new Ball(mSceneMgr, 0, mPhysics,
              btVector3(-500, -300, 500),
              btVector3(rand() % 800 - 400, rand() % 800 - 400, rand() % 800 - 400));
+*/
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {

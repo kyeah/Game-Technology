@@ -33,11 +33,15 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
   node = parentNode->createChildSceneNode(_nodeName);
   node->attachObject(entity);
   
+  node->setPosition(Ogre::Vector3(origin[0], origin[1], origin[2]));
+  if (rotation)
+    node->setOrientation(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
+
   // Change Entity Color
   //  setColor(0,1,0,0.1,  1,1,1,0.4);
 
   Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
   collisionShape = new btSphereShape(s[0]);
-  body = addToSimulator(origin, rotation);
+  addToSimulator(origin, rotation);
   body->setLinearVelocity(velocity);
 }
