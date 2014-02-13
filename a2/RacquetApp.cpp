@@ -15,7 +15,8 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
-#include "BallApp.h"
+#include "RacquetApp.h"
+#include "RacquetObject.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <macUtils.h>
@@ -23,80 +24,29 @@
 #endif
 
 //-------------------------------------------------------------------------------------
-BallApp::BallApp(void)
+RacquetApp::RacquetApp(void)
 {
   mPhysics = new Physics(btVector3(0,0,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
 }
 //-------------------------------------------------------------------------------------
-BallApp::~BallApp(void)
+RacquetApp::~RacquetApp(void)
 {
 }
 
-void BallApp::createCamera(void) {
+void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
   mCamera->setPosition(3500,-700,-3500);
   mCamera->lookAt(-500,-350,500);
 }
 
-void BallApp::createBall(int x, int y, int z, int vx, int vy, int vz) {
-  static int ballID;
-  
-  std::stringstream ss;
-  ss << "myBall" << ballID;
-  std::string ent = ss.str();
-  ss << "node";
-  ballID++;
-  
-  createBall(ent, ss.str(), x, y, z, vx, vy, vz);
-}
-
-void BallApp::createRacquet(std::string entName, std::string nodeName, int x, int y, int z){
-    Ogre::Entity *entity = mSceneMgr->createEntity(entName, "sphere.mesh");
-    entity->setCastShadows(true);
-  
-    Ogre::SceneNode *newNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(nodeName);
-    newNode->attachObject(entity);
-
-    newNode->scale(.5, 3, 3);
-
-    mPhysics->addRigidSphere(entity, newNode, 0.0f, 0.95f, btVector3(0,0,0), btVector3(x,y,z));
-
-    // Change Entity Color
-    Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
-    Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
-    pass->setDiffuse(0,1,0,0.1);
-    pass->setSpecular(.5,1,1,0.4);
-    entity->setMaterialName(mat->getName());
-
-}
-
-void BallApp::createBall(std::string entName, std::string nodeName, 
-                        int x, int y, int z,
-                        int vx, int vy, int vz) {
-  
-  Ogre::Entity *entity = mSceneMgr->createEntity(entName, "sphere.mesh");
-  entity->setCastShadows(true);
-  
-  Ogre::SceneNode *newNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(nodeName);
-  newNode->attachObject(entity);
-
-  mPhysics->addRigidSphere(entity, newNode, 0.1f, 1.0f, btVector3(0,0,0), btVector3(x,y,z), new btQuaternion(1.0f, 1.0f, 0, 0))->setLinearVelocity(btVector3(vx, vy, vz));
-
-  // Change Entity Color
-  Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
-  Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
-  pass->setDiffuse(0,1,0,0.1);
-  pass->setSpecular(1,1,1,0.4);
-  entity->setMaterialName(mat->getName());
-}
-
-bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(id == OIS::MB_Left) { 
    
-    createBall(-500, -300, 500,
-              rand() % 120 - 60, 500, rand() % 80 - 40);
+    new Ball(mSceneMgr, 0, mPhysics, 
+             btVector3(-500,-300,500), 
+             btVector3( rand() % 120 - 60, 500, rand() % 80 - 40));
 
   } else if (id == OIS::MB_Right) {
     static int gravity = 1;
@@ -119,7 +69,7 @@ bool BallApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 }
 
 //-------------------------------------------------------------------------------------
-void BallApp::createScene(void)
+void RacquetApp::createScene(void)
 {
   mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.05f, 0));
   mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
@@ -155,10 +105,7 @@ void BallApp::createScene(void)
     btVector3(0,0,-l/2),
     btVector3(0,0,l/2),
   };
-  
-
-  
-
+ 
   for (int i = 0; i < 6; i++) {
     Ogre::MeshManager::getSingleton().createPlane(pNames[i],
                                                   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -199,37 +146,23 @@ void BallApp::createScene(void)
 
   sLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));
 
-  createRacquet("racqEntity", "racqNode", 100, 100, 50);
+  new Racquet(mSceneMgr, 0, mPhysics,
+              btVector3(100, 100, 50));
 
   for (int i = 0; i < 4; i++)
-    createBall(-500, -300, 500,
-               rand() % 800 - 400, rand() % 800 - 400, rand() % 800 - 400);
+    new Ball(mSceneMgr, 0, mPhysics,
+             btVector3(-500, -300, 500),
+             btVector3(rand() % 800 - 400, rand() % 800 - 400, rand() % 800 - 400));
 }
 
-bool BallApp::frameStarted(const Ogre::FrameEvent &evt) {
+bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   bool result = BaseApplication::frameStarted(evt);
-  if (mPhysics != NULL) {
-    btDiscreteDynamicsWorld* world = mPhysics->getDynamicsWorld();
-    world->stepSimulation(1.0f/60.0f);
+  static Ogre::Real time = mRoot->getTimer()->getMilliseconds();
 
-    btAlignedObjectArray<btCollisionObject*> objs = world->getCollisionObjectArray();
-    for (int i = 0; i < objs.size(); i++) {
-      btCollisionObject *obj = objs[i];
-      btRigidBody *body = btRigidBody::upcast(obj);
-      
-      if (body && body->getMotionState()) {
-        btTransform trans;
-        body->getMotionState()->getWorldTransform(trans);
-        
-        void *userPointer = body->getUserPointer();
-        if (userPointer) {
-          btQuaternion orientation = trans.getRotation();
-          Ogre::SceneNode *sceneNode = static_cast<Ogre::SceneNode *>(userPointer);
-          sceneNode->setPosition(Ogre::Vector3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ()));
-          sceneNode->setOrientation(Ogre::Quaternion(orientation.getW(), orientation.getX(), orientation.getY(), orientation.getZ()));
-        }
-      }
-    }
+  Ogre::Real elapsedTime = mRoot->getTimer()->getMilliseconds() - time;
+  time = mRoot->getTimer()->getMilliseconds();  
+  if (mPhysics != NULL) {
+    mPhysics->stepSimulation(elapsedTime);
   }
 
   return result;
@@ -267,7 +200,7 @@ extern "C" {
     return retVal;
 #else
     // Create application object
-    BallApp app;
+    RacquetApp app;
 
     try {
       app.go();

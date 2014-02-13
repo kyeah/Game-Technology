@@ -14,17 +14,17 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
-#ifndef __BallApp_h_
-#define __BallApp_h_
+#ifndef __RacquetApp_h_
+#define __RacquetApp_h_
 
 #include "BaseApplication.h"
 #include "Physics.h"
 
-class BallApp : public BaseApplication
+class RacquetApp : public BaseApplication
 {
 public:
-    BallApp(void);
-    virtual ~BallApp(void);
+    RacquetApp(void);
+    virtual ~RacquetApp(void);
 
     Ogre::RenderWindow * getWindow(void) { return mWindow; }
     Ogre::Timer * getTimer(void) { return mTimer; }
@@ -46,4 +46,4 @@ protected:
     Physics *mPhysics;
 };
 
-#endif // #ifndef __BallApp_h_
+#endif // #ifndef __RacquetApp_h_
