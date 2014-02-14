@@ -20,7 +20,7 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
                  Physics* _physics,
                  btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest, 
                  btVector3 _localInertia, btQuaternion *rotation) 
-  : GameObject(_entName, _nodeName, parentNode, _physics, origin, velocity, _mass, _rest, _localInertia, rotation)
+  : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, velocity, _mass, _rest, _localInertia, rotation)
 {
 
   if (!parentNode) {
@@ -30,27 +30,16 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
   entity = mgr->createEntity(_entName, "sphere.mesh");
   entity->setCastShadows(true);
   
-  node = parentNode->createChildSceneNode(_nodeName);
   node->attachObject(entity);
-
-  // Segfaulting on node change
-  node->setPosition(Ogre::Vector3(origin[0], origin[1], origin[2]));
-  if (rotation)
-    node->setOrientation(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
-  
   node->scale(.5,3,3);
 
   // Change Entity Color
   // setColor(0,1,0,0.1,  0.5,1,1,0.4);
 
-  Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
+  node->_update(true,true);
+  node->_updateBounds();
+  Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
   collisionShape = new btBoxShape( btVector3(s[0],s[1],s[2]) );
-  addToSimulator(origin, rotation);
+  addToSimulator();
   body->setLinearVelocity(velocity);
-}
-
-void Racquet::move() {
-  //  node->setPosition(Ogre::Vector3(50, 50, 50));
-  //btVector3 origin = trans.getOrigin();
-  //trans.setOrigin(btVector3(origin[0],origin[1]+2, origin[2]));
 }

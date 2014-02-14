@@ -3,8 +3,8 @@
 OgreMotionState::OgreMotionState ( Ogre::SceneNode * node )
 {
   mVisibleNode = node;
-  Ogre::Vector3 position = mVisibleNode -> _getDerivedPosition ( );
-  Ogre::Quaternion quaternion = mVisibleNode -> _getDerivedOrientation ( );
+  Ogre::Vector3 position = mVisibleNode -> getPosition();
+  Ogre::Quaternion quaternion = mVisibleNode -> getOrientation();
   mWorldTransform.setOrigin ( btVector3 ( position.x, position.y, position.z ) );
   mWorldTransform.setRotation ( btQuaternion ( quaternion.x, quaternion.y, quaternion.z, quaternion.w ) ); 
 }

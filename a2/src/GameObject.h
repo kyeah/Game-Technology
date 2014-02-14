@@ -11,17 +11,22 @@ class GameObject {
  public:
   GameObject() {}
 
-  GameObject(Ogre::String _entName, Ogre::String nodeName, Ogre::SceneNode* parentNode, Physics* physics,
+  GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String nodeName, Ogre::SceneNode* parentNode, 
+             Physics* physics,
              btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), btScalar mass=0.0f, 
              btScalar rest=0.0f, btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   void updateTransform();
-  void addToSimulator(btVector3 position, btQuaternion* orientation);
+  void addToSimulator();
 
   void setColor(float dr, float dg, float db, float da,
                 float sr, float sg, float sb, float sa);
 
   btRigidBody* getBody() { return body; }
+  void setPosition(btVector3 position);
+  void translate(btVector3 d);
+  void setOrientation(btQuaternion quaternion);
+  void rotate(btQuaternion q);
 
  protected:
   Ogre::String entName, nodeName;

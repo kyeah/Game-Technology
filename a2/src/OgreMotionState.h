@@ -16,7 +16,7 @@ class OgreMotionState : public btMotionState
   virtual void getWorldTransform ( btTransform & worldTrans ) const;
   virtual void setWorldTransform ( const btTransform & worldTrans );
 
- private:
+ protected:
   Ogre::SceneNode * mVisibleNode;
   btTransform mWorldTransform;
 };

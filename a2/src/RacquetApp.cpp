@@ -42,17 +42,13 @@ void RacquetApp::createCamera(void) {
 }
 
 bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
-  if (arg.key == OIS::KC_Y) {
-    mRacquet->move();
-  }
- 
   return BaseApplication::keyPressed(arg);
 }
 
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(id == OIS::MB_Left) { 
    
-    new Ball(mSceneMgr, 0, mPhysics, 
+    Ball *m = new Ball(mSceneMgr, 0, mPhysics, 
              btVector3(-500,-300,500), 
              btVector3( rand() % 120 - 60, 500, rand() % 80 - 40));
 
@@ -156,21 +152,20 @@ void RacquetApp::createScene(void)
 
   mRacquet = new Racquet(mSceneMgr, 0, mPhysics,
               btVector3(100, 100, 50));
-  
-  /*
+
   for (int i = 0; i < 4; i++)
     new Ball(mSceneMgr, 0, mPhysics,
              btVector3(-500, -300, 500),
              btVector3(rand() % 800 - 400, rand() % 800 - 400, rand() % 800 - 400));
-*/
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   bool result = BaseApplication::frameStarted(evt);
-  static Ogre::Real time = mRoot->getTimer()->getMilliseconds();
+  static Ogre::Real time = mTimer->getMilliseconds();
 
-  Ogre::Real elapsedTime = mRoot->getTimer()->getMilliseconds() - time;
-  time = mRoot->getTimer()->getMilliseconds();  
+  Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
+  time = mTimer->getMilliseconds();  
+
   if (mPhysics != NULL) {
     mPhysics->stepSimulation(elapsedTime);
   }

@@ -2,7 +2,7 @@
 #define __RACQUETOBJECT_H__
 #include "GameObject.h"
 
-class Ball : GameObject {
+class Ball : public GameObject {
  public:
   Ball(Ogre::SceneManager *mgr, Ogre::SceneNode* parentNode, Physics* physics,
        btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), 
@@ -16,7 +16,7 @@ class Ball : GameObject {
        btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 };
 
-class Racquet : GameObject {
+class Racquet : public GameObject {
  public:
   Racquet(Ogre::SceneManager *mgr, Ogre::SceneNode* parentNode, Physics* physics,
           btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), 
@@ -29,6 +29,5 @@ class Racquet : GameObject {
           btScalar mass=0.0f, btScalar rest=0.95f, 
           btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
-  void move();
 };
 #endif
