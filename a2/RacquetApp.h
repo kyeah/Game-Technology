@@ -19,6 +19,7 @@ This source file is part of the
 
 #include "BaseApplication.h"
 #include "Physics.h"
+#include "RacquetObject.h"
 
 class RacquetApp : public BaseApplication
 {
@@ -44,6 +45,7 @@ protected:
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
+    Racquet *mRacquet;
 };
 
 #endif // #ifndef __RacquetApp_h_
