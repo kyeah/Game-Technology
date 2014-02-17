@@ -13,6 +13,8 @@ class Ball : public GameObject {
        btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), 
        btScalar mass=0.1f, btScalar rest=1.0f, 
        btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
+
+  void update(float elapsedTime);
 };
 
 class Racquet : public GameObject {
@@ -28,4 +30,5 @@ class Racquet : public GameObject {
           btScalar mass=0.0f, btScalar rest=0.95f, 
           btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
+  void update(float elapsedTime);
 };

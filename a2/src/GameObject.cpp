@@ -1,4 +1,5 @@
 #include <OgreSubEntity.h>
+#include "Collisions.h"
 #include "GameObject.h"
 #include "OgreMotionState.h"
 
@@ -21,7 +22,6 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   
   transform.setIdentity();
   // Extend this class dude
-
 }
 
 void GameObject::setColor(float dr, float dg, float db, float da,
@@ -42,9 +42,8 @@ void GameObject::addToSimulator() {
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, collisionShape, inertia);
   body = new btRigidBody(rbInfo);
   body->setRestitution(rest);
-  body->setUserPointer(node);
-
-  physics->addBody(body);
+  body->setUserPointer(this);
+  physics->addObject(this);
   updateTransform();
 }
 

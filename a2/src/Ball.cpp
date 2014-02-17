@@ -35,4 +35,13 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
   collisionShape = new btSphereShape(s[0]);
   addToSimulator();
   body->setLinearVelocity(velocity);
+
+  cCallback = new BulletContactCallback(*body, contexts);
+}
+
+void Ball::update(float elapsedTime) {
+  if (physics->checkCollisions(this)) {
+    std::cout << "COLLISION" << std::endl;
+    //    translate(btVector3(1000,1000,1000));
+  }
 }

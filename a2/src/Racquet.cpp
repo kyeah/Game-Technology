@@ -42,4 +42,14 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
   collisionShape = new btBoxShape( btVector3(s[0],s[1],s[2]) );
   addToSimulator();
   body->setLinearVelocity(velocity);
+
+  cCallback = new BulletContactCallback(*body, contexts);
+}
+
+void Racquet::update(float elapsedTime) {
+  std::cout << "starting racquet update" << std::endl;
+  if (physics->checkCollisions(this)) {
+    std::cout << "COLLISION" << std::endl;
+    //    translate(btVector3(1000,1000,1000));
+  }
 }
