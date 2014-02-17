@@ -15,6 +15,8 @@ class Physics {
   std::vector<btCollisionShape *> collisionShapes;
   std::map<std::string, btRigidBody *> physicsAccessors;
 
+  static int simID;
+
  public:
   Physics( btVector3 gravity = btVector3(0,-98,0) );
 
