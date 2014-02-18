@@ -1,4 +1,9 @@
 #include "Physics.h"
+#include "GameObject.h"
+#include "RacquetObject.h"
+#include "OgreMotionState.h"
+
+int Physics::simID = 0;
 
 Physics::Physics( btVector3 gravity ) {
   collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -11,33 +16,43 @@ Physics::Physics( btVector3 gravity ) {
 
 void Physics::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, const Ogre::Real fixedTimeStep) {
   dynamicsWorld->stepSimulation(elapsedTime, maxSubSteps, fixedTimeStep);
-  
-  btAlignedObjectArray<btCollisionObject*> objs = dynamicsWorld->getCollisionObjectArray();
-  for (int i = 0; i < objs.size(); i++) {
-    btCollisionObject *obj = objs[i];
-    btRigidBody *body = btRigidBody::upcast(obj);
-    
-    if (body && body->getMotionState()) {
-      btTransform trans;
-      body->getMotionState()->getWorldTransform(trans);
-      
-      void *userPointer = body->getUserPointer();
-      if (userPointer) {
-        btQuaternion orientation = trans.getRotation();
-        Ogre::SceneNode *sceneNode = static_cast<Ogre::SceneNode *>(userPointer);
-        sceneNode->setPosition(Ogre::Vector3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ()));
-        sceneNode->setOrientation(Ogre::Quaternion(orientation.getW(), orientation.getX(), orientation.getY(), orientation.getZ()));
-      }
-    }
+
+  // Update Game state
+  for (int i = 0; i < objList.size(); i++) {
+    objList[i]->update(elapsedTime);
   }
 }
 
+bool Physics::checkCollisions(GameObject *obj) {
+  if (obj->getContactCallback()) {
+    std::vector<CollisionContext *> *contexts = obj->getCollisionContexts();
+    BulletContactCallback callback = *(obj->getContactCallback());
+    
+    contexts->clear();
+    dynamicsWorld->contactTest(obj->getBody(), callback);
+    return !(contexts->empty());
+  }
+  return false;
+}
+
+bool Physics::checkCollisionPair(GameObject *obj1, GameObject *obj2) {
+  if (obj1->getContactCallback()) {
+    BulletContactCallback callback = *(obj1->getContactCallback());
+    obj1->getCollisionContexts()->clear();
+    dynamicsWorld->contactPairTest(obj1->getBody(), obj2->getBody(), callback);
+    return !(obj1->getCollisionContexts()->empty());
+  }
+  return false;
+}
+
+/******************************/
+
 btRigidBody* Physics::addRigidBox(Ogre::Entity* entity, Ogre::SceneNode* node,
-                                   btScalar mass, btScalar rest, btVector3 localInertia, btVector3 origin, btQuaternion *rotation) {
+                                  btScalar mass, btScalar rest, btVector3 localInertia, btVector3 origin, btQuaternion *rotation) {
   Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
   btCollisionShape *boxShape = new btBoxShape( btVector3(s[0],s[1],s[2]) );
   addRigidBody(entity, node, boxShape, mass, rest, localInertia, origin, rotation);
-  
+
 };
 btRigidBody* Physics::addRigidSphere(Ogre::Entity* entity, Ogre::SceneNode* node,
                                      btScalar mass, btScalar rest, btVector3 localInertia, btVector3 origin, btQuaternion *rotation) {
@@ -54,8 +69,9 @@ btRigidBody* Physics::addRigidBody(Ogre::Entity* entity, Ogre::SceneNode* node, 
   if (rotation) {
     startTransform.setRotation(*rotation);
   }
+
   rigidShape->calculateLocalInertia(mass, localInertia);
-  
+
   // Instantiate the body and add it to the dynamics world
   btDefaultMotionState *myMotionState = new btDefaultMotionState(startTransform);
 
@@ -68,6 +84,10 @@ btRigidBody* Physics::addRigidBody(Ogre::Entity* entity, Ogre::SceneNode* node, 
   return body;
 }
 
-void Physics::addBody(btRigidBody *body) {
-  getDynamicsWorld()->addRigidBody(body);
+int Physics::addObject(GameObject *obj) {
+  objList.push_back(obj);
+  obj->setSimID(simID);
+  getDynamicsWorld()->addRigidBody(obj->getBody());
+
+  return simID++;
 }

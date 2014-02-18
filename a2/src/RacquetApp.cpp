@@ -49,13 +49,18 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
 
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(id == OIS::MB_Left) { 
-   
-    Ball *m = new Ball(mSceneMgr, 0, mPhysics, 
-             btVector3(-500,-300,500), 
-             btVector3( rand() % 120 - 60, 500, rand() % 80 - 40));
     
-    mRacquet->translate(btVector3(100, 100, 100));
-
+    static int ballID;
+    std::stringstream ss;
+    ss << "myBall" << ballID;
+    std::string ent = ss.str();
+    ss << "node";
+    ballID++;
+    
+    Ball *m = new Ball(mSceneMgr, ent, ss.str(), 0, mPhysics, 
+                       btVector3(-500,-300,500), 
+                       btVector3( rand() % 120 - 60, 500, rand() % 80 - 40));
+    
   } else if (id == OIS::MB_Right) {
     static int gravity = 1;
     btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
@@ -127,6 +132,7 @@ void RacquetApp::createScene(void)
     
     Ogre::SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode(pNames[i]);
     node->attachObject(entity);
+    node->setPosition(Ogre::Vector3(pos[i][0], pos[i][1], pos[i][2]));
 
     mPhysics->addRigidBox(entity, node, 0.0f, 0.95f, btVector3(0,0,0), pos[i]);  
   }
@@ -157,14 +163,14 @@ void RacquetApp::createScene(void)
 */
 
 
-  mRacquet = new Racquet(mSceneMgr, 0, mPhysics,
-              btVector3(100, 100, 50));
-
  /* for (int i = 0; i < 4; i++)
     new Ball(mSceneMgr, 0, mPhysics,
              btVector3(-500, -300, 500),
              btVector3(rand() % 800 - 400, rand() % 800 - 400, rand() % 800 - 400));
  */ 
+
+  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics,
+                         btVector3(100, 100, 50));
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {

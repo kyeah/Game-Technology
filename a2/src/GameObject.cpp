@@ -1,4 +1,5 @@
 #include <OgreSubEntity.h>
+#include "Collisions.h"
 #include "GameObject.h"
 #include "OgreMotionState.h"
 
@@ -7,21 +8,20 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
                        btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest, 
                        btVector3 _localInertia, btQuaternion *rotation) 
   : entName(_entName), nodeName(_nodeName), 
-    physics(_physics), mass(_mass), rest(_rest), inertia(_localInertia) {
+    physics(_physics), mass(_mass), rest(_rest), inertia(_localInertia), initVel(velocity) {
 
   if (!parentNode) {
     parentNode = mgr->getRootSceneNode();
   }
   
   node = parentNode->createChildSceneNode(_nodeName);
-
+  
   node->setPosition(Ogre::Vector3(origin[0], origin[1], origin[2]));
   if (rotation)
     node->setOrientation(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
   
   transform.setIdentity();
   // Extend this class dude
-
 }
 
 void GameObject::setColor(float dr, float dg, float db, float da,
@@ -42,10 +42,12 @@ void GameObject::addToSimulator() {
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, collisionShape, inertia);
   body = new btRigidBody(rbInfo);
   body->setRestitution(rest);
-  body->setUserPointer(node);
-
-  physics->addBody(body);
+  body->setUserPointer(this);
+  body->setLinearVelocity(initVel);
+  physics->addObject(this);
   updateTransform();
+
+  cCallback = new BulletContactCallback(*body, contexts);
 }
 
 void GameObject::updateTransform() {
@@ -59,6 +61,7 @@ void GameObject::updateTransform() {
 void GameObject::setPosition(btVector3 position) {
   transform.setOrigin(position);
   motionState->setWorldTransform(transform);
+  updateTransform();
 }
 
 void GameObject::translate(btVector3 d) {
@@ -69,9 +72,11 @@ void GameObject::translate(btVector3 d) {
 void GameObject::setOrientation(btQuaternion quaternion) {
   transform.setRotation(quaternion);
   motionState->setWorldTransform(transform);
+  updateTransform();
 }
 
 void GameObject::rotate(btQuaternion q) {
   transform.setRotation(transform.getRotation() + q);
   motionState->setWorldTransform(transform);
+  updateTransform();
 }
