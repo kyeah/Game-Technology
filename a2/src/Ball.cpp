@@ -24,14 +24,13 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 void Ball::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
-
-      // Need to update walls in RacquetApp to be a GameObject before using this
-      //if (contexts[i]->object && contexts[i]->object->getEntityName().c_str() == "ceiling") {
-      //update app score
-      
-      //} else {
-      std::cout << "BALL COLLISION" << std::endl;
-      //}
+      if (contexts[i]->object && 
+          contexts[i]->object->getEntityName().compare("farWall") == 0) {
+        //update app score
+        std::cout << "BALL COLLISION WITH FARWALL; NICE JOB" << std::endl;        
+      } else {
+        std::cout << "BALL COLLISION" << std::endl;
+      }
 
     }
   }

@@ -3,7 +3,7 @@ noinst_HEADERS= src/BaseApplication.h src/RacquetApp.h src/Physics.h src/OgreMot
 
 bin_PROGRAMS= RacquetApp
 RacquetApp_CPPFLAGS= -I$(top_srcdir) -I/usr/include/bullet -I/usr/local/include/bullet 
-RacquetApp_SOURCES= src/BaseApplication.cpp src/RacquetApp.cpp src/Physics.cpp src/OgreMotionState.cpp src/GameObject.cpp src/Ball.cpp src/Racquet.cpp
+RacquetApp_SOURCES= src/BaseApplication.cpp src/RacquetApp.cpp src/Physics.cpp src/OgreMotionState.cpp src/GameObject.cpp src/Ball.cpp src/Racquet.cpp src/Plane.cpp
 RacquetApp_CXXFLAGS= $(OGRE_CFLAGS) $(OIS_CFLAGS) $(SDL_CFLAGS)
 RacquetApp_LDADD= $(OGRE_LIBS) $(OIS_LIBS) $(SDL_LIBS) -lboost_system -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
 EXTRA_DIST= buildit makeit

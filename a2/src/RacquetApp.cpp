@@ -23,6 +23,10 @@
 #   include "AppDelegate.h"
 #endif
 
+const static int DETAILS_HIGHSCORE = 0;
+const static int DETAILS_SCORE = 1;
+const static int DETAILS_GRAVITY = 3;
+
 int highscore = 0;
 int score = 0;
 
@@ -105,10 +109,10 @@ void RacquetApp::createScene(void)
 
   // Boxed Environment
   Ogre::Plane planes[] = {
-    Ogre::Plane(Ogre::Vector3::UNIT_X, 0),
     Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_X, 0),
-    Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
+    Ogre::Plane(Ogre::Vector3::UNIT_X, 0),
     Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0),
+    Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
     Ogre::Plane(Ogre::Vector3::UNIT_Z, 0),
     Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0)
   };
@@ -118,7 +122,7 @@ void RacquetApp::createScene(void)
   };
 
   Ogre::Vector3 up[] = {
-    Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Y, 
+    Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Y,
     Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Z, 
     Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_X
   };
@@ -150,17 +154,11 @@ void RacquetApp::createScene(void)
                                                   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                   planes[i], width, height, 20, 20, true, 1, 5, 5, up[i]);
 
-    Ogre::Entity* entity = mSceneMgr->createEntity(pNames[i], pNames[i]);
-    if (pNames[i] == "ground") {
-      entity->setMaterialName("Court/Floor");
-    }
-    entity->setCastShadows(true);
+    Plane *p = new Plane(mSceneMgr, pNames[i], pNames[i], pNames[i], 0, mPhysics, pos[i]);
     
-    Ogre::SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode(pNames[i]);
-    node->attachObject(entity);
-    node->setPosition(Ogre::Vector3(pos[i][0], pos[i][1], pos[i][2]));
-
-    mPhysics->addRigidBox(entity, node, 0.0f, 0.95f, btVector3(0,0,0), pos[i]);  
+    if (pNames[i] == "ground") {
+      p->getEntity()->setMaterialName("Court/Floor");
+    }
   }
   
   // Lights

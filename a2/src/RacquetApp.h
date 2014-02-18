@@ -21,10 +21,6 @@ This source file is part of the
 #include "Physics.h"
 #include "RacquetObject.h"
 
-const static int DETAILS_HIGHSCORE = 0;
-const static int DETAILS_SCORE = 1;
-const static int DETAILS_GRAVITY = 3;
-
 extern int highscore;
 extern int score;
 

@@ -19,7 +19,7 @@ class GameObject {
 
   void init();
   
-  virtual void update(float elapsedTime) = 0;
+  virtual void update(float elapsedTime) {}
   void updateTransform();
   void addToSimulator();
 
