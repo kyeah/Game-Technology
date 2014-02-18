@@ -1,26 +1,28 @@
-CS354R - Assignment 1 (Ball Room)
+CS354R - Assignment 2 (Single Player Engine and Game)
 =================================
 
 RUNNING
 =================================
 1. Consult README for instructions on building.
-2. run the BallApp executable (./BallApp)
+2. run the RacquetApp executable (./RacquetApp)
 
 IMPLEMENTATION
 =================================
-This implementation of Ball in Room uses red-orange ambient lighting with a red point light, a dark green directional light, and a blue spotlight. 4 balls of random directional velocity are provided on startup. 
+//This implementation of Ball in Room uses red-orange ambient lighting with a red point light, a dark green directional light, and a blue spotlight. 4 balls of random directional velocity are provided on startup. 
 
 ADDITIONAL FEATURES
 =================================
-1. Bullet Integration for gravity and collision handling between all objects in the world.
-2. Left click instantiates a new ball with upward velocity.
-3. Right click will cycle between gravity settings (off => upward => downward)
-4. Ball entity color properties are changed to provide more diffuse and specular coloration from surrounding lighting. They also cast shadows on the environment.
-5. The ground is textured with Rockwall.
-6. Camera with mouse and keyboard (WASD) controls.
+//1. Bullet Integration for gravity and collision handling between all objects in the world.
+//2. Left click instantiates a new ball with upward velocity.
+//3. Right click will cycle between gravity settings (off => upward => downward)
+//4. Ball entity color properties are changed to provide more diffuse and specular coloration from surrounding lighting. They also cast shadows on the environment.
+//5. The ground is textured with Rockwall.
+//6. Camera with mouse and keyboard (WASD) controls.
 
 FILES
 =================================
-BaseApplication.cpp, BaseApplication.h (Modified slightly to show Gravity status in advanced stats)
-BallApp.cpp, BallApp.h (Main application files)
-Physics.cpp, Physics.h (Bullet integration helper files)
+BaseApplication.h/cpp (Modified slightly to show Gravity status in advanced stats)
+RacquetApp.h/cpp (Main application files)
+Physics.h/cpp, OgreMotionState.h/cpp (Bullet integration helper files)
+GameObject.h, RacquetObject.h (General Game Object Definitions)
+Racquet.cpp, Ball.cpp (Specific Game Object Definitions)
