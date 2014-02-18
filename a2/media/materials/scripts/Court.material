@@ -1,0 +1,27 @@
+material Court/Floor
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture wood.jpg
+			}
+		}
+	}
+}
+
+material Court/Racquet
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture clouds.jpg
+			}
+		}
+	}
+}
