@@ -1,10 +1,10 @@
 ACLOCAL_AMFLAGS= -I m4
-noinst_HEADERS= BaseApplication.h BallApp.h Physics.h
+noinst_HEADERS= src/BaseApplication.h src/RacquetApp.h src/Physics.h src/OgreMotionState.h src/GameObject.h src/RacquetObject.h
 
-bin_PROGRAMS= BallApp
-BallApp_CPPFLAGS= -I$(top_srcdir) -I/usr/include/bullet -I/usr/local/include/bullet
-BallApp_SOURCES= BaseApplication.cpp BallApp.cpp Physics.cpp
-BallApp_CXXFLAGS= $(OGRE_CFLAGS) $(OIS_CFLAGS)
-BallApp_LDADD= $(OGRE_LIBS) $(OIS_LIBS) -lboost_system -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
+bin_PROGRAMS= RacquetApp
+RacquetApp_CPPFLAGS= -I$(top_srcdir) -I/usr/include/bullet -I/usr/local/include/bullet
+RacquetApp_SOURCES= src/BaseApplication.cpp src/RacquetApp.cpp src/Physics.cpp src/OgreMotionState.cpp src/GameObject.cpp src/Ball.cpp src/Racquet.cpp
+RacquetApp_CXXFLAGS= $(OGRE_CFLAGS) $(OIS_CFLAGS)
+RacquetApp_LDADD= $(OGRE_LIBS) $(OIS_LIBS) -lboost_system -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
 EXTRA_DIST= buildit makeit
 AUTOMAKE_OPTIONS= foreign

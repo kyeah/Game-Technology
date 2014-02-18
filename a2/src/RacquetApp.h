@@ -14,17 +14,18 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
-#ifndef __BallApp_h_
-#define __BallApp_h_
+#ifndef __RacquetApp_h_
+#define __RacquetApp_h_
 
 #include "BaseApplication.h"
 #include "Physics.h"
+#include "RacquetObject.h"
 
-class BallApp : public BaseApplication
+class RacquetApp : public BaseApplication
 {
 public:
-    BallApp(void);
-    virtual ~BallApp(void);
+    RacquetApp(void);
+    virtual ~RacquetApp(void);
 
     Ogre::RenderWindow * getWindow(void) { return mWindow; }
     Ogre::Timer * getTimer(void) { return mTimer; }
@@ -39,11 +40,13 @@ protected:
     void createRacquet(std::string, std::string, int, int, int);
     void createBall(int x, int y, int z, int vx, int vy, int vz);
     void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
+    bool keyPressed( const OIS::KeyEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
+    Racquet *mRacquet;
 };
 
-#endif // #ifndef __BallApp_h_
+#endif // #ifndef __RacquetApp_h_
