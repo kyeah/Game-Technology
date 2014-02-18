@@ -40,6 +40,7 @@ class GameObject {
   btRigidBody* getBody() { return body; }
   Ogre::SceneNode* getNode() { return node; }
   Ogre::Entity* getEntity() { return entity; }
+  Ogre::String getEntityName() { return entName; }
   OgreMotionState* getMotionState() { return motionState; }
 
   void setSimID(int id) { simID = id; }

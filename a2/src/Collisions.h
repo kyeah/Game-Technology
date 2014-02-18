@@ -57,31 +57,30 @@ class BulletContactCallback : public btCollisionWorld::ContactResultCallback {
                                    const btCollisionObject* colObj0, int partId0, int index0,
                                    const btCollisionObject* colObj1, int partId1, int index1) {
 
-    CollisionContext *c = new CollisionContext();
-    CollisionContext ctxt = *c;
+    CollisionContext *ctxt = new CollisionContext();
 
-    ctxt.hit = true;
-    ctxt.lastBody = ctxt.body;
+    ctxt->hit = true;
+    ctxt->lastBody = ctxt->body;
     if( colObj0 == &body ) {
-      ctxt.point = cp.m_localPointA;
-      ctxt.body = colObj1;
+      ctxt->point = cp.m_localPointA;
+      ctxt->body = colObj1;
 
     } else {
       assert(colObj1 == &body && "body does not match either collision object");
-      ctxt.point = cp.m_localPointB;
-      ctxt.body = colObj0;
+      ctxt->point = cp.m_localPointB;
+      ctxt->body = colObj0;
     }
 
-    ctxt.object = static_cast<GameObject*>(ctxt.body->getUserPointer());
-    ctxt.normal = cp.m_normalWorldOnB;
-    ctxt.velocity = body.getLinearVelocity();
-    ctxt.velNorm = ctxt.normal.dot(ctxt.velocity);
-    ctxts.push_back(c);
+    ctxt->object = static_cast<GameObject*>(ctxt->body->getUserPointer());
+    ctxt->normal = cp.m_normalWorldOnB;
+    ctxt->velocity = body.getLinearVelocity();
+    ctxt->velNorm = ctxt->normal.dot(ctxt->velocity);
+    ctxts.push_back(ctxt);
     return 0;
   }
 
   // Uncomment this if using Ogre 1.8+
-  /* 
+  
   virtual btScalar addSingleResult(btManifoldPoint& cp, 
                                    const btCollisionObjectWrapper* colObj0Wrap, int partId0,int index0, 
                                    const btCollisionObjectWrapper* colObj1Wrap, int partId1,int index1) {
@@ -90,7 +89,6 @@ class BulletContactCallback : public btCollisionWorld::ContactResultCallback {
                            colObj1Wrap->getCollisionObject(), partId1, index1);
     
   }
-  */
 
 };
 

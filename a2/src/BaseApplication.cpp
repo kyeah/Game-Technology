@@ -117,28 +117,6 @@ void BaseApplication::createFrameListener(void)
     mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
     mTrayMgr->hideCursor();
 
-    // create a params panel for displaying sample details
-    Ogre::StringVector items;
-    /*    items.push_back("cam.pX");
-    items.push_back("cam.pY");
-    items.push_back("cam.pZ");
-    items.push_back("");
-    items.push_back("cam.oW");
-    items.push_back("cam.oX");
-    items.push_back("cam.oY");
-    items.push_back("cam.oZ");
-    items.push_back("");*/
-    items.push_back("Filtering");
-    items.push_back("Poly Mode");
-    items.push_back("");
-    items.push_back("Gravity");
-
-    mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
-    mDetailsPanel->setParamValue(0, "Bilinear");
-    mDetailsPanel->setParamValue(1, "Solid");
-    mDetailsPanel->setParamValue(3, "Off");
-    //    mDetailsPanel->hide();
-
     mRoot->addFrameListener(this);
 }
 //-------------------------------------------------------------------------------------

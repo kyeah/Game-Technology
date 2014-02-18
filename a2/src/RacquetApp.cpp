@@ -23,6 +23,9 @@
 #   include "AppDelegate.h"
 #endif
 
+int highscore = 0;
+int score = 0;
+
 //-------------------------------------------------------------------------------------
 RacquetApp::RacquetApp(void)
 {
@@ -37,10 +40,23 @@ RacquetApp::~RacquetApp(void)
 
 void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
- // mCamera->setPosition(3500,-700,-3500);
- // mCamera->lookAt(-500,-350,500);
   mCamera->setPosition(0,0,-3500);
   mCamera->lookAt(0,0,500);
+}
+
+void RacquetApp::createFrameListener(void) {
+  BaseApplication::createFrameListener();
+
+  Ogre::StringVector items;
+  items.push_back("Highscore");
+  items.push_back("Current Score");
+  items.push_back("");
+  items.push_back("Gravity");
+  
+  mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
+  mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_SCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
 }
 
 bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
@@ -66,13 +82,13 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
     btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
     if (gravity == 0) {
       world->setGravity(btVector3(0,0,0));
-      mDetailsPanel->setParamValue(3, "Off");
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
     } else if (gravity == 1) {
       world->setGravity(btVector3(0,980,0));
-      mDetailsPanel->setParamValue(3, "Upward");
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Upward");
     } else if (gravity == 2) {
       world->setGravity(btVector3(0,-980,0));
-      mDetailsPanel->setParamValue(3, "Downward");
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downward");
     }
 
     gravity = (gravity+1)%3;

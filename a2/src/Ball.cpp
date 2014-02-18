@@ -1,3 +1,4 @@
+#include "RacquetApp.h"
 #include "RacquetObject.h"
 
 Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode, 
@@ -22,6 +23,16 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
 void Ball::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
-    std::cout << "BALL COLLISION" << std::endl;
+    for (int i = 0; i < contexts.size(); i++) {
+
+      // Need to update walls in RacquetApp to be a GameObject before using this
+      //if (contexts[i]->object && contexts[i]->object->getEntityName().c_str() == "ceiling") {
+      //update app score
+      
+      //} else {
+      std::cout << "BALL COLLISION" << std::endl;
+      //}
+
+    }
   }
 }

@@ -21,6 +21,13 @@ This source file is part of the
 #include "Physics.h"
 #include "RacquetObject.h"
 
+const static int DETAILS_HIGHSCORE = 0;
+const static int DETAILS_SCORE = 1;
+const static int DETAILS_GRAVITY = 3;
+
+extern int highscore;
+extern int score;
+
 class RacquetApp : public BaseApplication
 {
 public:
@@ -37,6 +44,7 @@ public:
 protected:
     virtual void createScene(void);
     void createCamera(void);
+    void createFrameListener(void);
     void createRacquet(std::string, std::string, int, int, int);
     void createBall(int x, int y, int z, int vx, int vy, int vz);
     void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
