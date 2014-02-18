@@ -19,22 +19,12 @@ void Physics::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, cons
 
   // Update Game state
   for (int i = 0; i < objList.size(); i++) {
-    GameObject *g = objList[i];
-
-    // Virtual BulletContactCallback test
-    //    if (checkCollisions(g)) {
-    //  std::cout << "yo" << std::endl;
-    //}
-
-    // Virtual update test
-    //    g->update(elapsedTime);
+    objList[i]->update(elapsedTime);
   }
 }
 
 bool Physics::checkCollisions(GameObject *obj) {
-  std::cout << "physics::checkCollisions" << std::endl;
   if (obj->getContactCallback()) {
-    std::cout << "Checking Collisions" << std::endl;
     std::vector<CollisionContext *> *contexts = obj->getCollisionContexts();
     BulletContactCallback callback = *(obj->getContactCallback());
     

@@ -57,7 +57,6 @@ class BulletContactCallback : public btCollisionWorld::ContactResultCallback {
                                    const btCollisionObject* colObj0, int partId0, int index0,
                                    const btCollisionObject* colObj1, int partId1, int index1) {
 
-    std::cout << "TESTETSTESTEST" << std::endl;
     CollisionContext *c = new CollisionContext();
     CollisionContext ctxt = *c;
 
@@ -81,7 +80,8 @@ class BulletContactCallback : public btCollisionWorld::ContactResultCallback {
     return 0;
   }
 
-  /*  
+  // Uncomment this if using Ogre 1.8+
+  /* 
   virtual btScalar addSingleResult(btManifoldPoint& cp, 
                                    const btCollisionObjectWrapper* colObj0Wrap, int partId0,int index0, 
                                    const btCollisionObjectWrapper* colObj1Wrap, int partId1,int index1) {

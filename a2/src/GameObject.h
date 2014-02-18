@@ -17,6 +17,8 @@ class GameObject {
              btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), btScalar _mass=0.0f, 
              btScalar _rest=0.0f, btVector3 _localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
+  void init();
+  
   virtual void update(float elapsedTime) = 0;
   void updateTransform();
   void addToSimulator();
@@ -36,6 +38,7 @@ class GameObject {
 
   btRigidBody* getBody() { return body; }
   Ogre::SceneNode* getNode() { return node; }
+  Ogre::Entity* getEntity() { return entity; }
 
   void setSimID(int id) { simID = id; }
   int getSimID() { return simID; }
@@ -54,6 +57,7 @@ class GameObject {
   btRigidBody *body;
   btTransform transform;
   btVector3 inertia;
+  btVector3 initVel;
 
   bool needsUpdates;
   std::vector<CollisionContext *> contexts;

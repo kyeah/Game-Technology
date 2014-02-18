@@ -6,6 +6,7 @@
 class GameObject;
 
 class Physics {
+ public:
   btDefaultCollisionConfiguration* collisionConfiguration;
   btCollisionDispatcher* dispatcher;
   btBroadphaseInterface* overlappingPairCache;

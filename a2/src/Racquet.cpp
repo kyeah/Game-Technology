@@ -1,31 +1,11 @@
 #include "RacquetObject.h"
 
-Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::SceneNode* parentNode, Physics* _physics,
-           btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest, 
-           btVector3 _localInertia, btQuaternion *rotation) {
-  
-  static int ballID;
-  
-  std::stringstream ss;
-  ss << "myRacquet" << ballID;
-  std::string ent = ss.str();
-  ss << "node";
-  ballID++;
-  
-  Racquet(mgr, ent, ss.str(), parentNode, _physics, origin, velocity, _mass, _rest, _localInertia, rotation);
-
-}
-
 Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode, 
                  Physics* _physics,
                  btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest, 
                  btVector3 _localInertia, btQuaternion *rotation) 
   : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, velocity, _mass, _rest, _localInertia, rotation)
 {
-
-  if (!parentNode) {
-    parentNode = mgr->getRootSceneNode();
-  }
 
   entity = mgr->createEntity(_entName, "sphere.mesh");
   entity->setCastShadows(true);
@@ -41,14 +21,17 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
   Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
   collisionShape = new btBoxShape( btVector3(s[0],s[1],s[2]) );
   addToSimulator();
-  body->setLinearVelocity(velocity);
 
-  cCallback = new BulletContactCallback(*body, contexts);
+  /*
+  body->setCollisionFlags(body->getCollisionFlags() |
+                          btCollisionObject::CF_KINEMATIC_OBJECT);
+  body->setActivationState(DISABLE_DEACTIVATION);
+  */
 }
 
 void Racquet::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
-    std::cout << "COLLISION" << std::endl;
+    std::cout << "RACQUET COLLISION" << std::endl;
     translate(btVector3(1000,1000,1000));
   }
 }
