@@ -23,16 +23,14 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
   collisionShape = new btBoxShape( btVector3(s[0],s[1],s[2]) );
   addToSimulator();
 
-  /*
   body->setCollisionFlags(body->getCollisionFlags() |
                           btCollisionObject::CF_KINEMATIC_OBJECT);
   body->setActivationState(DISABLE_DEACTIVATION);
-  */
 }
 
 void Racquet::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
     std::cout << "RACQUET COLLISION" << std::endl;
-    translate(btVector3(1000,1000,1000));
+    translate(btVector3(5,5,5));
   }
 }

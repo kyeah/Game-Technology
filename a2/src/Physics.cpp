@@ -19,6 +19,14 @@ void Physics::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, cons
 
   // Update Game state
   for (int i = 0; i < objList.size(); i++) {
+    btTransform transform;
+    btVector3 pos;
+    btQuaternion q;
+    objList[i]->getMotionState()->getWorldTransform(transform);
+    pos = transform.getOrigin();
+    q = transform.getRotation();
+    objList[i]->getNode()->setPosition(pos[0], pos[1], pos[2]);
+    objList[i]->getNode()->setOrientation(q[0], q[1], q[2], q[3]);
     objList[i]->update(elapsedTime);
   }
 }

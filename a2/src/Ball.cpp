@@ -23,6 +23,5 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 void Ball::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
     std::cout << "BALL COLLISION" << std::endl;
-    translate(btVector3(1000,1000,1000));
   }
 }

@@ -30,6 +30,7 @@ class GameObject {
   void translate(btVector3 d);
   void setOrientation(btQuaternion quaternion);
   void rotate(btQuaternion q);
+  void setVelocity(btVector3 velocity);
 
   void setContactCallBack(BulletContactCallback *_callback) { cCallback = _callback; }
 
@@ -39,6 +40,7 @@ class GameObject {
   btRigidBody* getBody() { return body; }
   Ogre::SceneNode* getNode() { return node; }
   Ogre::Entity* getEntity() { return entity; }
+  OgreMotionState* getMotionState() { return motionState; }
 
   void setSimID(int id) { simID = id; }
   int getSimID() { return simID; }

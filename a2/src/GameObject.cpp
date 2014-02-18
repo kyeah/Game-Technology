@@ -59,24 +59,25 @@ void GameObject::updateTransform() {
 }
 
 void GameObject::setPosition(btVector3 position) {
+  motionState->getWorldTransform(transform);
   transform.setOrigin(position);
   motionState->setWorldTransform(transform);
-  updateTransform();
 }
 
 void GameObject::translate(btVector3 d) {
+  motionState->getWorldTransform(transform);
   transform.setOrigin(transform.getOrigin() + d);
   motionState->setWorldTransform(transform);
 }
 
 void GameObject::setOrientation(btQuaternion quaternion) {
+  motionState->getWorldTransform(transform);
   transform.setRotation(quaternion);
   motionState->setWorldTransform(transform);
-  updateTransform();
 }
 
 void GameObject::rotate(btQuaternion q) {
+  motionState->getWorldTransform(transform);
   transform.setRotation(transform.getRotation() + q);
   motionState->setWorldTransform(transform);
-  updateTransform();
 }
