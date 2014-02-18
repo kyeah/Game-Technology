@@ -107,8 +107,12 @@ void RacquetApp::createScene(void)
     Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_X
   };
   
+  //w applies to leftWall/rightWall
+  //h applies to ground/ceiling
+  //l applies to farWall/nearWall
   int l,w,h;
-  l = w = h = 3000;
+  l = 5000;
+  w = h = 3000;
   
   btVector3 pos[] = {
     btVector3(-w/2,0,0),
@@ -119,10 +123,16 @@ void RacquetApp::createScene(void)
     btVector3(0,0,l/2),
   };
  
+  int width, height;
+  width = w;
+  height = h;
   for (int i = 0; i < 6; i++) {
+    if(pNames[i] == "leftWall" || pNames[i] == "rightWall") { width = l; height = w; }
+    if(pNames[i] == "ground" || pNames[i] == "ceiling") { width = w; height = l;}
+    if(pNames[i] == "farWall" || pNames[i] == "nearWall") { width = w; height = w;}
     Ogre::MeshManager::getSingleton().createPlane(pNames[i],
                                                   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                  planes[i], l, w, 20, 20, true, 1, 5, 5, up[i]);
+                                                  planes[i], width, height, 20, 20, true, 1, 5, 5, up[i]);
 
     Ogre::Entity* entity = mSceneMgr->createEntity(pNames[i], pNames[i]);
     if (pNames[i] == "ground") {
@@ -138,36 +148,23 @@ void RacquetApp::createScene(void)
   }
   
   // Lights
-  Ogre::Light* pLight = mSceneMgr->createLight( "PointLight" );
-//  pLight->setType(Ogre::Light::LT_POINT);
-  pLight->setPosition(0,0,-3500);
-  pLight->setDiffuseColour(1,1,1);
-  pLight->setSpecularColour(1,1,1);
-
-
-/*  Ogre::Light* dLight = mSceneMgr->createLight( "DirectionalLight" );
-  dLight->setType(Ogre::Light::LT_DIRECTIONAL);
-  dLight->setDiffuseColour(Ogre::ColourValue(.25,.25,0));
-  dLight->setSpecularColour(Ogre::ColourValue(.25,.25,0));
-  dLight->setDirection(Ogre::Vector3(0,-1,1));
-*/
-/*  Ogre::Light* sLight = mSceneMgr->createLight("SpotLight");
-  sLight->setType(Ogre::Light::LT_SPOTLIGHT);
-  sLight->setDiffuseColour(1, 1, 1);
-  sLight->setSpecularColour(1, 1, 1);
-
-  sLight->setDirection(-1, -1, 0);
-  sLight->setPosition(Ogre::Vector3(0, 400, 200));
-
-  sLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));
-*/
-
-
- /* for (int i = 0; i < 4; i++)
-    new Ball(mSceneMgr, 0, mPhysics,
-             btVector3(-500, -300, 500),
-             btVector3(rand() % 800 - 400, rand() % 800 - 400, rand() % 800 - 400));
- */ 
+  Ogre::Light* lights[9];
+  int z;
+  for(z = 0; z < 9; z++) { 
+	lights[z] = mSceneMgr->createLight("point light" + z); 
+  	lights[z]->setType(Ogre::Light::LT_POINT);
+	lights[z]->setDiffuseColour(.1,.1,.1);
+	lights[z]->setSpecularColour(.1,.1,.1);	
+  }
+  lights[0]->setPosition(-1499,1499,0);
+  lights[1]->setPosition(-1499,1499,1000);
+  lights[2]->setPosition(-1499,1499,2000);
+  lights[3]->setPosition(-1000,1499,2499);
+  lights[4]->setPosition(0,1499,2499);
+  lights[5]->setPosition(1000,1499,2499);
+  lights[6]->setPosition(1499,1499,2000);
+  lights[7]->setPosition(1499,1499,1000);
+  lights[8]->setPosition(1499,1499,0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics,
                          btVector3(100, 100, 50));

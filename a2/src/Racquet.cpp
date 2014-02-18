@@ -12,7 +12,7 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
   entity->setMaterialName("Court/Racquet");
   
   node->attachObject(entity);
-  node->scale(3,3,.5);
+  node->scale(3,4,.2);
 
   // Change Entity Color
   // setColor(0,1,0,0.1,  0.5,1,1,0.4);
