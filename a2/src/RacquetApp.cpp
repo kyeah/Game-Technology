@@ -47,7 +47,7 @@ RacquetApp::~RacquetApp(void)
 
 void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(-1200,0,-7000);
+  mCamera->setPosition(-800,0,-7000);
   mCamera->lookAt(0,0,500);
 }
 
@@ -252,7 +252,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();  
-
+  
+  // Limit Ball Velocity
   ballVelocity = mBall->getBody()->getLinearVelocity();
   btScalar speed = ballVelocity.length();
   if(speed > MAX_SPEED){
@@ -266,8 +267,7 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   mRacquet->getBody()->translate(mDirection);
   mRacquet->translate(mDirection);
-
-
+  
   mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));  
   if (score > highscore) {
     highscore = score;

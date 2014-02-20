@@ -23,7 +23,7 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
   bouncedOnce = false;
   
   body->setCcdMotionThreshold(1);
-  body->setCcdSweptSphereRadius(0.5);
+  body->setCcdSweptSphereRadius(0.4);
 }
 
 void Ball::update(float elapsedTime) {
