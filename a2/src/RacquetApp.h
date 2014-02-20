@@ -53,6 +53,8 @@ protected:
     Physics *mPhysics;
     Racquet *mRacquet;
     Ball *mBall;
+    btVector3 ballVelocity;
+    btScalar MAX_SPEED;
     btVector3 mDirection;
     Ogre::Vector3 oDirection;
 };

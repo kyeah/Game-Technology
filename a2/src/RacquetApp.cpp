@@ -38,6 +38,7 @@ RacquetApp::RacquetApp(void)
   mTimer->reset();
   mDirection = btVector3(0, 0, 0);
   oDirection = Ogre::Vector3(0, 0, 0);
+  MAX_SPEED = btScalar(10000);
 }
 //-------------------------------------------------------------------------------------
 RacquetApp::~RacquetApp(void)
@@ -243,6 +244,13 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();  
+
+  ballVelocity = mBall->getBody()->getLinearVelocity();
+  btScalar speed = ballVelocity.length();
+  if(speed > MAX_SPEED){
+    ballVelocity *= MAX_SPEED/speed;
+    mBall->getBody()->setLinearVelocity(ballVelocity);
+  }
 
   if (mPhysics != NULL) {
     mPhysics->stepSimulation(elapsedTime);
