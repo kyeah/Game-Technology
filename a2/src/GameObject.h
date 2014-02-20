@@ -32,6 +32,9 @@ class GameObject {
   void rotate(btQuaternion q);
   void setVelocity(btVector3 velocity);
 
+  btVector3 getPosition();
+  btQuaternion getOrientation();
+
   void setContactCallBack(BulletContactCallback *_callback) { cCallback = _callback; }
 
   std::vector<CollisionContext *> *getCollisionContexts() { return &contexts; }

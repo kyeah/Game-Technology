@@ -52,6 +52,7 @@ protected:
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
     Racquet *mRacquet;
+    Ball *mBall;
     btVector3 mDirection;
     Ogre::Vector3 oDirection;
 };

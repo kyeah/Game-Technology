@@ -10,6 +10,7 @@ class Ball : public GameObject {
        btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   void update(float elapsedTime);
+  bool bouncedOnce;
 };
 
 class Racquet : public GameObject {

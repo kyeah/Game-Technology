@@ -81,3 +81,13 @@ void GameObject::rotate(btQuaternion q) {
   transform.setRotation(transform.getRotation() + q);
   motionState->setWorldTransform(transform);
 }
+
+btVector3 GameObject::getPosition() {
+  motionState->getWorldTransform(transform);
+  return transform.getOrigin();
+}
+
+btQuaternion GameObject::getOrientation() {
+  motionState->getWorldTransform(transform);
+  return transform.getRotation();
+}

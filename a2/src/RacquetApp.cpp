@@ -33,7 +33,7 @@ int score = 0;
 //-------------------------------------------------------------------------------------
 RacquetApp::RacquetApp(void)
 {
-  mPhysics = new Physics(btVector3(0,0,0));
+  mPhysics = new Physics(btVector3(0,-980,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
   mDirection = btVector3(0, 0, 0);
@@ -46,7 +46,7 @@ RacquetApp::~RacquetApp(void)
 
 void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(0,0,-3500);
+  mCamera->setPosition(-1200,0,-7000);
   mCamera->lookAt(0,0,500);
 }
 
@@ -178,8 +178,8 @@ void RacquetApp::createScene(void)
   //h applies to ground/ceiling
   //l applies to farWall/nearWall
   int l,w,h;
-  l = 5000;
-  w = h = 3000;
+  l = 7500;
+  w = h = 4500;
   
   btVector3 pos[] = {
     btVector3(-w/2,0,0),
@@ -205,7 +205,7 @@ void RacquetApp::createScene(void)
     
     if (pNames[i] == "ground") {
       p->getEntity()->setMaterialName("Court/Floor");
-    }
+    } 
   }
   
   // Lights
@@ -228,13 +228,13 @@ void RacquetApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics,
+                         btVector3(100, 100, -3500));
 
-                         btVector3(100, 100, 50));
 
-
-  Ball *m = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics, 
-                     btVector3(100,100,150), 
-                     btVector3( rand() % 120 - 60, rand() % 80 - 40, 1500));
+  mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics, 
+                   btVector3(100,100,150), 
+                   btVector3( rand() % 120 - 60, rand() % 80 - 40, 5000),
+                   1000);
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
@@ -257,6 +257,9 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
     highscore = score;
     mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(score));
   }
+
+  btVector3 pos = mBall->getPosition();
+  mCamera->lookAt(pos[0], pos[1], pos[2]);
 
   return result;
 }
