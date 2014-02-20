@@ -46,6 +46,8 @@ protected:
     void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
     bool keyPressed( const OIS::KeyEvent &arg );
     bool keyReleased(const OIS::KeyEvent &arg);
+
+    bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     Ogre::Timer *mTimer;

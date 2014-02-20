@@ -62,7 +62,7 @@ void RacquetApp::createFrameListener(void) {
   mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
   mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, "0");
   mDetailsPanel->setParamValue(DETAILS_SCORE, "0");
-  mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
+  mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downwards");
 }
 
 bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
@@ -114,6 +114,21 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
   return BaseApplication::keyPressed(arg);
 }
 
+bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
+  // BaseApplication::mouseMoved(arg);
+  int x = -arg.state.X.rel;
+  int y = -arg.state.Y.rel;
+  int z = -arg.state.Z.rel;
+  
+  /*
+  mDirection = btVector3(x, y, z);
+  oDirection.x = x;
+  oDirection.y = y;
+  oDirection.z = z;*/
+
+  mRacquet->translate(btVector3(x,y,0));
+}
+
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(id == OIS::MB_Left) { 
     
@@ -129,7 +144,7 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
                        btVector3( rand() % 120 - 60, 500, rand() % 80 - 40));
     
   } else if (id == OIS::MB_Right) {
-    static int gravity = 1;
+    static int gravity = 0;
     btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
     if (gravity == 0) {
       world->setGravity(btVector3(0,0,0));

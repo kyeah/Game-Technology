@@ -21,6 +21,9 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
   addToSimulator();
   
   bouncedOnce = false;
+  
+  // body->setCcdMotionThreshold(1);
+  // body->setCcdSweptSphereRadius(0.2);
 }
 
 void Ball::update(float elapsedTime) {
@@ -32,6 +35,10 @@ void Ball::update(float elapsedTime) {
         Ogre::String name = contexts[i]->object->getEntityName();
         if (name.compare("farWall") == 0) {
           score++;
+          break;
+        } else if (name.compare("nearWall") == 0) {
+          bouncedOnce = false;
+          score = 0;
           break;
         } else if (name.compare("ground") == 0) {
           if (bouncedOnce) {
