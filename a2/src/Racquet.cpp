@@ -31,6 +31,6 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
 void Racquet::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
     std::cout << "RACQUET COLLISION" << std::endl;
-    translate(btVector3(5,5,5));
+    //translate(btVector3(5,5,5));
   }
 }

@@ -36,6 +36,8 @@ RacquetApp::RacquetApp(void)
   mPhysics = new Physics(btVector3(0,0,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
+  mDirection = btVector3(0, 0, 0);
+  oDirection = Ogre::Vector3(0, 0, 0);
 }
 //-------------------------------------------------------------------------------------
 RacquetApp::~RacquetApp(void)
@@ -64,6 +66,51 @@ void RacquetApp::createFrameListener(void) {
 }
 
 bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
+  switch(arg.key){
+    case OIS::KC_D:
+      mDirection += btVector3(-40, 0, 0);
+      oDirection.x += -40;
+      break;
+    case OIS::KC_S:
+      mDirection += btVector3(0, -40, 0);
+      oDirection.y += -40;
+      break;
+    case OIS::KC_A:
+      mDirection += btVector3(40, 0, 0);
+      oDirection.x += 40;
+      break;
+    case OIS::KC_W:
+      mDirection += btVector3(0, 40, 0);
+      oDirection.y += 40;
+      break;
+  }
+
+  return BaseApplication::keyPressed(arg);
+}
+
+bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
+  switch(arg.key){
+    case OIS::KC_J:
+      case OIS::KC_D:
+      mDirection -= btVector3(-40, 0, 0);
+      oDirection.x -= -40;
+      break;
+    case OIS::KC_S:
+      mDirection -= btVector3(0, -40, 0);
+      oDirection.y -= -40;
+      break;
+    case OIS::KC_A:
+      mDirection -= btVector3(40, 0, 0);
+      oDirection.x -= 40;
+      break;
+    case OIS::KC_W:
+      mDirection -= btVector3(0, 40, 0);
+      oDirection.y -= 40;
+      break;
+
+
+  }
+
   return BaseApplication::keyPressed(arg);
 }
 
@@ -181,7 +228,11 @@ void RacquetApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics,
-                         btVector3(100, 100, 50));
+                         btVector3(100, 100, -100));
+
+  Ball *m = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics, 
+                     btVector3(100,100,150), 
+                     btVector3( rand() % 120 - 60, rand() % 80 - 40, 1500));
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
@@ -194,6 +245,9 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   if (mPhysics != NULL) {
     mPhysics->stepSimulation(elapsedTime);
   }
+
+  mRacquet->getBody()->translate(mDirection);
+  mRacquet->translate(mDirection);
 
   return result;
 }
