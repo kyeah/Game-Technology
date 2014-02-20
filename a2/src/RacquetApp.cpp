@@ -72,16 +72,16 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
       oDirection.x += -40;
       break;
     case OIS::KC_S:
-      mDirection += btVector3(0, -40, 0);
-      oDirection.y += -40;
+      mDirection += btVector3(0, 0, -40);
+      oDirection.z += -40;
       break;
     case OIS::KC_A:
       mDirection += btVector3(40, 0, 0);
       oDirection.x += 40;
       break;
     case OIS::KC_W:
-      mDirection += btVector3(0, 40, 0);
-      oDirection.y += 40;
+      mDirection += btVector3(0, 0, 40);
+      oDirection.z += 40;
       break;
   }
 
@@ -96,16 +96,16 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
       oDirection.x -= -40;
       break;
     case OIS::KC_S:
-      mDirection -= btVector3(0, -40, 0);
-      oDirection.y -= -40;
+      mDirection -= btVector3(0, 0, -40);
+      oDirection.z -= -40;
       break;
     case OIS::KC_A:
       mDirection -= btVector3(40, 0, 0);
       oDirection.x -= 40;
       break;
     case OIS::KC_W:
-      mDirection -= btVector3(0, 40, 0);
-      oDirection.y -= 40;
+      mDirection -= btVector3(0, 0, 40);
+      oDirection.z -= 40;
       break;
 
 
@@ -115,18 +115,11 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
 }
 
 bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
-  // BaseApplication::mouseMoved(arg);
   int x = -arg.state.X.rel;
   int y = -arg.state.Y.rel;
   int z = -arg.state.Z.rel;
   
-  /*
-  mDirection = btVector3(x, y, z);
-  oDirection.x = x;
-  oDirection.y = y;
-  oDirection.z = z;*/
-
-  mRacquet->translate(btVector3(x,y,0));
+  mRacquet->translate(btVector3(x,y,z));
 }
 
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
