@@ -71,19 +71,19 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
     case OIS::KC_D:
       mDirection += btVector3(-40, 0, 0);
       oDirection.x += -40;
-      break;
+      return true;
     case OIS::KC_S:
       mDirection += btVector3(0, 0, -40);
       oDirection.z += -40;
-      break;
+      return true;
     case OIS::KC_A:
       mDirection += btVector3(40, 0, 0);
       oDirection.x += 40;
-      break;
+      return true;
     case OIS::KC_W:
       mDirection += btVector3(0, 0, 40);
       oDirection.z += 40;
-      break;
+      return true;
   }
 
   return BaseApplication::keyPressed(arg);
@@ -214,7 +214,9 @@ void RacquetApp::createScene(void)
     
     if (pNames[i] == "ground") {
       p->getEntity()->setMaterialName("Court/Floor");
-    } 
+    } else {
+      p->getEntity()->setMaterialName("Court/Wall");
+    }
   }
   
   // Lights
@@ -242,7 +244,7 @@ void RacquetApp::createScene(void)
 
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics, 
                    btVector3(100,100,150), 
-                   btVector3( rand() % 120 - 60, rand() % 80 - 40, 5000),
+                   btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
 }
 

@@ -25,3 +25,17 @@ material Court/Racquet
 		}
 	}
 }
+
+material Court/Wall
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture tusk.jpg
+			}
+		}
+	}
+}
