@@ -160,8 +160,8 @@ void RacquetApp::createScene(void)
     Ogre::Plane(Ogre::Vector3::UNIT_X, 0),
     Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0),
     Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
-    Ogre::Plane(Ogre::Vector3::UNIT_Z, 0),
-    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0)
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0),
+    Ogre::Plane(Ogre::Vector3::UNIT_Z, 0)
   };
 
   std::string pNames[] = {
@@ -186,8 +186,8 @@ void RacquetApp::createScene(void)
     btVector3(w/2,0,0),
     btVector3(0,-h/2,0),
     btVector3(0,h/2,0),
-    btVector3(0,0,-l/2),
     btVector3(0,0,l/2),
+    btVector3(0,0,-l/2)
   };
  
   int width, height;
@@ -228,7 +228,9 @@ void RacquetApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics,
-                         btVector3(100, 100, -100));
+
+                         btVector3(100, 100, 50));
+
 
   Ball *m = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics, 
                      btVector3(100,100,150), 
@@ -248,6 +250,13 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   mRacquet->getBody()->translate(mDirection);
   mRacquet->translate(mDirection);
+
+
+  mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));  
+  if (score > highscore) {
+    highscore = score;
+    mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(score));
+  }
 
   return result;
 }
