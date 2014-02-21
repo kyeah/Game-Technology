@@ -1,0 +1,26 @@
+Implementation Update
+========================
+
+Bullet Integration: Bullet is fully integrated with our GameObject implementation, allowing new objects to be created and added to our world painlessly. Collision callbacks are working. There are still problems regarding fast objects clipping through or getting stuck inside others, and the racquet is not contained within the bounds.
+
+Look and Texturing: The floor and walls are textured, and ceiling lighting + shadowing is in place.
+
+SDL / Sound Effects: SDL is not currently integrated with our application.
+
+User Input: Keyboard/Mouse control is integrated. We are still experimenting with user input -- how to efficiently move in three dimensions, angle your racquet, and hit the ball with the right amount of force.
+
+Camera Control: The camera is statically positioned off-center and tracks the ball's movement. This will likely change, as it causes some depth confusion that makes it difficult to hit the ball.
+
+Heads-up display and Scoring: Basic scoring and display is in place, with hits against the far wall counting as one point, and double-bounces or back-wall hits resetting the score.
+
+Game Design: We will look into improving the control of the game, adding an option to reset the state, and making the game more interesting (obstacles, more balls, different types of walls).
+
+Architecture Update
+=======================
+
+Our planned architecture is working perfectly, and provides a balance between abstraction and ease-of-use.
+
+Division of Labor
+=======================
+
+The workload is balanced across all teammates. All of us are on track with what we expected to get done by week two.
