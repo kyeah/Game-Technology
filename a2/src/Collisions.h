@@ -79,16 +79,15 @@ class BulletContactCallback : public btCollisionWorld::ContactResultCallback {
     return 0;
   }
 
-  // Uncomment this if using Ogre 1.8+
-  /*
-  virtual btScalar addSingleResult(btManifoldPoint& cp, 
+  // Uncomment this if using recent Bullet Physics
+  /*  virtual btScalar addSingleResult(btManifoldPoint& cp, 
                                    const btCollisionObjectWrapper* colObj0Wrap, int partId0,int index0, 
                                    const btCollisionObjectWrapper* colObj1Wrap, int partId1,int index1) {
     return addSingleResult(cp,
                            colObj0Wrap->getCollisionObject(), partId0, index0,
                            colObj1Wrap->getCollisionObject(), partId1, index1);
     
-                           }*/
+                           } */
 
 };
 

@@ -59,7 +59,7 @@ void RacquetApp::createFrameListener(void) {
   items.push_back("Current Score");
   items.push_back("");
   items.push_back("Gravity");
-  
+
   mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
   mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, "0");
   mDetailsPanel->setParamValue(DETAILS_SCORE, "0");
@@ -68,22 +68,22 @@ void RacquetApp::createFrameListener(void) {
 
 bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
   switch(arg.key){
-    case OIS::KC_D:
-      mDirection += btVector3(-40, 0, 0);
-      oDirection.x += -40;
-      return true;
-    case OIS::KC_S:
-      mDirection += btVector3(0, 0, -40);
-      oDirection.z += -40;
-      return true;
-    case OIS::KC_A:
-      mDirection += btVector3(40, 0, 0);
-      oDirection.x += 40;
-      return true;
-    case OIS::KC_W:
-      mDirection += btVector3(0, 0, 40);
-      oDirection.z += 40;
-      return true;
+  case OIS::KC_D:
+    mDirection += btVector3(-40, 0, 0);
+    oDirection.x += -40;
+    return true;
+  case OIS::KC_S:
+    mDirection += btVector3(0, 0, -40);
+    oDirection.z += -40;
+    return true;
+  case OIS::KC_A:
+    mDirection += btVector3(40, 0, 0);
+    oDirection.x += 40;
+    return true;
+  case OIS::KC_W:
+    mDirection += btVector3(0, 0, 40);
+    oDirection.z += 40;
+    return true;
   }
 
   return BaseApplication::keyPressed(arg);
@@ -91,25 +91,23 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
 
 bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
   switch(arg.key){
-    case OIS::KC_J:
-      case OIS::KC_D:
-      mDirection -= btVector3(-40, 0, 0);
-      oDirection.x -= -40;
-      break;
-    case OIS::KC_S:
-      mDirection -= btVector3(0, 0, -40);
-      oDirection.z -= -40;
-      break;
-    case OIS::KC_A:
-      mDirection -= btVector3(40, 0, 0);
-      oDirection.x -= 40;
-      break;
-    case OIS::KC_W:
-      mDirection -= btVector3(0, 0, 40);
-      oDirection.z -= 40;
-      break;
-
-
+  case OIS::KC_J:
+  case OIS::KC_D:
+    mDirection -= btVector3(-40, 0, 0);
+    oDirection.x -= -40;
+    return true;
+  case OIS::KC_S:
+    mDirection -= btVector3(0, 0, -40);
+    oDirection.z -= -40;
+    return true;
+  case OIS::KC_A:
+    mDirection -= btVector3(40, 0, 0);
+    oDirection.x -= 40;
+    return true;
+  case OIS::KC_W:
+    mDirection -= btVector3(0, 0, 40);
+    oDirection.z -= 40;
+    return true;
   }
 
   return BaseApplication::keyPressed(arg);
@@ -119,24 +117,24 @@ bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
   int x = -arg.state.X.rel;
   int y = -arg.state.Y.rel;
   int z = -arg.state.Z.rel;
-  
+
   mRacquet->translate(btVector3(x,y,z));
 }
 
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-  if(id == OIS::MB_Left) { 
-    
+  if(id == OIS::MB_Left) {
+
     static int ballID;
     std::stringstream ss;
     ss << "myBall" << ballID;
     std::string ent = ss.str();
     ss << "node";
     ballID++;
-    
-    Ball *m = new Ball(mSceneMgr, ent, ss.str(), 0, mPhysics, 
-                       btVector3(-500,-300,500), 
+
+    Ball *m = new Ball(mSceneMgr, ent, ss.str(), 0, mPhysics,
+                       btVector3(-500,-300,500),
                        btVector3( rand() % 120 - 60, 500, rand() % 80 - 40));
-    
+
   } else if (id == OIS::MB_Right) {
     static int gravity = 0;
     btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
@@ -153,7 +151,7 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
 
     gravity = (gravity+1)%3;
   }
-  
+
   return BaseApplication::mouseReleased(arg, id);
 }
 
@@ -179,17 +177,17 @@ void RacquetApp::createScene(void)
 
   Ogre::Vector3 up[] = {
     Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Y,
-    Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Z, 
+    Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Z,
     Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_X
   };
-  
+
   //w applies to leftWall/rightWall
   //h applies to ground/ceiling
   //l applies to farWall/nearWall
   int l,w,h;
   l = 7500;
   w = h = 4500;
-  
+
   btVector3 pos[] = {
     btVector3(-w/2,0,0),
     btVector3(w/2,0,0),
@@ -198,7 +196,7 @@ void RacquetApp::createScene(void)
     btVector3(0,0,l/2),
     btVector3(0,0,-l/2)
   };
- 
+
   int width, height;
   width = w;
   height = h;
@@ -211,22 +209,22 @@ void RacquetApp::createScene(void)
                                                   planes[i], width, height, 20, 20, true, 1, 5, 5, up[i]);
 
     Plane *p = new Plane(mSceneMgr, pNames[i], pNames[i], pNames[i], 0, mPhysics, pos[i]);
-    
+
     if (pNames[i] == "ground") {
       p->getEntity()->setMaterialName("Court/Floor");
     } else {
       p->getEntity()->setMaterialName("Court/Wall");
     }
   }
-  
+
   // Lights
   Ogre::Light* lights[9];
   int z;
-  for(z = 0; z < 9; z++) { 
-	lights[z] = mSceneMgr->createLight("point light" + z); 
-  	lights[z]->setType(Ogre::Light::LT_POINT);
-	lights[z]->setDiffuseColour(.1,.1,.1);
-	lights[z]->setSpecularColour(.1,.1,.1);	
+  for(z = 0; z < 9; z++) {
+    lights[z] = mSceneMgr->createLight("point light" + z);
+    lights[z]->setType(Ogre::Light::LT_POINT);
+    lights[z]->setDiffuseColour(.1,.1,.1);
+    lights[z]->setSpecularColour(.1,.1,.1);
   }
   lights[0]->setPosition(-1499,1499,0);
   lights[1]->setPosition(-1499,1499,1000);
@@ -242,8 +240,8 @@ void RacquetApp::createScene(void)
                          btVector3(100, 100, -3500));
 
 
-  mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics, 
-                   btVector3(100,100,150), 
+  mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
+                   btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
 }
@@ -253,8 +251,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   static Ogre::Real time = mTimer->getMilliseconds();
 
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
-  time = mTimer->getMilliseconds();  
-  
+  time = mTimer->getMilliseconds();
+
   // Limit Ball Velocity
   ballVelocity = mBall->getBody()->getLinearVelocity();
   btScalar speed = ballVelocity.length();
@@ -269,8 +267,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   mRacquet->getBody()->translate(mDirection);
   mRacquet->translate(mDirection);
-  
-  mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));  
+
+  mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));
   if (score > highscore) {
     highscore = score;
     mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(score));
