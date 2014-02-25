@@ -16,9 +16,9 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   
   node = parentNode->createChildSceneNode(_nodeName);
   
-  node->setPosition(Ogre::Vector3(origin[0], origin[1], origin[2]));
+  node->translate(Ogre::Vector3(origin[0], origin[1], origin[2]));
   if (rotation)
-    node->setOrientation(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
+    node->rotate(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
   
   transform.setIdentity();
   // Extend this class dude
@@ -34,8 +34,10 @@ void GameObject::setColor(float dr, float dg, float db, float da,
 }
 
 void GameObject::addToSimulator() {
+  motionState = 0;
+  updateTransform();
   //using motionState is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-  motionState = new OgreMotionState(node);
+  motionState = new OgreMotionState(transform, node);
   
   //rigidbody is dynamic if and only if mass is non zero, otherwise static
   if (mass != 0.0f) collisionShape->calculateLocalInertia(mass, inertia);
@@ -51,9 +53,9 @@ void GameObject::addToSimulator() {
 }
 
 void GameObject::updateTransform() {
-  Ogre::Vector3 pos = node->getPosition();
+  Ogre::Vector3 pos = node->_getDerivedPosition();
   transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
-  Ogre::Quaternion qt = node->getOrientation();
+  Ogre::Quaternion qt = node->_getDerivedOrientation();
   transform.setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
   if (motionState) motionState->updateWorldTransform(transform);
 }
@@ -68,6 +70,7 @@ void GameObject::translate(btVector3 d) {
   motionState->getWorldTransform(transform);
   transform.setOrigin(transform.getOrigin() + d);
   motionState->setWorldTransform(transform);
+  body->setWorldTransform(transform);
 }
 
 void GameObject::setOrientation(btQuaternion quaternion) {

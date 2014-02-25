@@ -56,6 +56,7 @@ protected:
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
     Racquet *mRacquet;
+    Ball *mPlayer;
     Ball *mBall;
     btVector3 ballVelocity;
     btScalar MAX_SPEED;

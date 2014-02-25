@@ -167,16 +167,16 @@ void RacquetApp::createScene(void)
 
   // Boxed Environment
   Ogre::Plane planes[] = {
-    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_X, 0),
     Ogre::Plane(Ogre::Vector3::UNIT_X, 0),
-    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0),
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_X, 0),
     Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
-    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0),
-    Ogre::Plane(Ogre::Vector3::UNIT_Z, 0)
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Y, 0),
+    Ogre::Plane(Ogre::Vector3::UNIT_Z, 0),
+    Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_Z, 0)
   };
 
   std::string pNames[] = {
-    "leftWall", "rightWall", "ground", "ceiling", "farWall", "nearWall"
+    "leftWall", "rightWall", "ground", "ceiling", "nearWall", "farWall"
   };
 
   Ogre::Vector3 up[] = {
@@ -197,8 +197,8 @@ void RacquetApp::createScene(void)
     btVector3(w/2,0,0),
     btVector3(0,-h/2,0),
     btVector3(0,h/2,0),
-    btVector3(0,0,l/2),
-    btVector3(0,0,-l/2)
+    btVector3(0,0,-l/2),
+    btVector3(0,0,l/2)
   };
 
   int width, height;
@@ -240,8 +240,10 @@ void RacquetApp::createScene(void)
   lights[7]->setPosition(1499,1499,1000);
   lights[8]->setPosition(1499,1499,0);
 
-  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics,
-                         btVector3(100, 100, -3500));
+  mPlayer = new Ball(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
+                     btVector3(100,100,-3500), btVector3(0,0,0), 0);
+
+  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics);
 
 
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
@@ -269,8 +271,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
     mPhysics->stepSimulation(elapsedTime);
   }
 
-  mRacquet->getBody()->translate(mDirection);
-  mRacquet->translate(mDirection);
+  mPlayer->getBody()->translate(mDirection);
+  mPlayer->translate(mDirection);
 
   mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));
   if (score > highscore) {
