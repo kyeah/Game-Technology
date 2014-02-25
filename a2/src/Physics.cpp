@@ -2,6 +2,9 @@
 #include "GameObject.h"
 #include "RacquetObject.h"
 #include "OgreMotionState.h"
+#include "RacquetApp.h"
+#include "SDL.h"
+#include "SDL_mixer.h"
 
 int Physics::simID = 0;
 
@@ -38,6 +41,11 @@ bool Physics::checkCollisions(GameObject *obj) {
     
     contexts->clear();
     dynamicsWorld->contactTest(obj->getBody(), callback);
+	
+    //play sound if something is hit
+/*    if(!contexts->empty()){
+	RacquetApp::PlayHitSound();
+    }*/ 
     return !(contexts->empty());
   }
   return false;

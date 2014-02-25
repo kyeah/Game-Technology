@@ -17,6 +17,7 @@
 #include <btBulletDynamicsCommon.h>
 #include "RacquetApp.h"
 #include "RacquetObject.h"
+#include "Sounds.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <macUtils.h>
@@ -39,10 +40,12 @@ RacquetApp::RacquetApp(void)
   mDirection = btVector3(0, 0, 0);
   oDirection = Ogre::Vector3(0, 0, 0);
   MAX_SPEED = btScalar(10000);
+  Sounds::init();
 }
 //-------------------------------------------------------------------------------------
 RacquetApp::~RacquetApp(void)
 {
+
 }
 
 void RacquetApp::createCamera(void) {
@@ -154,6 +157,7 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
 
   return BaseApplication::mouseReleased(arg, id);
 }
+
 
 //-------------------------------------------------------------------------------------
 void RacquetApp::createScene(void)
