@@ -86,6 +86,7 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
   case OIS::KC_W:
     mDirection += btVector3(0, 0, 40);
     oDirection.z += 40;
+    Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
     return true;
   }
 
@@ -240,7 +241,7 @@ void RacquetApp::createScene(void)
   lights[7]->setPosition(1499,1499,1000);
   lights[8]->setPosition(1499,1499,0);
 
-  mPlayer = new Ball(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
+  mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
                      btVector3(100,100,-3500), btVector3(0,0,0), 0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics);
@@ -280,8 +281,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
     mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(score));
   }
 
-  btVector3 pos = mBall->getPosition();
-  mCamera->lookAt(pos[0], pos[1], pos[2]);
+  //btVector3 pos = mBall->getPosition();
+  //mCamera->lookAt(pos[0], pos[1], pos[2]);
 
   return result;
 }

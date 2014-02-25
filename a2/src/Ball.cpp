@@ -29,10 +29,17 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
 void Ball::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
-    Sounds::playSound(Sounds::BALL_HIT); 
+    
+    //Sounds::playSound(Sounds::BALL_HIT, ); 
     
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object) {
+	btVector3 point = contexts[i]->point;
+	float distance = sqrt(((point.getX())*(point.getX())) + ((point.getY())*(point.getY())) + ((point.getZ() + 100) * (point.getZ() + 100)));
+	distance = (distance * 128) / 215; 
+	
+	Sounds::playSound(Sounds::BALL_HIT, (int)distance);
+
         Ogre::String name = contexts[i]->object->getEntityName();
         if (name.compare("farWall") == 0) {
           score++;

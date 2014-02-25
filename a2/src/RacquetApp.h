@@ -20,8 +20,6 @@ This source file is part of the
 #include "BaseApplication.h"
 #include "Physics.h"
 #include "RacquetObject.h"
-#include "SDL.h"
-#include "SDL_mixer.h"
 
 extern int highscore;
 extern int score;
@@ -56,13 +54,12 @@ protected:
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
     Racquet *mRacquet;
-    Ball *mPlayer;
+    Dude *mPlayer;
     Ball *mBall;
     btVector3 ballVelocity;
     btScalar MAX_SPEED;
     btVector3 mDirection;
     Ogre::Vector3 oDirection;
-    static Mix_Music* sound;
 };
 
 #endif // #ifndef __RacquetApp_h_
