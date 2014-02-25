@@ -46,7 +46,10 @@ protected:
     void createRacquet(std::string, std::string, int, int, int);
     void createBall(int x, int y, int z, int vx, int vy, int vz);
     void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
-    void createNewScoringPlane();
+    void createNewScoringPlane(int points = 2, btVector3 pos = btVector3(0,0,7500/2 - 20), 
+                               btVector3 speed = btVector3(6000,0,0),
+                               btVector3 linearFactor = btVector3(1,0,0), 
+                               btVector3 angularFactor = btVector3(0,0,0));
     bool keyPressed( const OIS::KeyEvent &arg );
     bool keyReleased(const OIS::KeyEvent &arg);
 

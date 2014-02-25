@@ -158,16 +158,23 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
   return BaseApplication::mouseReleased(arg, id);
 }
 
-void RacquetApp::createNewScoringPlane() {
-  Ogre::SceneNode *anchor = mSceneMgr->getRootSceneNode()->createChildSceneNode("2wall");
-  anchor->translate(Ogre::Vector3(0,0,7500/2));
+void RacquetApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
+  static int wallID;
+  std::stringstream ss;
+  ss << points << "wall";
+  std::string mesh = ss.str();
+  ss << wallID;
+  std::string ent = ss.str();
+  ss << "node";
+  std::string node = ss.str();
+  wallID++;
+  
+  Plane *extra = new Plane(mSceneMgr, ent, mesh, node, 0, mPhysics, 
+                           pos, speed, 1.0, 1.0);
 
-  Plane *extra = new Plane(mSceneMgr, "2wall", "2wall", "2wall", anchor, mPhysics, btVector3(0,0-20),
-                           btVector3(6000,0,0), 0.001, 1.0);
-
-  extra->getBody()->setCollisionFlags(extra->getBody()->getCollisionFlags() |
-                                      btCollisionObject::CF_KINEMATIC_OBJECT);
-  extra->getBody()->setActivationState(DISABLE_DEACTIVATION);
+  extra->setColor(1,0,0,0,0,0,0,0);
+  extra->getBody()->setLinearFactor(linearFactor);
+  extra->getBody()->setAngularFactor(angularFactor);
 }
 
 //-------------------------------------------------------------------------------------
