@@ -158,6 +158,17 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
   return BaseApplication::mouseReleased(arg, id);
 }
 
+void RacquetApp::createNewScoringPlane() {
+  Ogre::SceneNode *anchor = mSceneMgr->getRootSceneNode()->createChildSceneNode("2wall");
+  anchor->translate(Ogre::Vector3(0,0,7500/2));
+
+  Plane *extra = new Plane(mSceneMgr, "2wall", "2wall", "2wall", anchor, mPhysics, btVector3(0,0-20),
+                           btVector3(6000,0,0), 0.001, 1.0);
+
+  extra->getBody()->setCollisionFlags(extra->getBody()->getCollisionFlags() |
+                                      btCollisionObject::CF_KINEMATIC_OBJECT);
+  extra->getBody()->setActivationState(DISABLE_DEACTIVATION);
+}
 
 //-------------------------------------------------------------------------------------
 void RacquetApp::createScene(void)
@@ -221,6 +232,14 @@ void RacquetApp::createScene(void)
     }
   }
 
+  Ogre::MeshManager::getSingleton().createPlane("2wall",
+                                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                planes[5], w/4, w/4, 20, 20, true, 1, 5, 5, up[5]);
+
+  Ogre::MeshManager::getSingleton().createPlane("3wall",
+                                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                planes[5], w/6, w/6, 20, 20, true, 1, 5, 5, up[5]);
+
   // Lights
   Ogre::Light* lights[9];
   int z;
@@ -250,6 +269,8 @@ void RacquetApp::createScene(void)
                    btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
+
+  createNewScoringPlane();
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
