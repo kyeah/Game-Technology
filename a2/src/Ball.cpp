@@ -1,5 +1,6 @@
 #include "RacquetApp.h"
 #include "RacquetObject.h"
+#include "Sounds.h"
 
 Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode, 
            Physics* _physics,
@@ -28,7 +29,7 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
 void Ball::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
-    // SoundMgr->playClip("BOINK");
+    Sounds::playSound(Sounds::BALL_HIT); 
     
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object) {
