@@ -60,6 +60,8 @@ protected:
     btScalar MAX_SPEED;
     btVector3 mDirection;
     Ogre::Vector3 oDirection;
+    int swing;
+    int unswing;
 };
 
 #endif // #ifndef __RacquetApp_h_

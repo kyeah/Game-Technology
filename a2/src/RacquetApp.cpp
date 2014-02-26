@@ -28,6 +28,10 @@ const static int DETAILS_HIGHSCORE = 0;
 const static int DETAILS_SCORE = 1;
 const static int DETAILS_GRAVITY = 3;
 
+const static int SWING_DELAY = 5;
+const static int UNSWING_DELAY = 10;
+
+
 int highscore = 0;
 int score = 0;
 
@@ -39,7 +43,9 @@ RacquetApp::RacquetApp(void)
   mTimer->reset();
   mDirection = btVector3(0, 0, 0);
   oDirection = Ogre::Vector3(0, 0, 0);
-  MAX_SPEED = btScalar(10000);
+  MAX_SPEED = btScalar(8000);
+  swing = 0;
+  unswing = 0;
   Sounds::init();
 }
 //-------------------------------------------------------------------------------------
@@ -50,7 +56,7 @@ RacquetApp::~RacquetApp(void)
 
 void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(-800,0,-7000);
+  mCamera->setPosition(-500,-200,-7000);
   mCamera->lookAt(0,0,500);
 }
 
@@ -86,6 +92,11 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
   case OIS::KC_W:
     mDirection += btVector3(0, 0, 40);
     oDirection.z += 40;
+    
+    return true;
+  case OIS::KC_SPACE:
+    if(swing == 0)
+      swing = SWING_DELAY;
     Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
     return true;
   }
@@ -242,7 +253,7 @@ void RacquetApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
-                     btVector3(100,100,-3500), btVector3(0,0,0), 0);
+                     btVector3(100,100,-2500), btVector3(0,0,0), 0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics);
 
@@ -274,6 +285,21 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   mPlayer->getBody()->translate(mDirection);
   mPlayer->translate(mDirection);
+
+  if(unswing > 0){
+    mRacquet->translate(btVector3(0, 0, -15));
+    //mRacquet->rotate(btQuaternion(btVector3(1, 0, 0), btScalar(70)));
+    unswing--;
+  }
+
+  if(swing > 0){
+    mRacquet->translate(btVector3(0, 0, 30));
+    //mRacquet->rotate(btQuaternion(btVector3(1, 0, 0), btScalar(90)));
+    swing--;
+    if(swing == 0)
+      unswing = UNSWING_DELAY;
+
+  }
 
   mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));
   if (score > highscore) {
