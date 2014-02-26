@@ -50,7 +50,7 @@ RacquetApp::~RacquetApp(void)
 
 void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(-800,0,-7000);
+  mCamera->setPosition(-800,0,-8000);
   mCamera->lookAt(0,0,500);
 }
 
