@@ -171,6 +171,24 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
   return BaseApplication::mouseReleased(arg, id);
 }
 
+void RacquetApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
+  static int wallID;
+  std::stringstream ss;
+  ss << points << "wall";
+  std::string mesh = ss.str();
+  ss << wallID;
+  std::string ent = ss.str();
+  ss << "node";
+  std::string node = ss.str();
+  wallID++;
+  
+  Plane *extra = new Plane(mSceneMgr, ent, mesh, node, 0, mPhysics, 
+                           pos, speed, 1.0, 1.0);
+
+  extra->setColor(1,0,0,0,0,0,0,0);
+  extra->getBody()->setLinearFactor(linearFactor);
+  extra->getBody()->setAngularFactor(angularFactor);
+}
 
 //-------------------------------------------------------------------------------------
 void RacquetApp::createScene(void)
@@ -250,6 +268,14 @@ int width, height;
     }
   }
 
+  Ogre::MeshManager::getSingleton().createPlane("2wall",
+                                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                planes[5], w/4, w/4, 20, 20, true, 1, 5, 5, up[5]);
+
+  Ogre::MeshManager::getSingleton().createPlane("3wall",
+                                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                planes[5], w/6, w/6, 20, 20, true, 1, 5, 5, up[5]);
+
   // Lights
   Ogre::Light* lights[9];
   int z;
@@ -279,6 +305,8 @@ int width, height;
                    btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
+
+  createNewScoringPlane();
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {

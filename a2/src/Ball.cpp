@@ -42,9 +42,15 @@ void Ball::update(float elapsedTime) {
 
         Ogre::String name = contexts[i]->object->getEntityName();
         if (name.compare("farWall") == 0) {
+          bouncedOnce = false;
           score++;
           break;
-        } else if (name.compare("nearWall") == 0) {
+        } else if (name.compare(0, 5, "2wall") == 0) {
+          bouncedOnce = false;
+          int points = name[0] - '0';
+          score += points;
+          break;
+        }else if (name.compare("nearWall") == 0) {
           bouncedOnce = false;
           score = 0;
           break;
