@@ -76,8 +76,8 @@ particle_system Examples/PurpleFountain
     affector ColourFader
     {
         red -0.25
-        green -0.25
-        blue -0.25
+        green -0.0
+        blue -0.0
     }
 }
 

@@ -12,7 +12,7 @@ Racquet::Racquet(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _n
   entity->setMaterialName("Court/Racquet");
   
   node->attachObject(entity);
-  node->scale(3,4,.2);
+  node->scale(3.0f,4.0f,.2);
 
   node->_update(true,true);
   node->_updateBounds();

@@ -16,7 +16,7 @@ Dude::Dude(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
   node->attachObject(entity);
 
   Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
-  collisionShape = new btSphereShape(s[0]);
+  collisionShape = new btSphereShape(0.01);
   addToSimulator();
 
   body->setCcdMotionThreshold(1);

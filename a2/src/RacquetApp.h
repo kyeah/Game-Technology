@@ -22,6 +22,7 @@ This source file is part of the
 #include "RacquetObject.h"
 
 extern int highscore;
+extern int lastscore;
 extern int score;
 
 class RacquetApp : public BaseApplication
@@ -36,6 +37,7 @@ public:
     OIS::Keyboard * getKeyboard(void) { return mKeyboard; }
 
     bool frameStarted(const Ogre::FrameEvent &evt);
+    void restart();
 
 protected:
     virtual void createScene(void);
@@ -73,4 +75,9 @@ protected:
     int unswing;
 };
 
+extern RacquetApp *instance;
+
 #endif // #ifndef __RacquetApp_h_
+
+
+
