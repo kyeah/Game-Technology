@@ -269,10 +269,10 @@ int width, height;
   lights[7]->setPosition(1499,1499,1000);
   lights[8]->setPosition(1499,1499,0);
 
-  mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
-                    btVector3(100,100,-1000), btVector3(0,0,0), 0);
+//  mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
+//                    btVector3(100,100,-1000), btVector3(0,0,0), 0);
 
-  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics);
+  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", 0, mPhysics);
 
 
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
@@ -300,8 +300,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
     mPhysics->stepSimulation(elapsedTime);
   }
 
-  mPlayer->getBody()->translate(mDirection);
-  mPlayer->translate(mDirection);
+  mRacquet->getBody()->translate(mDirection);
+  mRacquet->translate(mDirection);
 
   if(unswing > 0){
     mRacquet->translate(btVector3(0, 0, -15));
