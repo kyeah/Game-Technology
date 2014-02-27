@@ -11,6 +11,7 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
   entity = mgr->createEntity(_entName, "sphere.mesh");
   entity->setCastShadows(true);
+  entity->setMaterialName("Court/Ball");
 
   node->attachObject(entity);
 

@@ -6,7 +6,8 @@ material Court/Floor
 		{
 			texture_unit
 			{
-				texture wood.jpg
+				texture MRAMOR6X6.jpg
+				scale 0.75 0.75
 			}
 		}
 	}
@@ -18,9 +19,13 @@ material Court/Racquet
 	{
 		pass
 		{
+			scene_blend alpha_blend
+			depth_write off
+			
 			texture_unit
 			{
-				texture clouds.jpg
+				colour_op_ex source1 src_manual src_current 0 0 0.8
+				alpha_op_ex source1 src_manual src_current 0.25
 			}
 		}
 	}
@@ -34,8 +39,28 @@ material Court/Wall
 		{
 			texture_unit
 			{
-				texture tusk.jpg
+				colour_op_ex source1 src_manual src_current 0.8 0 0
 			}
 		}
 	}
 }
+
+material Court/Ball
+    {
+        technique
+        {
+            pass
+            {
+                ambient 1.0 1.0 1.0
+                diffuse 1.0 1.0 1.0
+                specular 1.0 1.0 1.0 10000.0
+                emissive 0.0 0.0 0.0 1
+                texture_unit
+                {
+                    texture nm_fr.png
+                    color_op_ex blend_manual src_texture src_current 0.1
+                    env_map spherical
+                }
+            }
+        }
+    }
