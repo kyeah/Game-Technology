@@ -62,10 +62,13 @@ protected:
     Racquet *mRacquet;
     Dude *mPlayer;
     Ball *mBall;
+
     btVector3 ballVelocity;
     btScalar MAX_SPEED;
     btVector3 mDirection;
     Ogre::Vector3 oDirection;
+    
+    int movementSpeed;
     int swing;
     int unswing;
 };

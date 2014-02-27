@@ -29,7 +29,7 @@ void GameObject::setColor(float ar, float ag, float ab,
                           float sr, float sg, float sb, float sa) {
   
   Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
-  mat = mat->clone(mat->getName() + "1");
+  mat = mat->clone(mat->getName() + entName + "1");
   Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
   pass->setAmbient(ar,ag,ab);
   pass->setDiffuse(dr, dg, db, da);
@@ -39,7 +39,7 @@ void GameObject::setColor(float ar, float ag, float ab,
 
 void GameObject::setAmbient(float ar, float ag, float ab) {
   Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
-  mat = mat->clone(mat->getName() + "1");
+  mat = mat->clone(mat->getName() + entName + "1");
   Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
   pass->setAmbient(ar,ag,ab);
   entity->setMaterialName(mat->getName());
@@ -47,7 +47,7 @@ void GameObject::setAmbient(float ar, float ag, float ab) {
 
 void GameObject::setDiffuse(float dr, float dg, float db, float da) {
   Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
-  mat = mat->clone(mat->getName() + "1");
+  mat = mat->clone(mat->getName() + entName + "1");
   Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
   pass->setDiffuse(dr, dg, db, da);
   entity->setMaterialName(mat->getName());
@@ -55,7 +55,7 @@ void GameObject::setDiffuse(float dr, float dg, float db, float da) {
 
 void GameObject::setSpecular(float sr, float sg, float sb, float sa) {
   Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
-  mat = mat->clone(mat->getName() + "1");
+  mat = mat->clone(mat->getName() + entName + "1");
   Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
   pass->setSpecular(sr, sg, sb, sa);
   entity->setMaterialName(mat->getName());

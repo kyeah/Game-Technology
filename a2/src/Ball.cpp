@@ -42,7 +42,6 @@ void Ball::update(float elapsedTime) {
   if (physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object) {
-        std::cout << contexts[i]->object->getEntityName() << std::endl;
         btVector3 point = contexts[i]->point;
         float distance = sqrt(((point.getX())*(point.getX())) + 
                               ((point.getY())*(point.getY())) + 

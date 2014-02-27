@@ -35,6 +35,7 @@ const static int UNSWING_DELAY = 10;
 int highscore = 0;
 int score = 0;
 
+btVector3 playerInitPos(100,-1200,-2245);
 btVector3 *axis; // Swing rotation axis
 static int gravMag = 7000;
 static bool pongMode = true;
@@ -50,6 +51,7 @@ RacquetApp::RacquetApp(void)
   MAX_SPEED = btScalar(8000);
   swing = 0;
   unswing = 0;
+  movementSpeed = 1;
   Sounds::init();
 }
 //-------------------------------------------------------------------------------------
@@ -110,6 +112,9 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
     }
 
     return true;
+  case OIS::KC_LSHIFT:
+    movementSpeed = 2;
+    return true;
   case OIS::KC_SPACE:
     if(swing == 0 && unswing == 0) {
       swing = SWING_DELAY;
@@ -129,7 +134,7 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
     swing = unswing = 0;
     pongMode = !pongMode;
     mPlayer->setOrientation(btQuaternion(0,0,0,1));
-    mPlayer->setPosition(btVector3(100,-1100,-2245));
+    mPlayer->setPosition(playerInitPos);
     mPlayer->getEntity()->setVisible(!mPlayer->getEntity()->isVisible());
     return true;
   case OIS::KC_J:
@@ -159,7 +164,9 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
       oDirection.z -= 40;
     }
     return true;
-
+  case OIS::KC_LSHIFT:
+    movementSpeed = 1;
+    return true;
   }
 
   return BaseApplication::keyPressed(arg);
@@ -227,10 +234,11 @@ void RacquetApp::createNewScoringPlane(int points, btVector3 pos, btVector3 spee
 
   extra->points = points;
 
-  if (points == 2)
+  if (points == 2) {
     extra->setDiffuse(1,0,0,0);
-  else
-    extra->setDiffuse(0,1,0,0);
+  } else {
+    extra->setAmbient(0.3,0.7,0.3);
+  }
 
   extra->getBody()->setLinearFactor(linearFactor);
   extra->getBody()->setAngularFactor(angularFactor);
@@ -344,7 +352,7 @@ void RacquetApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
-                     btVector3(100,-1100,-2245), btVector3(0,0,0), 0);
+                     playerInitPos, btVector3(0,0,0), 0);
   
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics,
                          btVector3(0,700,0));
@@ -357,7 +365,7 @@ void RacquetApp::createScene(void)
   if (pongMode) mPlayer->getEntity()->setVisible(false);
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
-  createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
+  createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 500), btVector3(30,0,0));
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
@@ -380,8 +388,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
     mPhysics->stepSimulation(elapsedTime);
   }
 
-  mPlayer->getBody()->translate(mDirection);
-  mPlayer->translate(mDirection);
+  mPlayer->getBody()->translate(mDirection*movementSpeed);
+  mPlayer->translate(mDirection*movementSpeed);
 
   // Swings
   if(unswing > 0){
