@@ -11,7 +11,7 @@ Plane::Plane(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshN
   entity->setCastShadows(true);
   
   node->attachObject(entity);
-  
+
   Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
   collisionShape = new btBoxShape(btVector3(s[0], s[1], s[2]));
   addToSimulator();

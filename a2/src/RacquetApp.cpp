@@ -56,7 +56,7 @@ RacquetApp::~RacquetApp(void)
 
 void RacquetApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(-500,-200,-7000);
+  mCamera->setPosition(0,0,-7000);
   mCamera->lookAt(0,0,500);
 }
 
@@ -123,6 +123,7 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
     mDirection -= btVector3(0, 0, 40);
     oDirection.z -= 40;
     return true;
+    
   }
 
   return BaseApplication::keyPressed(arg);
@@ -201,7 +202,7 @@ void RacquetApp::createScene(void)
   //h applies to ground/ceiling
   //l applies to farWall/nearWall
   int l,w,h;
-  l = 7500;
+  l = 3000;
   w = h = 4500;
 
   btVector3 pos[] = {
@@ -213,7 +214,23 @@ void RacquetApp::createScene(void)
     btVector3(0,0,l/2)
   };
 
-  int width, height;
+//lines
+  Ogre::Entity* line1 = mSceneMgr->createEntity("L1", "cube.mesh");
+  Ogre::Entity* line2 = mSceneMgr->createEntity("L2", "cube.mesh");
+  Ogre::Entity* line3 = mSceneMgr->createEntity("L3", "cube.mesh");
+  Ogre::Entity* line4 = mSceneMgr->createEntity("L4", "cube.mesh");
+
+  Ogre::SceneNode* n1 = mSceneMgr->getRootSceneNode()->createChildSceneNode("N1",Ogre::Vector3(0.0f, 2245.0f, -1500.0f));
+  Ogre::SceneNode* n2 = mSceneMgr->getRootSceneNode()->createChildSceneNode("N2",Ogre::Vector3(0.0f, -2245.0f, -1500.0f));
+  Ogre::SceneNode* n3 = mSceneMgr->getRootSceneNode()->createChildSceneNode("N3",Ogre::Vector3(2245.0f, 0.0f, -1500.0f));
+  Ogre::SceneNode* n4 = mSceneMgr->getRootSceneNode()->createChildSceneNode("N4",Ogre::Vector3(-2245.0f, 0.0f, -1500.0f));
+
+  n1->attachObject(line1); n1->scale(300, .5, .5);
+  n2->attachObject(line2); n2->scale(300, .5, .5);
+  n3->attachObject(line3); n3->scale(.5, 300, .5);
+  n4->attachObject(line4); n4->scale(.5, 300, .5);
+  
+int width, height;
   width = w;
   height = h;
   for (int i = 0; i < 6; i++) {
@@ -253,7 +270,7 @@ void RacquetApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
-                     btVector3(100,100,-2500), btVector3(0,0,0), 0);
+                    btVector3(100,100,-1000), btVector3(0,0,0), 0);
 
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics);
 
