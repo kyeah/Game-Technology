@@ -80,7 +80,7 @@ class BulletContactCallback : public btCollisionWorld::ContactResultCallback {
   }
 
   // Uncomment this if using recent Bullet Physics
-  /*virtual btScalar addSingleResult(btManifoldPoint& cp, 
+  /*  virtual btScalar addSingleResult(btManifoldPoint& cp, 
                                    const btCollisionObjectWrapper* colObj0Wrap, int partId0,int index0, 
                                    const btCollisionObjectWrapper* colObj1Wrap, int partId1,int index1) {
     return addSingleResult(cp,

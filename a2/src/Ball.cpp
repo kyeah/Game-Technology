@@ -66,7 +66,7 @@ void Ball::update(float elapsedTime) {
           } else if (name.compare("ground") == 0) {
             if (bouncedOnce) {
               bouncedOnce = false;
-              score = 0;
+              instance->restart();
             } else {
               bouncedOnce = true;
             }

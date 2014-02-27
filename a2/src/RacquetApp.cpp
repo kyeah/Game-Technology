@@ -25,20 +25,25 @@
 #endif
 
 const static int DETAILS_HIGHSCORE = 0;
-const static int DETAILS_SCORE = 1;
-const static int DETAILS_GRAVITY = 3;
+const static int DETAILS_LASTSCORE = 2;
+const static int DETAILS_SCORE = 3;
+const static int DETAILS_GRAVITY = 4;
 
 const static int SWING_DELAY = 5;
 const static int UNSWING_DELAY = 10;
 
-
 int highscore = 0;
+int lastscore = 0;
 int score = 0;
 
+btVector3 racquetInitPos(0,700.0f,0);
 btVector3 playerInitPos(100,-1200,-2245);
 btVector3 *axis; // Swing rotation axis
 static int gravMag = 7000;
-static bool pongMode = true;
+static bool pongMode = false;
+static bool right_mouse_button = false;
+
+RacquetApp *instance;
 
 //-------------------------------------------------------------------------------------
 RacquetApp::RacquetApp(void)
@@ -57,7 +62,6 @@ RacquetApp::RacquetApp(void)
 //-------------------------------------------------------------------------------------
 RacquetApp::~RacquetApp(void)
 {
-
 }
 
 void RacquetApp::createCamera(void) {
@@ -71,12 +75,14 @@ void RacquetApp::createFrameListener(void) {
 
   Ogre::StringVector items;
   items.push_back("Highscore");
-  items.push_back("Current Score");
   items.push_back("");
+  items.push_back("Last Score");
+  items.push_back("Current Score");
   items.push_back("Gravity");
 
   mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
   mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_LASTSCORE, "0");
   mDetailsPanel->setParamValue(DETAILS_SCORE, "0");
   mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downwards");
 }
@@ -126,10 +132,22 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
   return BaseApplication::keyPressed(arg);
 }
 
+void RacquetApp::restart() {
+  static int gamenum = 0;
+  mBall->setPosition(btVector3(0,0,0));
+  mBall->getBody()->setLinearVelocity(btVector3(0,0,0));
+  std::cout << "Game " << gamenum++ << ": " << score << std::endl;
+  lastscore = score;
+  score = 0;
+}
+
 bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
   static bool vert = false;
 
   switch(arg.key){
+  case OIS::KC_R:
+    restart();
+    return true;
   case OIS::KC_P:
     swing = unswing = 0;
     pongMode = !pongMode;
@@ -166,6 +184,22 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
     return true;
   case OIS::KC_LSHIFT:
     movementSpeed = 1;
+    return true;
+  case OIS::KC_G:
+    static int gravity = 0;
+    btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
+    if (gravity == 0) {
+      world->setGravity(btVector3(0,0,0));
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
+    } else if (gravity == 1) {
+      world->setGravity(btVector3(0,gravMag,0));
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Upward");
+    } else if (gravity == 2) {
+      world->setGravity(btVector3(0,-gravMag,0));
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downward");
+    }
+
+    gravity = (gravity+1)%3;
     return true;
   }
 
@@ -204,32 +238,19 @@ bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
 }
 
 bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-  if(id == OIS::MB_Left) {
-    if(swing == 0 && unswing == 0) {
+  if(swing == 0 && unswing == 0) {
+    
+    if(id == OIS::MB_Left || id == OIS::MB_Right) {
       swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
 
       Ogre::Vector3 p = mRacquet->getNode()->getPosition();
       axis = new btVector3(p[1], -p[0], 0);
-    }
 
-  } else if (id == OIS::MB_Right) {
-    static int gravity = 0;
-    btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
-    if (gravity == 0) {
-      world->setGravity(btVector3(0,0,0));
-      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
-    } else if (gravity == 1) {
-      world->setGravity(btVector3(0,gravMag,0));
-      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Upward");
-    } else if (gravity == 2) {
-      world->setGravity(btVector3(0,-gravMag,0));
-      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downward");
+      right_mouse_button = (id == OIS::MB_Right);
     }
-
-    gravity = (gravity+1)%3;
   }
-
+  
   return BaseApplication::mouseReleased(arg, id);
 }
 
@@ -371,7 +392,7 @@ void RacquetApp::createScene(void)
                      playerInitPos, btVector3(0,0,0), 0);
   
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics,
-                         btVector3(0,700,0));
+                         racquetInitPos);
 
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
                    btVector3(100,100,150),
@@ -383,7 +404,7 @@ void RacquetApp::createScene(void)
   if (pongMode) mPlayer->getEntity()->setVisible(false);
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
-  createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 500), btVector3(30,0,0));
+  createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
@@ -444,8 +465,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   
   // Swings
   if(unswing > 0){
-    if (pongMode) {
-      mPlayer->translate(btVector3(0, 0, -25));
+    if (pongMode || right_mouse_button) {
+      mPlayer->translate(btVector3(0, 0, -15));
     } else if (axis) {
       mPlayer->rotate(btQuaternion(*axis, btScalar(-0.2)));
     }
@@ -453,8 +474,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   }
 
   if(swing > 0){
-    if (pongMode) {
-      mPlayer->translate(btVector3(0, 0, 50));
+    if (pongMode || right_mouse_button) {
+      mPlayer->translate(btVector3(0, 0, 30));
     } else if (axis) {
       mPlayer->rotate(btQuaternion(*axis, btScalar(0.4)));
     }
@@ -463,10 +484,11 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
       unswing = UNSWING_DELAY;
   }
 
+  mDetailsPanel->setParamValue(DETAILS_LASTSCORE, std::to_string(lastscore));
   mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));
   if (score > highscore) {
     highscore = score;
-    mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(score));
+    mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(highscore));
   }
 
   btVector3 pos = (pongMode ? mRacquet->getPosition() : mPlayer->getPosition());
@@ -508,6 +530,7 @@ extern "C" {
 #else
     // Create application object
     RacquetApp app;
+    instance = &app;
 
     try {
       app.go();
