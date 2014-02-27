@@ -362,6 +362,8 @@ void RacquetApp::createScene(void)
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
 
+  mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain2", "Examples/PurpleFountain"));
+
   if (pongMode) mPlayer->getEntity()->setVisible(false);
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
