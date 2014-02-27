@@ -23,8 +23,13 @@ class GameObject {
   void updateTransform();
   void addToSimulator();
 
-  void setColor(float dr, float dg, float db, float da,
+  void setColor(float ar, float ag, float ab,
+                float dr, float dg, float db, float da,
                 float sr, float sg, float sb, float sa);
+
+  void setAmbient(float ar, float ag, float ab);
+  void setDiffuse(float dr, float dg, float db, float da);
+  void setSpecular(float sr, float sg, float sb, float sa);
 
   void setPosition(btVector3 position);
   void translate(btVector3 d);
