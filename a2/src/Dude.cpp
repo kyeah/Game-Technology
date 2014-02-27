@@ -24,6 +24,8 @@ Dude::Dude(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
   body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
   body->setActivationState(DISABLE_DEACTIVATION);
+  setAmbient(0.5,0.5,0.9);
+  setSpecular(0.1,0,0,0.4);
 }
 
 void Dude::update(float elapsedTime) {

@@ -122,3 +122,8 @@ btQuaternion GameObject::getOrientation() {
   motionState->getWorldTransform(transform);
   return transform.getRotation();
 }
+
+void GameObject::setVelocity(btVector3 vel) {
+  initVel = vel;
+  body->setLinearVelocity(initVel);
+}

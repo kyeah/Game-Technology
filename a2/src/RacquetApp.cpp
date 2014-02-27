@@ -134,8 +134,12 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
 
 void RacquetApp::restart() {
   static int gamenum = 0;
+  mPhysics->removeObject(mBall);
   mBall->setPosition(btVector3(0,0,0));
-  mBall->getBody()->setLinearVelocity(btVector3(0,0,0));
+  mBall->setVelocity(btVector3(0,0,0));
+  mBall->updateTransform();
+  mBall->addToSimulator();
+  //  mPhysics->addObject(mBall);
   std::cout << "Game " << gamenum++ << ": " << score << std::endl;
   lastscore = score;
   score = 0;

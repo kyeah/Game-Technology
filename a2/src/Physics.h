@@ -36,6 +36,7 @@ class Physics {
                             btVector3 origin=btVector3(0,0,0), btQuaternion *rotation=0);
   
   int addObject(GameObject *obj);
+  void removeObject(GameObject *obj);
   bool checkCollisions(GameObject *obj);
   bool checkCollisionPair(GameObject *obj1, GameObject *obj2);
   void stepSimulation(const Ogre::Real elapsedTime, int maxSubsteps = 1, 
