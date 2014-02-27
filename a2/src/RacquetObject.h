@@ -57,5 +57,6 @@ class ScoringPlane : public Plane {
                btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   void update(float elapsedTime);
+  void cycleColor();
   int width, length, height;
 };

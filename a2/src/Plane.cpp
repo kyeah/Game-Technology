@@ -56,3 +56,28 @@ void ScoringPlane::update(float elapsedTime) {
   if (std::abs(pos[2]) + s[2] > width/2) initVel[2] *= -1;
   translate(initVel);
 }
+
+void ScoringPlane::cycleColor() {
+  static btVector3 *diffuse[3];
+  diffuse[0] = new btVector3(1,0,0);
+  diffuse[1] = new btVector3(0,1,0);
+  diffuse[2] = new btVector3(0,0,1);
+
+  static btVector3 *amb[3];
+  amb[0] = new btVector3(0.3,0.7,0.3);
+  amb[1] = new btVector3(0.3,0.3,0.7);
+  amb[2] = new btVector3(0.7,0.3,0.3);
+  
+  static int currDiffuse = 0;
+  static int currAmb = 0;
+
+  if (points == 2) {
+    btVector3 d = *diffuse[currDiffuse];
+    setDiffuse(d[0], d[1], d[2], 0);
+    currDiffuse = (currDiffuse + 1) % 3;
+  } else {
+    btVector3 a = *amb[currAmb];
+    setAmbient(a[0], a[1], a[2]);
+    currAmb = (currAmb + 1) % 3;
+  }
+}

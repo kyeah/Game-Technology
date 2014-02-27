@@ -275,12 +275,7 @@ void RacquetApp::createNewScoringPlane(int points, btVector3 pos, btVector3 spee
 
   extra->points = points;
 
-  if (points == 2) {
-    extra->setDiffuse(1,0,0,0);
-  } else {
-    extra->setAmbient(0.3,0.7,0.3);
-  }
-
+  extra->cycleColor();
   extra->getBody()->setLinearFactor(linearFactor);
   extra->getBody()->setAngularFactor(angularFactor);
 }
@@ -403,6 +398,7 @@ void RacquetApp::createScene(void)
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
 
+  mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain1", "Examples/PurpleFountain"));
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain2", "Examples/PurpleFountain"));
 
   if (pongMode) mPlayer->getEntity()->setVisible(false);
@@ -470,18 +466,18 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   // Swings
   if(unswing > 0){
     if (pongMode || right_mouse_button) {
-      mPlayer->translate(btVector3(0, 0, -15));
+      mPlayer->translate(btVector3(0, 0, -25));
     } else if (axis) {
-      mPlayer->rotate(btQuaternion(*axis, btScalar(-0.2)));
+      mPlayer->rotate(btQuaternion(*axis, btScalar(-0.1)));
     }
     unswing--;
   }
 
   if(swing > 0){
     if (pongMode || right_mouse_button) {
-      mPlayer->translate(btVector3(0, 0, 30));
+      mPlayer->translate(btVector3(0, 0, 50));
     } else if (axis) {
-      mPlayer->rotate(btQuaternion(*axis, btScalar(0.4)));
+      mPlayer->rotate(btQuaternion(*axis, btScalar(0.2)));
     }
     swing--;
     if(swing == 0)
