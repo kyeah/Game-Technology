@@ -21,8 +21,9 @@ ADDITIONAL FEATURES
 
 FILES
 =================================
-BaseApplication.h/cpp (Modified slightly to show Gravity status in advanced stats)
-RacquetApp.h/cpp (Main application files)
-Physics.h/cpp, OgreMotionState.h/cpp (Bullet integration helper files)
+BaseApplication.h/cpp
+RacquetApp.h/cpp (Main application files, Game Logic)
+Physics.h/cpp, OgreMotionState.h/cpp, Collisions.h (Bullet integration files)
+SDL.h, SDL_mixer.h, Sounds.cpp/h (SDL/Mixer integration files)
 GameObject.h, RacquetObject.h (General Game Object Definitions)
-Racquet.cpp, Ball.cpp (Specific Game Object Definitions)
+Racquet.cpp, Ball.cpp, Plane.cpp, Dude.cpp (Specific Game Object Definitions)
