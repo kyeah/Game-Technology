@@ -24,12 +24,40 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   // Extend this class dude
 }
 
-void GameObject::setColor(float dr, float dg, float db, float da,
+void GameObject::setColor(float ar, float ag, float ab,
+                          float dr, float dg, float db, float da,
                           float sr, float sg, float sb, float sa) {
+  
   Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
+  mat = mat->clone(mat->getName() + "1");
+  Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
+  pass->setAmbient(ar,ag,ab);
+  pass->setDiffuse(dr, dg, db, da);
+  pass->setSpecular(sr, sg, sb, sa);
+  entity->setMaterialName(mat->getName());
+}
+
+void GameObject::setAmbient(float ar, float ag, float ab) {
+  Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
+  mat = mat->clone(mat->getName() + "1");
+  Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
+  pass->setAmbient(ar,ag,ab);
+  entity->setMaterialName(mat->getName());
+}
+
+void GameObject::setDiffuse(float dr, float dg, float db, float da) {
+  Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
+  mat = mat->clone(mat->getName() + "1");
   Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
   pass->setDiffuse(dr, dg, db, da);
-  pass->setSpecular(dr, dg, db, da);
+  entity->setMaterialName(mat->getName());
+}
+
+void GameObject::setSpecular(float sr, float sg, float sb, float sa) {
+  Ogre::MaterialPtr mat = entity->getSubEntity(0)->getMaterial();
+  mat = mat->clone(mat->getName() + "1");
+  Ogre::Pass *pass = mat->getTechnique(0)->getPass(0);
+  pass->setSpecular(sr, sg, sb, sa);
   entity->setMaterialName(mat->getName());
 }
 
@@ -81,7 +109,7 @@ void GameObject::setOrientation(btQuaternion quaternion) {
 
 void GameObject::rotate(btQuaternion q) {
   motionState->getWorldTransform(transform);
-  transform.setRotation(transform.getRotation() + q);
+  transform.setRotation(transform.getRotation()*q);
   motionState->setWorldTransform(transform);
 }
 

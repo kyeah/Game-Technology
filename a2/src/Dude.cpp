@@ -21,15 +21,11 @@ Dude::Dude(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
   body->setCcdMotionThreshold(1);
   body->setCcdSweptSphereRadius(0.4);
+
+  body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+  body->setActivationState(DISABLE_DEACTIVATION);
 }
 
 void Dude::update(float elapsedTime) {
-  if (physics->checkCollisions(this)) {
-    for (int i = 0; i < contexts.size(); i++) {
-      if (contexts[i]->object) {
-        Ogre::String name = contexts[i]->object->getEntityName();
-      }
-    }
-  }
 }    
 

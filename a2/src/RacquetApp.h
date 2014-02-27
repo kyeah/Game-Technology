@@ -44,8 +44,8 @@ protected:
     void createRacquet(std::string, std::string, int, int, int);
     void createBall(int x, int y, int z, int vx, int vy, int vz);
     void createBall(std::string entName, std::string nodeName, int x, int y, int z, int vx, int vy, int vz);
-    void createNewScoringPlane(int points = 2, btVector3 pos = btVector3(0,0,7500/2 - 20), 
-                               btVector3 speed = btVector3(6000,0,0),
+    void createNewScoringPlane(int points = 2, btVector3 pos = btVector3(0,0,5000/2 - 20), 
+                               btVector3 speed = btVector3(50,0,0),
                                btVector3 linearFactor = btVector3(1,0,0), 
                                btVector3 angularFactor = btVector3(0,0,0));
     bool keyPressed( const OIS::KeyEvent &arg );
@@ -53,6 +53,8 @@ protected:
 
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+    int worldWidth,worldLength,worldHeight;
 
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
