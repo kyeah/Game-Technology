@@ -113,8 +113,8 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
       mDirection += btVector3(0, 40, 0);
       oDirection.y += 40;
     } else {
-      mDirection += btVector3(0, 0, 40);
-      oDirection.z += 40;
+        mDirection += btVector3(0, 0, 40);
+        oDirection.z += 40;
     }
 
     return true;
@@ -182,8 +182,8 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
       mDirection -= btVector3(0, 40, 0);
       oDirection.y -= 40;
     } else {
-      mDirection -= btVector3(0, 0, 40);
-      oDirection.z -= 40;
+        mDirection -= btVector3(0, 0, 40);
+        oDirection.z -= 40;
     }
     return true;
   case OIS::KC_LSHIFT:
@@ -218,6 +218,22 @@ bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
     static float rotfactor = 6.28 / 1800;
     
     if (pongMode) {
+      //Boundaries
+      if(x < 0 && mRacquet->getPosition().getX() >= 2000){
+        x = 0;
+      }
+      if(x > 0 && mRacquet->getPosition().getX() <= -2000){
+        x = 0;
+      }
+      if(y < 0 && mRacquet->getPosition().getY() >= 2000){
+        y = 0;
+      }
+      if(y > 0 && mRacquet->getPosition().getY() <= -2000){
+        y = 0;
+      }
+
+
+
       mPlayer->translate(btVector3(-x,-y,0));
     } else {
       mPlayer->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor)));
@@ -414,10 +430,43 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   if (mPhysics != NULL) {
     mPhysics->stepSimulation(elapsedTime);
   }
+  
+  //store original vectors
+  int oldZ = mDirection.getZ();
+  int oldX = mDirection.getX();
+  int oldY = mDirection.getY();
+
+  //boundaries
+  if(mRacquet->getPosition().getZ() >= 600){
+    mDirection.setZ(-10);
+  }
+  if(mRacquet->getPosition().getZ() <= -2400){
+    mDirection.setZ(10);
+  }
+  if(mRacquet->getPosition().getX() >= 2000){
+    mDirection.setX(-10);
+  }
+  if(mRacquet->getPosition().getX() <= -2000){
+    mDirection.setX(10);
+  }
+  if(mRacquet->getPosition().getY() >= 2000){
+    mDirection.setY(-10);
+  }
+  if(mRacquet->getPosition().getY() <= -2000){
+    mDirection.setY(10);
+  }
+
+
 
   mPlayer->getBody()->translate(mDirection*movementSpeed);
   mPlayer->translate(mDirection*movementSpeed);
 
+  //reset the vector after translation
+  mDirection.setZ(oldZ);
+  mDirection.setX(oldX);
+  mDirection.setY(oldY);
+
+  
   // Swings
   if(unswing > 0){
     if (pongMode || right_mouse_button) {
