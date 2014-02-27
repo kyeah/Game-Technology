@@ -202,7 +202,7 @@ void RacquetApp::createScene(void)
   //h applies to ground/ceiling
   //l applies to farWall/nearWall
   int l,w,h;
-  l = 3000;
+  l = 5000;
   w = h = 4500;
 
   btVector3 pos[] = {
@@ -215,7 +215,7 @@ void RacquetApp::createScene(void)
   };
 
 //lines
-  Ogre::Entity* line1 = mSceneMgr->createEntity("L1", "cube.mesh");
+/*  Ogre::Entity* line1 = mSceneMgr->createEntity("L1", "cube.mesh");
   Ogre::Entity* line2 = mSceneMgr->createEntity("L2", "cube.mesh");
   Ogre::Entity* line3 = mSceneMgr->createEntity("L3", "cube.mesh");
   Ogre::Entity* line4 = mSceneMgr->createEntity("L4", "cube.mesh");
@@ -229,7 +229,7 @@ void RacquetApp::createScene(void)
   n2->attachObject(line2); n2->scale(300, .5, .5);
   n3->attachObject(line3); n3->scale(.5, 300, .5);
   n4->attachObject(line4); n4->scale(.5, 300, .5);
-  
+  */
 int width, height;
   width = w;
   height = h;
@@ -325,7 +325,8 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   }
 
   //btVector3 pos = mBall->getPosition();
-  //mCamera->lookAt(pos[0], pos[1], pos[2]);
+  btVector3 pos = mRacquet->getPosition();
+  mCamera->lookAt(pos[0], pos[1], pos[2]);
 
   return result;
 }
