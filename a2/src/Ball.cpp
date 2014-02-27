@@ -61,7 +61,10 @@ void Ball::update(float elapsedTime) {
             if (pointsTimeDelay == 0) {
               bouncedOnce = false;
               score += points;
-              if (points > 1) dynamic_cast<ScoringPlane*>(p)->cycleColor();
+              if (points > 1) {
+                dynamic_cast<ScoringPlane*>(p)->cycleColor();
+                Sounds::playSound(Sounds::SCORE_POINT, (int)distance);
+              }
               pointsTimeDelay = 300;
             }
           } else if (name.compare("ground") == 0) {
