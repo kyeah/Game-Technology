@@ -6,18 +6,41 @@ RUNNING
 1. Consult README for instructions on building.
 2. run the RacquetApp executable (./RacquetApp)
 
-IMPLEMENTATION
+CONTROLS
 =================================
-//This implementation of Ball in Room uses red-orange ambient lighting with a red point light, a dark green directional light, and a blue spotlight. 4 balls of random directional velocity are provided on startup. 
+Racquetball Mode:
+WASD - X-Z Movement
+Shift - Hold to increase movement speed
+Mouse - Paddle Rotation (Horizontal Mouse Control)
+Left Click / Spacebar - Swing
+Right Click - Push
 
-ADDITIONAL FEATURES
+Pong Mode:
+WASD - X-Z Movement
+Shift - Hold to increase movement speed
+Mouse - X-Y Paddle Movement
+Left Click / Spacebar - Push
+
+Keyboard Options:
+P - Toggle Pong Mode
+G - Toggle Gravity, for dishonest CHEATERS (Down -> Off -> Up)
+R - Restart
+
+FINAL IMPLEMENTATION OVERVIEW
 =================================
-//1. Bullet Integration for gravity and collision handling between all objects in the world.
-//2. Left click instantiates a new ball with upward velocity.
-//3. Right click will cycle between gravity settings (off => upward => downward)
-//4. Ball entity color properties are changed to provide more diffuse and specular coloration from surrounding lighting. They also cast shadows on the environment.
-//5. The ground is textured with Rockwall.
-//6. Camera with mouse and keyboard (WASD) controls.
+Bullet Integration: The final implementation of bullet still contains problems with object clipping, but occurrences have been reduced to playable levels.
+
+Look and Texturing: We found the indie arcade style to be a good fit for the type of game we created, and added particle/material effects to make it more interesting.
+
+SDL / Sound Effects: Works well enough, although we are limited to playing one clip at a time.
+
+User Input: Feels good, but limitations in our implementation of Bullet Physics prevents the paddle from being swung too quickly.
+
+Camera Control: Simple and unobtrusive; we created a semi-transparent paddle material to make it easier to see the ball.
+
+Heads-up display and Scoring: Visual cues help users know when they have scored.
+
+Game Design: We experimented with different options, such as 3D movement for scoring planes, but decided that it was easier and more fun to play when we kept it simple.
 
 FILES
 =================================
