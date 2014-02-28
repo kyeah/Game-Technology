@@ -9,6 +9,7 @@ class Ball : public GameObject {
        btScalar mass=0.1f, btScalar rest=1.0f, 
        btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
+  static void *changeWall(void *entity);
   void update(float elapsedTime);
   bool bouncedOnce;
 };
@@ -44,6 +45,7 @@ class Plane : public GameObject {
         btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   virtual void update(float elapsedTime);
+  Ogre::Entity* getEntity() { return entity; }
   int points;
 };
 

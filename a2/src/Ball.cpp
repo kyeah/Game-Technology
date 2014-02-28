@@ -1,6 +1,12 @@
 #include "RacquetApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
+#include <pthread.h>
+
+struct args{
+	Ogre::Entity *entity;
+	Plane *p;
+};
 
 Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
            Physics* _physics,
@@ -23,6 +29,20 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
 
   body->setCcdMotionThreshold(1);
   body->setCcdSweptSphereRadius(0.4);
+}
+
+void *Ball::changeWall(void *params){
+
+	struct args *arg = (struct args*)params;
+	Ogre::Entity *ent = (Ogre::Entity*)arg->entity;
+	Plane* plane = (Plane*)arg->p;
+  	Ogre::String name = plane->getEntityName();
+	
+	if(name.compare("ground") != 0){	
+		ent->setMaterialName("Court/HitWall");
+		usleep(1000);
+		ent->setMaterialName("Court/Wall");	
+	}
 }
 
 void Ball::update(float elapsedTime) {
@@ -55,7 +75,14 @@ void Ball::update(float elapsedTime) {
         // Check Wall hits
         Plane *p = dynamic_cast<Plane*>(contexts[i]->object);
         if (p) {
-          Ogre::String name = p->getEntityName();
+
+	  struct args *arg = (struct args*)malloc(sizeof(struct args*));
+ 	  arg->entity = p->getEntity();
+	  arg->p = p;
+	  pthread_t thread;
+	  pthread_create(&thread, 0, changeWall, (void*)(arg)); 
+          
+	  Ogre::String name = p->getEntityName();
           int points = p->points;
           if (points > 0) {
             if (pointsTimeDelay == 0) {
