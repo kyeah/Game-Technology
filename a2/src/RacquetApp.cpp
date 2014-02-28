@@ -42,6 +42,7 @@ btVector3 *axis; // Swing rotation axis
 static int gravMag = 7000;
 static bool pongMode = false;
 static bool right_mouse_button = false;
+Ogre::Light* discolights[6];
 
 RacquetApp *instance;
 
@@ -139,7 +140,6 @@ void RacquetApp::restart() {
   mBall->setVelocity(btVector3(0,0,0));
   mBall->updateTransform();
   mBall->addToSimulator();
-  //  mPhysics->addObject(mBall);
   std::cout << "Game " << gamenum++ << ": " << score << std::endl;
   lastscore = score;
   score = 0;
@@ -372,11 +372,24 @@ void RacquetApp::createScene(void)
   Ogre::Light* lights[9];
   int z;
   for(z = 0; z < 9; z++) {
-    lights[z] = mSceneMgr->createLight("point light" + z);
+    std::stringstream ss;
+    ss << "point light" << z;
+    lights[z] = mSceneMgr->createLight(ss.str());
     lights[z]->setType(Ogre::Light::LT_POINT);
     lights[z]->setDiffuseColour(.1,.1,.1);
     lights[z]->setSpecularColour(.1,.1,.1);
+    
+    ss << z;
+    if (z < 6) {
+      discolights[z] = mSceneMgr->createLight(ss.str());
+      discolights[z]->setType(Ogre::Light::LT_SPOTLIGHT);
+      discolights[z]->setDiffuseColour(rand(),rand(),rand());
+      discolights[z]->setSpecularColour(rand(),rand(),rand());
+      discolights[z]->setDirection(rand(), rand(), rand());
+      discolights[z]->setSpotlightOuterAngle(Ogre::Radian(0.1));
+    }
   }
+  
   lights[0]->setPosition(-1499,1499,0);
   lights[1]->setPosition(-1499,1499,1000);
   lights[2]->setPosition(-1499,1499,2000);
@@ -386,6 +399,24 @@ void RacquetApp::createScene(void)
   lights[6]->setPosition(1499,1499,2000);
   lights[7]->setPosition(1499,1499,1000);
   lights[8]->setPosition(1499,1499,0);
+
+  // Front Wall
+  discolights[0]->setDirection(-0.5,0,1);
+  discolights[1]->setDirection(0.5,0,1);
+  discolights[0]->setPosition(0,1800,0);
+  discolights[1]->setPosition(0,1800,0);
+
+  // Right Wall
+  discolights[2]->setDirection(-1,0,0);
+  discolights[3]->setDirection(-1,0,-1);
+  discolights[2]->setPosition(0,-1800,0);
+  discolights[3]->setPosition(0,-1800,0);
+  
+  // Left Wall
+  discolights[4]->setDirection(1,0,0);
+  discolights[5]->setDirection(1,0,-1);
+  discolights[4]->setPosition(0,-1800,0);
+  discolights[5]->setPosition(0,-1800,0);
 
   mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
                      playerInitPos, btVector3(0,0,0), 0);
@@ -408,6 +439,19 @@ void RacquetApp::createScene(void)
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
+  for (int i = 0; i < 2; i++) {
+    Ogre::Vector3 v = discolights[i]->getDirection();
+    double x = v[0] + 0.02;
+    if (x > 1.0) x = x - 2.0;
+    discolights[i]->setDirection(x, v[1], v[2]);
+  }
+  for (int i = 2; i < 6; i++) {
+    Ogre::Vector3 v = discolights[i]->getDirection();
+    double z = v[2] + 0.02;
+    if (z > 1.0) z = z - 2.0;
+    discolights[i]->setDirection(v[0], v[1], z);
+  }
+
   bool result = BaseApplication::frameStarted(evt);
   static Ogre::Real time = mTimer->getMilliseconds();
 
