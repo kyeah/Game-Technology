@@ -75,13 +75,16 @@ void Ball::update(float elapsedTime) {
         // Check Wall hits
         Plane *p = dynamic_cast<Plane*>(contexts[i]->object);
         if (p) {
+          ScoringPlane *sp = dynamic_cast<ScoringPlane*>(p);
 
-	  struct args *arg = (struct args*)malloc(sizeof(struct args*));
- 	  arg->entity = p->getEntity();
-	  arg->p = p;
-	  pthread_t thread;
-	  pthread_create(&thread, 0, changeWall, (void*)(arg)); 
-          
+          if (!sp) {
+            struct args *arg = (struct args*)malloc(sizeof(struct args*));
+            arg->entity = p->getEntity();
+            arg->p = p;
+            pthread_t thread;
+            pthread_create(&thread, 0, changeWall, (void*)(arg)); 
+          }
+
 	  Ogre::String name = p->getEntityName();
           int points = p->points;
           if (points > 0) {
@@ -89,7 +92,7 @@ void Ball::update(float elapsedTime) {
               bouncedOnce = false;
               score += points;
               if (points > 1) {
-                dynamic_cast<ScoringPlane*>(p)->cycleColor();
+                sp->cycleColor();
                 Sounds::playSound(Sounds::SCORE_POINT, (int)distance);
               }
               pointsTimeDelay = 300;
