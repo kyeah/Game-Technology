@@ -1,0 +1,18 @@
+Game Upgrade for 2 players
+
+We will be taking our existing game, remove the wall and replace it with another player. 
+
+Gameplay will be slightly different. Scores will be similar to ping-pong, the ball will travel between the two and whoever fails to hit it back will lose the point. 
+
+We will need to add a toggle for the sound. 
+
+Our plan is to have the original player, player 1, be the 'server'. Player 1 will wait until player 2 requests to join. 
+
+We will have to look into the specific implementation of the server but the basic idea is that when the game starts up, it will attempt to send a request to be player 2 to the server. If this request fails to succeed, then the process will assume it is player 1, and proceed. 
+
+The other idea is to specifically have two games, one for player1 and one for player 2. All player 2 should do is communicate with player 1. We have a feeling that this will be difficult to implement. 
+
+Division of Labor:
+	Alyssa: Set up Server/Client communication between player 1 and player 2. 
+	Kevin: 
+	Patrick:
