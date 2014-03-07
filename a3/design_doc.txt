@@ -10,9 +10,7 @@ Our plan is to have the original player, player 1, be the 'server'. Player 1 wil
 
 We will have to look into the specific implementation of the server but the basic idea is that when the game starts up, it will attempt to send a request to be player 2 to the server. If this request fails to succeed, then the process will assume it is player 1, and proceed. 
 
-The other idea is to specifically have two games, one for player1 and one for player 2. All player 2 should do is communicate with player 1. We have a feeling that this will be difficult to implement. 
-
 Division of Labor:
-	Alyssa: Set up Server/Client communication between player 1 and player 2. 
+	Alyssa: add sdl_net, Set up Server/Client communication between player 1 and player 2. 
 	Kevin: 
 	Patrick:
