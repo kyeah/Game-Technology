@@ -1,16 +1,25 @@
 Game Upgrade for 2 players
 
-We will be taking our existing game, remove the wall and replace it with another player. 
+We will be taking our existing game, remove the wall and replace it with another player + a table.
 
-Gameplay will be slightly different. Scores will be similar to ping-pong, the ball will travel between the two and whoever fails to hit it back will lose the point. 
+Gameplay will be slightly different. Scores will be similar to ping-pong, the ball will travel between the two and whoever fails to hit it back before it hits the ground will lose the point. We may implement rounds and match lengths (i.e. best of 5)
 
 We will need to add a toggle for the sound. 
 
-Our plan is to have the original player, player 1, be the 'server'. Player 1 will wait until player 2 requests to join. 
+Our plan is to have the original player, player 1, be the server. Player 1 will wait until player 2 requests to join. 
 
-We will have to look into the specific implementation of the server but the basic idea is that when the game starts up, it will attempt to send a request to be player 2 to the server. If this request fails to succeed, then the process will assume it is player 1, and proceed. 
+We will have to look into the specific implementation of the server but the basic idea is that when the game starts up, it will attempt to send a request to be player 2 to the server. If this request fails to succeed, then the process will assume it is player 1, and proceed. We are looking to implement the server-client networking paradigm, where command inputs are sent to the server and the physics simulation is run.
+
+For now, we will have a key toggle to switch between single-player and multi-player modes. We will hopefully set up a main menu to choose between the two modes by the final week.
+
+Power-ups are a possibility in week 3.
 
 Division of Labor:
 	Alyssa: add sdl_net, Set up Server/Client communication between player 1 and player 2. 
-	Kevin: 
-	Patrick:
+	Kevin: Architecture for conversion from single to multi-player (additional game classes, mode toggle)
+	Patrick: UI/Score-tracking improvements, Sound toggle, server-client game logic
+
+Upgraded Code Architecture:
+1. Abstracted Classes for setting up server-client network using sdl_net (i.e. Server and Client)
+2. Player class to hold player information and entity object pointers, + take care of sending necessary network information.
+3. Possibly abstract Application into SinglePlayer and MultiPlayer child classes.
