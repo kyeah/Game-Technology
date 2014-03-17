@@ -1,11 +1,15 @@
 #include "MenuApp.h"
+#include "RacquetApp.h"
 
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 
+bool bootstrapped = false;
+
 //-------------------------------------------------------------------------------------
 MenuApp::MenuApp(void)
 {
+  
 }
 //-------------------------------------------------------------------------------------
 MenuApp::~MenuApp(void)
@@ -21,16 +25,25 @@ void MenuApp::createScene(void)
   CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
 
-  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-  // CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
-  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
-  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
+  if (!bootstrapped) {
+    bootstrapped = true;
+    mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+    // CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
+    CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+    CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+    CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
+  }
+
   CEGUI::WindowManager* Wmgr = CEGUI::WindowManager::getSingletonPtr();
 
   try
     {
-      CEGUI::Window* menu = Wmgr->loadWindowLayout("Menu.layout");
+      CEGUI::Window* menu;
+      try {
+        menu = Wmgr->getWindow("Menu/Background");
+      } catch (CEGUI::Exception &e) {
+        menu = Wmgr->loadWindowLayout("Menu.layout");
+      }
       CEGUI::System::getSingleton().setGUISheet(menu);
       //      myRoot->addChildWindow(menu);
     }
@@ -38,7 +51,16 @@ void MenuApp::createScene(void)
     {
       OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, std::string(e.getMessage().c_str()), "Error Parsing Menu");
     }
+
+  CEGUI::PushButton* singlePlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/SinglePlayer");
+  CEGUI::PushButton* multiPlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/MultiPlayer");
+  CEGUI::PushButton* quitButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/QuitGame");
+
+  singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartSinglePlayer,this));
+  multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartMultiPlayer,this));
+  quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::quit,this));
 }
+
 //-------------------------------------------------------------------------------------
 void MenuApp::createFrameListener(void)
 {
@@ -66,7 +88,6 @@ void MenuApp::createFrameListener(void)
   Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
   mRoot->addFrameListener(this);
-  //  BaseApplication::createFrameListener();
 }
 //-------------------------------------------------------------------------------------
 bool MenuApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
@@ -85,7 +106,6 @@ bool MenuApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
   CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
   return true;
-  // return BaseApplication::frameRenderingQueued(evt);
 }
 //-------------------------------------------------------------------------------------
 bool MenuApp::keyPressed( const OIS::KeyEvent &arg )
@@ -94,14 +114,12 @@ bool MenuApp::keyPressed( const OIS::KeyEvent &arg )
   sys.injectKeyDown(arg.key);
   sys.injectChar(arg.text);
   return true;
-  //  return BaseApplication::keyPressed(arg);
 }
 //-------------------------------------------------------------------------------------
 bool MenuApp::keyReleased( const OIS::KeyEvent &arg )
 {
   CEGUI::System::getSingleton().injectKeyUp(arg.key);
   return true;
-  //  return BaseApplication::keyReleased(arg);
 }
 //-------------------------------------------------------------------------------------
 CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
@@ -130,26 +148,53 @@ bool MenuApp::mouseMoved( const OIS::MouseEvent &arg )
   if (arg.state.Z.rel)
     sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
   return true;
-  // return BaseApplication::mouseMoved(arg);
 }
 //-------------------------------------------------------------------------------------
 bool MenuApp::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
   CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
   return true;
-  //  return BaseApplication::mousePressed(arg, id);
 }
 //-------------------------------------------------------------------------------------
 bool MenuApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
   CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
   return true;
-  //  return BaseApplication::mouseReleased(arg, id);
 }
+
+static int MODE_MENU = 0;
+static int MODE_SP= 1;
+static int MODE_MP= 2;
+static int MODE_QUIT= 3;
+int mode = MODE_MENU;
 //-------------------------------------------------------------------------------------
+bool MenuApp::StartSinglePlayer(const CEGUI::EventArgs& e) {
+  mode = MODE_SP;
+  mRoot->queueEndRendering();
+  return true;
+}
+
+bool MenuApp::StartMultiPlayer(const CEGUI::EventArgs& e) {
+  mode = MODE_MP;
+  mRoot->queueEndRendering();
+  return true;
+}
+
 bool MenuApp::quit(const CEGUI::EventArgs &e)
 {
+  mode = MODE_QUIT;
+  mRoot->queueEndRendering();
   return true;
+}
+
+void handleException( Ogre::Exception& e ) {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+  MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TA \
+              SKMODAL);
+#else
+  std::cerr << "An exception has occured: " <<
+    e.getFullDescription().c_str() << std::endl;
+#endif
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -183,20 +228,34 @@ extern "C" {
 
     return retVal;
 #else
-    // Create application object
-    MenuApp app;
-    //    instance = &app;
-
-    try {
-      app.go();
-    } catch( Ogre::Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-      MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TA\
-                  SKMODAL);
-#else
-      std::cerr << "An exception has occured: " <<
-        e.getFullDescription().c_str() << std::endl;
-#endif
+    while (mode != MODE_QUIT) {
+      if (mode == MODE_MENU) {
+        try {
+          mode = MODE_QUIT;
+          MenuApp menu;
+          menu.go();
+        } catch( Ogre::Exception& e ) {
+          handleException(e);
+        }
+      } else if (mode == MODE_SP) {
+        RacquetApp app;
+        instance = &app;
+        try {
+          app.go();
+        } catch( Ogre::Exception& e ) {
+          handleException(e);
+        }
+        mode = MODE_QUIT;  // Default to menu when done with current mode
+      } else {
+        RacquetApp app;
+        instance = &app;
+        try {
+          app.go();
+        } catch( Ogre::Exception& e ) {
+          handleException(e);
+        }
+        mode = MODE_QUIT;  // Default to menu when done with current mode
+      }
     }
 #endif
     return 0;

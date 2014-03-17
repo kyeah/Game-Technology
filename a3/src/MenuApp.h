@@ -25,6 +25,8 @@ class MenuApp : public BaseApplication
   virtual bool mouseMoved( const OIS::MouseEvent &arg );
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
-  
+
+  bool StartSinglePlayer(const CEGUI::EventArgs& e);
+  bool StartMultiPlayer(const CEGUI::EventArgs& e);
   bool quit(const CEGUI::EventArgs &e);
 };
