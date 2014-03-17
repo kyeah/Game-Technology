@@ -2,6 +2,7 @@
 <GUILayout>
   <Window Type="WindowsLook/StaticImage" Name="Menu/Background">
     <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <!--Property Name="Image" Value="set:MenuBackground image:Background" /-->
     <Property Name="Image" Value="set:WindowsLook image:Background" />
 
     <Window Type="WindowsLook/Button" Name="Menu/SinglePlayer">

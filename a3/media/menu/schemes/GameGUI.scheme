@@ -1,4 +1,4 @@
 <?xml version="1.0" ?>
 <GUIScheme Name="GameGUI">
-  <Imageset Name="WindowsLook" Filename="WindowsLook.imageset"/>
+  <Imageset Name="MenuBackground" Filename="MenuBackground.imageset"/>
 </GUIScheme>

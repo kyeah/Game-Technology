@@ -31,6 +31,7 @@ void MenuApp::createScene(void)
     // CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
     CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
     CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+    CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
     CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
   }
 
