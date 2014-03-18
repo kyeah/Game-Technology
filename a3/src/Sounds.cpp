@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Sounds.h"
 
+int Sounds::enabled = true;
+
 void Sounds::init(){
   //SETUP MUSIC
   int audio_rate = 22050;
