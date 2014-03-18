@@ -75,7 +75,7 @@ protected:
     int unswing;
 };
 
-extern RacquetApp *instance;
+extern RacquetApp *sp_instance;
 
 #endif // #ifndef __RacquetApp_h_
 

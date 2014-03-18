@@ -44,7 +44,7 @@ static bool pongMode = false;
 static bool right_mouse_button = false;
 Ogre::Light* discolights[6];
 
-RacquetApp *instance;
+RacquetApp *sp_instance;
 
 //-------------------------------------------------------------------------------------
 RacquetApp::RacquetApp(void)

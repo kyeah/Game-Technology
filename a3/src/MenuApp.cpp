@@ -1,5 +1,6 @@
 #include "MenuApp.h"
 #include "RacquetApp.h"
+#include "MultiPlayerApp.h"
 
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
@@ -240,16 +241,25 @@ extern "C" {
         }
       } else if (mode == MODE_SP) {
         RacquetApp app;
-        instance = &app;
+        sp_instance = &app;
         try {
           app.go();
         } catch( Ogre::Exception& e ) {
           handleException(e);
         }
         mode = MODE_QUIT;  // Default to menu when done with current mode
+      } else if (mode == MODE_MP) {
+	MultiPlayerApp app;
+ //	mp_instance = &app;
+	try{
+	  app.go();
+	} catch( Ogre::Exception& e) {
+	  handleException(e);
+	}
+   	mode = MODE_QUIT;
       } else {
         RacquetApp app;
-        instance = &app;
+        sp_instance = &app;
         try {
           app.go();
         } catch( Ogre::Exception& e ) {
@@ -257,7 +267,7 @@ extern "C" {
         }
         mode = MODE_QUIT;  // Default to menu when done with current mode
       }
-    }
+    } 
 #endif
     return 0;
   }
