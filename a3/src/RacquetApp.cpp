@@ -186,6 +186,9 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
         oDirection.z -= 40;
     }
     return true;
+  case OIS::KC_M:
+    Sounds::enabled = !Sounds::enabled;
+    return true;
   case OIS::KC_LSHIFT:
     movementSpeed = 1;
     return true;

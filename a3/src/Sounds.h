@@ -8,6 +8,7 @@ public:
 	static const int BALL_HIT = 1;
 	static const int SMOOTH_JAZZ = 2;
 	static const int SCORE_POINT = 3;
+        static int enabled = true;
 
 	static void musicDone();
 	static void init();
