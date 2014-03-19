@@ -18,6 +18,7 @@
 #include "RacquetApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
+#include "SDL_net.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <macUtils.h>
@@ -143,6 +144,38 @@ void RacquetApp::restart() {
   std::cout << "Game " << gamenum++ << ": " << score << std::endl;
   lastscore = score;
   score = 0;
+}
+
+void RacquetApp::Server(){
+	TCPsocket sd, csd;
+	IPaddress ip, *remoteIP;
+	int quit, quit2;
+	char buf[512];
+
+	SDLNet_Init();
+	SDLNet_ResolveHost(&ip, NULL, 2000);
+	sd = SDLNet_TCP_Open(&ip);
+	
+	quit = 0;
+	while(!quit){
+		if((csd = SDLNet_TCP_Accept(sd))){
+			if((remoteIP = SDLNet_TCP_GetPeerAddress(csd)))
+				printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
+			quit2 = 0;
+			while(!quit2){
+				if(SDLNet_TCP_Recv(csd, buf, 512) > 0){
+					//buf contains stuff
+						if(strcmp(buf, "quit") == 0){
+						quit2 = 1;
+						quit = 1;
+					}
+				}
+			}
+			SDLNet_TCP_Close(csd);
+		}
+	}
+	SDLNet_TCP_Close(sd);
+	SDLNet_Quit();
 }
 
 bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){

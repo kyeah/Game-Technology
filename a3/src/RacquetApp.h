@@ -38,6 +38,7 @@ public:
 
     bool frameStarted(const Ogre::FrameEvent &evt);
     void restart();
+    void Server();
 
 protected:
     virtual void createScene(void);
