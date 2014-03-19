@@ -23,3 +23,9 @@ Upgraded Code Architecture:
 1. Abstracted Classes for setting up server-client network using sdl_net (i.e. Server and Client)
 2. Player class to hold player information and entity object pointers, + take care of sending necessary network information.
 3. Possibly abstract Application into SinglePlayer and MultiPlayer child classes.
+
+------------------------------------------------
+networking clarifications for Randall:
+We will likely be using UDP with user inputs being sent to the server, and world states (game objects) being sent back to the clients. We will use timeouts in case any of the machines crash, and if a user willingly exits, we will notify the server with an EXIT message and respond appropriately.
+
+We'll represent client packets using a struct/class containing client information (e.g. user ID, simulator ID of their paddle) and keycodes/mouse codes representing their input. Since we can be sending different types of messages besides user inputs (i.e. chat messages and exit messages), the packet struct will also have a TYPE variable and, if it is a chat message, a string variable to go along with it. We felt that UDP would be suitable to avoid any lagging or time delays that may arise from TCP, but if we find that our architecture is simple enough to run well over TCP, then we may just stick with that for extra reliability.
