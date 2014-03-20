@@ -36,6 +36,15 @@ protected:
     char* Receive();
     void Close();
 
+    void createFrameListener();
+    bool keyPressed( const OIS::KeyEvent &arg );
+    bool keyReleased(const OIS::KeyEvent &arg);
+
+    bool mouseMoved( const OIS::MouseEvent &arg );
+    bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+
+
     IPaddress ip, *remoteIP;
     TCPsocket sd, csd;
     bool connected;

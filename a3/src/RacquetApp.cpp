@@ -468,12 +468,6 @@ void RacquetApp::createScene(void)
 }
 
 bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) { 
-  if(sd){	
-	btVector3 curPos = mBall->getPosition();
-        char buf[512];
-  	sprintf(buf, "Ball %d %d %d", (int)curPos.x(), (int)curPos.y(), (int)curPos.z());
-  	RacquetApp::Send(buf, 50);
-  }
 
   for (int i = 0; i < 2; i++) {
     Ogre::Vector3 v = discolights[i]->getDirection();
@@ -573,6 +567,15 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   btVector3 pos = (pongMode ? mRacquet->getPosition() : mPlayer->getPosition());
   mCamera->lookAt(pos[0], pos[1], pos[2]);
+
+  if(sd){
+        btVector3 ballPos = mBall->getPosition();
+	btVector3 playerPos = mPlayer->getPosition();
+        char buf[512];
+        sprintf(buf, "Ball %d %d %d Player %d %d %d", (int)ballPos.x(), (int)ballPos.y(), (int)ballPos.z(), (int)playerPos.x(), (int)playerPos.y(), (int)playerPos.z());
+        RacquetApp::Send(buf, 100);
+  }
+
 
   return result;
 }

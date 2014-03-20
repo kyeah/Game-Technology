@@ -175,6 +175,10 @@ void MultiPlayerApp::createScene(void)
                    btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
+
+  printf("setting ball position initially\n");
+  mBall->setPosition(btVector3(0,0,0));
+
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain1", "Examples/PurpleFountain"));
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain2", "Examples/PurpleFountain"));
   //if (pongMode) mPlayer->getEntity()->setVisible(false);
@@ -210,7 +214,7 @@ void MultiPlayerApp::Connect(){
 
 char* MultiPlayerApp::Receive(){
 	for(int i = 0; i < 512; i++){
-		buf[i] = '*';	
+		buf[i] = ' ';	
 	}	
 	if(SDLNet_TCP_Recv(csd, buf, 512) > 0){
 		return (char*)buf;
@@ -225,14 +229,180 @@ void MultiPlayerApp::Close(){
 	connected = false;
 }
 
+void MultiPlayerApp::createFrameListener(void){
+	BaseApplication::createFrameListener();
+}
+
+bool MultiPlayerApp::keyReleased(const OIS::KeyEvent &arg){
+  static bool vert = false;
+
+  switch(arg.key){
+  case OIS::KC_R:
+//    restart();
+    return true;
+  case OIS::KC_P:
+/*    swing = unswing = 0;
+    pongMode = !pongMode;
+    mPlayer->setOrientation(btQuaternion(0,0,0,1));
+    mPlayer->setPosition(playerInitPos);
+    mPlayer->getEntity()->setVisible(!mPlayer->getEntity()->isVisible());
+*/    return true;
+  case OIS::KC_J:
+  case OIS::KC_D:
+//    mDirection -= btVector3(-40, 0, 0);
+//    oDirection.x -= -40;
+    return true;
+  case OIS::KC_S:
+    if (vert) {
+//      mDirection -= btVector3(0, -40, 0);
+//      oDirection.y -= -40;
+    } else {
+//      mDirection -= btVector3(0, 0, -40);
+//      oDirection.z -= -40;
+    }
+    return true;
+  case OIS::KC_A:
+//    mDirection -= btVector3(40, 0, 0);
+//    oDirection.x -= 40;
+    return true;
+  case OIS::KC_W:
+    if (vert) {
+//      mDirection -= btVector3(0, 40, 0);
+//      oDirection.y -= 40;
+    } else {
+//        mDirection -= btVector3(0, 0, 40);
+//        oDirection.z -= 40;
+    }
+    return true;
+  case OIS::KC_LSHIFT:
+//    movementSpeed = 1;
+    return true;
+  case OIS::KC_G:
+/*    static int gravity = 0;
+    btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
+    if (gravity == 0) {
+      world->setGravity(btVector3(0,0,0));
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
+    } else if (gravity == 1) {
+      world->setGravity(btVector3(0,gravMag,0));
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Upward");
+    } else if (gravity == 2) {
+      world->setGravity(btVector3(0,-gravMag,0));
+      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downward");                                                                                                     
+    }
+
+    gravity = (gravity+1)%3;
+*/    return true;
+  }
+
+  return BaseApplication::keyPressed(arg);
+}
+
+bool MultiPlayerApp::mouseMoved( const OIS::MouseEvent& arg ) {
+/*  if (swing == 0 && unswing == 0) {
+    int x = arg.state.X.rel;
+    int y = arg.state.Y.rel;
+
+    static float rotfactor = 6.28 / 1800;
+
+    if (pongMode) {
+      //Boundaries
+      if(x < 0 && mRacquet->getPosition().getX() >= 2000){
+        x = 0;
+      }
+      if(x > 0 && mRacquet->getPosition().getX() <= -2000){
+        x = 0;
+      }
+      if(y < 0 && mRacquet->getPosition().getY() >= 2000){
+        y = 0;
+      }
+      if(y > 0 && mRacquet->getPosition().getY() <= -2000){
+        y = 0;
+      }
+
+
+
+      mPlayer->translate(btVector3(-x,-y,0));
+    } else {
+      mPlayer->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor)));
+    }
+  }
+*/
+}
+
+bool MultiPlayerApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+/*  if(swing == 0 && unswing == 0) {
+
+    if(id == OIS::MB_Left || id == OIS::MB_Right) {
+      swing = SWING_DELAY;
+      Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
+
+      Ogre::Vector3 p = mRacquet->getNode()->getPosition();
+      axis = new btVector3(p[1], -p[0], 0);
+
+      right_mouse_button = (id == OIS::MB_Right);
+    }
+  }
+*/
+  return BaseApplication::mouseReleased(arg, id);
+}
+
+
+
+bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
+  static bool vert = false;
+
+  switch(arg.key){
+  case OIS::KC_D:
+//    mDirection += btVector3(-40, 0, 0);
+//    oDirection.x += -40;
+    return true;
+  case OIS::KC_S:
+    if (vert) {
+//      mDirection += btVector3(0, -40, 0);
+//      oDirection.y += -40;
+    } else {
+//      mDirection += btVector3(0, 0, -40);
+//      oDirection.z += -40;
+    }
+    return true;
+  case OIS::KC_A:
+//    mDirection += btVector3(40, 0, 0);
+//    oDirection.x += 40;
+    return true;
+  case OIS::KC_W:
+    if (vert) {
+//      mDirection += btVector3(0, 40, 0);
+//      oDirection.y += 40;
+    } else {
+//        mDirection += btVector3(0, 0, 40);
+//        oDirection.z += 40;
+    }
+
+    return true;
+  case OIS::KC_LSHIFT:
+//    movementSpeed = 2;
+    return true;
+  case OIS::KC_SPACE:
+//    if(swing == 0 && unswing == 0) {
+//      swing = SWING_DELAY;
+//      Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
+//    }
+    return true;
+  }
+
+  return BaseApplication::keyPressed(arg);
+}
+
+
+
 bool MultiPlayerApp::frameStarted(const Ogre::FrameEvent &evt) {
 	char* msg = MultiPlayerApp::Receive();
 	int x,y,z; 
 	sscanf(msg, "Ball %d %d %d", &x, &y, &z);
-	printf("found %d,%d,%d\n", x, y, z);
+	mBall->setPosition(btVector3(x,y,z));
+        sscanf(msg, "Player %d %d %d", &x,&y,&z);	
+	mPlayer->setPosition(btVector3(x,y,z));
 
-	if(mBall){
-		mBall->setPosition(btVector3(x,y,z));
-	}
+	return true;
 }
-
