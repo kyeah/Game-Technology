@@ -14,8 +14,12 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
+#include <btBulletDynamicsCommon.h>
 #include "MultiPlayerApp.h"
 #include "SDL_net.h"
+
+const static int SWING_DELAY = 5;
+const static int UNSWING_DELAY = 10;
 
 btVector3 racquetInitialPosition(0,700.0f,0);
 btVector3 playerInitialPosition(100, -1200, -2245);
@@ -398,11 +402,18 @@ bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
 
 bool MultiPlayerApp::frameStarted(const Ogre::FrameEvent &evt) {
 	char* msg = MultiPlayerApp::Receive();
-	int x,y,z; 
-	sscanf(msg, "Ball %d %d %d", &x, &y, &z);
-	mBall->setPosition(btVector3(x,y,z));
-        sscanf(msg, "Player %d %d %d", &x,&y,&z);	
-	mPlayer->setPosition(btVector3(x,y,z));
+	printf("received %s\n", msg);
+	int bx,by,bz,px,py,pz,swing,unswing, axis_x, axis_y, axis_z; 
+	int returnvalue = sscanf(msg, "B %d %d %d P %d %d %d S %d U %d A %d %d %d", &bx, &by, &bz, &px, &py, &pz, &swing, &unswing, &axis_x, &axis_y, &axis_z);
+	
+ 	mBall->setPosition(btVector3(bx,by,bz));
+	mPlayer->setPosition(btVector3(px,py,pz));
+	if(swing) {  
+		mPlayer->rotate(btQuaternion(btVector3(axis_x,axis_y,axis_z), btScalar(-0.1))); 
+	}
+	if(unswing) {  
+		mPlayer->rotate(btQuaternion(btVector3(axis_x,axis_y,axis_z), btScalar(0.2)));
+	}
 
 	return true;
 }

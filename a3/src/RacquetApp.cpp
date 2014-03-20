@@ -151,7 +151,7 @@ void RacquetApp::restart() {
 
 void RacquetApp::Connect(){
 	printf("in connect\n");
-        char *host = "rovner.cs.utexas.edu";
+        char *host = "dum-dums.cs.utexas.edu";
         int port = 65501;
 
         printf("trying to connect to player 2...\n");
@@ -572,8 +572,11 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
         btVector3 ballPos = mBall->getPosition();
 	btVector3 playerPos = mPlayer->getPosition();
         char buf[512];
-        sprintf(buf, "Ball %d %d %d Player %d %d %d", (int)ballPos.x(), (int)ballPos.y(), (int)ballPos.z(), (int)playerPos.x(), (int)playerPos.y(), (int)playerPos.z());
-        RacquetApp::Send(buf, 100);
+	if(axis)
+        	sprintf(buf, "B %d %d %d P %d %d %d S %d U %d A %d %d %d", (int)ballPos.x(), (int)ballPos.y(), (int)ballPos.z(), (int)playerPos.x(), (int)playerPos.y(), (int)playerPos.z(), swing, unswing, axis->x(), axis->y(), axis->z());
+        else
+		 sprintf(buf, "B %d %d %d P %d %d %d S %d U %d", (int)ballPos.x(), (int)ballPos.y(), (int)ballPos.z(), (int)playerPos.x(), (int)playerPos.y(), (int)playerPos.z(), swing, unswing);
+	RacquetApp::Send(buf, 512);
   }
 
 
