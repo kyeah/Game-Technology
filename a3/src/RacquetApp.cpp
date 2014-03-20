@@ -151,7 +151,7 @@ void RacquetApp::restart() {
 
 void RacquetApp::Connect(){
 	printf("in connect\n");
-        char *host = "hockey-elemental.cs.utexas.edu";
+        char *host = "rovner.cs.utexas.edu";
         int port = 65501;
 
         printf("trying to connect to player 2...\n");
