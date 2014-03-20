@@ -12,7 +12,7 @@
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonLeftPushed" />
       <Property Name="Tooltip" Value="Start a new game"/>
       <Window Type="TaharezLook/StaticText" Name="btnNewGame_text__">
-        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.2,0.0},{0.6,0.0},{0.4,0.0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
         <Property Name="FrameEnabled"      Value="False" />
         <Property Name="BackgroundEnabled" Value="False" />
         <Property Name="HorzFormatting"    Value="WordWrapCentred" />
@@ -30,7 +30,7 @@
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
       <Property Name="Tooltip" Value="Multiplayer"/>
       <Window Type="TaharezLook/StaticText" Name="btnMultiplayerGame_text__">
-        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.2,0.0},{0.6,0.0},{0.4,0.0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
         <Property Name="FrameEnabled"      Value="False" />
         <Property Name="BackgroundEnabled" Value="False" />
         <Property Name="HorzFormatting"    Value="WordWrapCentred" />
@@ -48,7 +48,7 @@
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonRightPushed" />
       <Property Name="Tooltip" Value="Exit To Desktop"/>
       <Window Type="TaharezLook/StaticText" Name="btnQuitGame_text__">
-        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.2,0.0},{0.6,0.0},{0.4,0.0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
         <Property Name="FrameEnabled"      Value="False" />
         <Property Name="BackgroundEnabled" Value="False" />
         <Property Name="HorzFormatting"    Value="WordWrapCentred" />

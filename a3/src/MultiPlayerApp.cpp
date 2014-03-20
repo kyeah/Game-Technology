@@ -23,7 +23,7 @@ static bool pongMode = false;
 Ogre::Light* scene_lights[6];
 
 //-------------------------------------------------------------------------------------
-MultiPlayerApp::MultiPlayerApp(void)
+MultiPlayerApp::MultiPlayerApp(bool _isHost) : isHost(_isHost)
 {
 	connected = false;
 	mPhysics = new Physics(btVector3(0, -7000, 0));

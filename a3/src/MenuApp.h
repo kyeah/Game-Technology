@@ -3,6 +3,13 @@
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
  
+static const int MODE_MENU = 0;
+static const int MODE_SP = 1;
+static const int MODE_MP_HOST = 2;
+static const int MODE_MP_CLIENT = 3;
+static const int MODE_QUIT = 4;
+static int mode = MODE_MENU;
+
 class MenuApp : public BaseApplication
 {
  public:
@@ -11,6 +18,8 @@ class MenuApp : public BaseApplication
  
  protected:
   CEGUI::OgreRenderer* mRenderer;
+  CEGUI::WindowManager* Wmgr;
+  CEGUI::Window* menu;
  
   virtual void createScene(void);
   virtual void createFrameListener(void);
@@ -26,7 +35,10 @@ class MenuApp : public BaseApplication
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
+  bool SwitchToMainMenu(const CEGUI::EventArgs& e);
+  bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
   bool StartSinglePlayer(const CEGUI::EventArgs& e);
-  bool StartMultiPlayer(const CEGUI::EventArgs& e);
+  bool StartHost(const CEGUI::EventArgs& e);
+  bool StartClient(const CEGUI::EventArgs& e);
   bool quit(const CEGUI::EventArgs &e);
 };

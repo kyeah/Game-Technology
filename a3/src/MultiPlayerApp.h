@@ -24,7 +24,7 @@ This source file is part of the
 class MultiPlayerApp : public BaseApplication
 {
 public:
-    MultiPlayerApp(void);
+    MultiPlayerApp(bool _isHost);
     virtual ~MultiPlayerApp(void);
     bool frameStarted(const Ogre::FrameEvent &evt);
 
@@ -44,10 +44,9 @@ protected:
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
 
-
     IPaddress ip, *remoteIP;
     TCPsocket sd, csd;
-    bool connected;
+    bool connected, isHost;
     char buf[512];
 
     Physics *mPhysics;
@@ -55,7 +54,7 @@ protected:
     Dude *mPlayer;
     Ball *mBall;
 
-
+    
 };
 
 #endif // #ifndef __MultiPlayerApp_h_

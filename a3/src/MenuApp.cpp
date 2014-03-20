@@ -10,7 +10,7 @@ bool bootstrapped = false;
 //-------------------------------------------------------------------------------------
 MenuApp::MenuApp(void)
 {
-  
+
 }
 //-------------------------------------------------------------------------------------
 MenuApp::~MenuApp(void)
@@ -36,31 +36,24 @@ void MenuApp::createScene(void)
     CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
   }
 
-  CEGUI::WindowManager* Wmgr = CEGUI::WindowManager::getSingletonPtr();
-
+  Wmgr = CEGUI::WindowManager::getSingletonPtr();
   try
     {
-      CEGUI::Window* menu;
       try {
         menu = Wmgr->getWindow("Menu/Background");
       } catch (CEGUI::Exception &e) {
         menu = Wmgr->loadWindowLayout("Menu.layout");
       }
       CEGUI::System::getSingleton().setGUISheet(menu);
-      //      myRoot->addChildWindow(menu);
+      // myRoot->addChildWindow(menu);
     }
   catch(CEGUI::Exception &e)
     {
       OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, std::string(e.getMessage().c_str()), "Error Parsing Menu");
     }
 
-  CEGUI::PushButton* singlePlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/SinglePlayer");
-  CEGUI::PushButton* multiPlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/MultiPlayer");
-  CEGUI::PushButton* quitButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/QuitGame");
-
-  singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartSinglePlayer,this));
-  multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartMultiPlayer,this));
-  quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::quit,this));
+  const CEGUI::EventArgs* args;
+  SwitchToMainMenu(*args);
 }
 
 //-------------------------------------------------------------------------------------
@@ -164,20 +157,60 @@ bool MenuApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
   return true;
 }
 
-static int MODE_MENU = 0;
-static int MODE_SP= 1;
-static int MODE_MP= 2;
-static int MODE_QUIT= 3;
-int mode = MODE_MENU;
 //-------------------------------------------------------------------------------------
+bool MenuApp::SwitchToMultiMenu(const CEGUI::EventArgs& e) {
+  Wmgr = CEGUI::WindowManager::getSingletonPtr();
+  try
+    {
+      try {
+        menu = Wmgr->getWindow("Menu/MultiBackground");  
+      } catch (CEGUI::Exception &e) {
+        menu = Wmgr->loadWindowLayout("MultiSubMenu.layout");
+      }
+      CEGUI::System::getSingleton().setGUISheet(menu);
+      // myRoot->addChildWindow(menu);
+    }
+  catch(CEGUI::Exception &e)
+    {
+      OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, std::string(e.getMessage().c_str()), "Error Parsing Menu");
+    }
+
+  CEGUI::PushButton* hostButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Host");
+  CEGUI::PushButton* clientButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Client");
+  CEGUI::PushButton* returnButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Return");
+
+  hostButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartHost,this));
+  clientButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartClient,this));
+  returnButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::SwitchToMainMenu,this));
+}
+
+bool MenuApp::SwitchToMainMenu(const CEGUI::EventArgs& e) {
+  menu = Wmgr->getWindow("Menu/Background");
+  CEGUI::System::getSingleton().setGUISheet(menu);
+
+  CEGUI::PushButton* singlePlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/SinglePlayer");
+  CEGUI::PushButton* multiPlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/MultiPlayer");
+  CEGUI::PushButton* quitButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/QuitGame");
+
+  singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::StartSinglePlayer,this));
+  multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::SwitchToMultiMenu, this));
+  quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MenuApp::quit,this));  
+}
+
 bool MenuApp::StartSinglePlayer(const CEGUI::EventArgs& e) {
   mode = MODE_SP;
   mRoot->queueEndRendering();
   return true;
 }
 
-bool MenuApp::StartMultiPlayer(const CEGUI::EventArgs& e) {
-  mode = MODE_MP;
+bool MenuApp::StartHost(const CEGUI::EventArgs& e) {
+  mode = MODE_MP_HOST;
+  mRoot->queueEndRendering();
+  return true;
+}
+
+bool MenuApp::StartClient(const CEGUI::EventArgs& e) {
+  mode = MODE_MP_CLIENT;
   mRoot->queueEndRendering();
   return true;
 }
@@ -247,27 +280,21 @@ extern "C" {
         } catch( Ogre::Exception& e ) {
           handleException(e);
         }
-        mode = MODE_QUIT;  // Default to menu when done with current mode
-      } else if (mode == MODE_MP) {
-	MultiPlayerApp app;
- //	mp_instance = &app;
-	try{
-	  app.go();
-	} catch( Ogre::Exception& e) {
-	  handleException(e);
-	}
-   	mode = MODE_QUIT;
-      } else {
-        RacquetApp app;
-        sp_instance = &app;
-        try {
+        mode = MODE_QUIT;
+      } else if (mode == MODE_MP_HOST || mode == MODE_MP_CLIENT) {
+        bool isHost = (mode == MODE_MP_HOST);
+        MultiPlayerApp app(isHost);
+        //      mp_instance = &app;
+        try{
           app.go();
-        } catch( Ogre::Exception& e ) {
+        } catch( Ogre::Exception& e) {
           handleException(e);
         }
-        mode = MODE_QUIT;  // Default to menu when done with current mode
+        mode = MODE_QUIT;
+      } else {
+        break;
       }
-    } 
+    }
 #endif
     return 0;
   }
