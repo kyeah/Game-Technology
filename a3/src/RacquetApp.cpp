@@ -60,10 +60,13 @@ RacquetApp::RacquetApp(void)
   unswing = 0;
   movementSpeed = 1;
   Sounds::init();
+  connected = false;
+  RacquetApp::Connect();
 }
 //-------------------------------------------------------------------------------------
 RacquetApp::~RacquetApp(void)
 {
+  RacquetApp::Close();
 }
 
 void RacquetApp::createCamera(void) {
@@ -146,36 +149,44 @@ void RacquetApp::restart() {
   score = 0;
 }
 
-void RacquetApp::Server(){
-	TCPsocket sd, csd;
-	IPaddress ip, *remoteIP;
-	int quit, quit2;
-	char buf[512];
+void RacquetApp::Connect(){
+	printf("in connect\n");
+        char *host = "hockey-elemental.cs.utexas.edu";
+        int port = 65501;
 
-	SDLNet_Init();
-	SDLNet_ResolveHost(&ip, NULL, 2000);
-	sd = SDLNet_TCP_Open(&ip);
-	
-	quit = 0;
-	while(!quit){
-		if((csd = SDLNet_TCP_Accept(sd))){
-			if((remoteIP = SDLNet_TCP_GetPeerAddress(csd)))
-				printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
-			quit2 = 0;
-			while(!quit2){
-				if(SDLNet_TCP_Recv(csd, buf, 512) > 0){
-					//buf contains stuff
-						if(strcmp(buf, "quit") == 0){
-						quit2 = 1;
-						quit = 1;
-					}
-				}
-			}
-			SDLNet_TCP_Close(csd);
-		}
-	}
+        printf("trying to connect to player 2...\n");
+        SDLNet_Init();
+        if(SDLNet_ResolveHost(&ip, host, port) == -1){
+                printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+                exit(0);
+        }
+
+	sd =SDLNet_TCP_Open(&ip);
+        while(!sd){
+                sd = SDLNet_TCP_Open(&ip);
+                if(!sd){
+                        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+                        printf("trying again...\n");
+                }
+        }
+	connected = true;
+}
+
+void RacquetApp::Send(char *msg, int len){
+	if(connected){
+		printf("sending, %s\n", msg);
+		int length = strlen(msg);
+		int result = SDLNet_TCP_Send(sd, (void*)msg, length);
+		if(result < length)
+			printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+	}	
+}
+
+void RacquetApp::Close(){
+	SDLNet_TCP_Close(csd);
 	SDLNet_TCP_Close(sd);
 	SDLNet_Quit();
+	connected = false;
 }
 
 bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
@@ -453,9 +464,17 @@ void RacquetApp::createScene(void)
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
   createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
+
 }
 
-bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
+bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) { 
+  if(sd){	
+	btVector3 curPos = mBall->getPosition();
+        char buf[512];
+  	sprintf(buf, "Ball %d %d %d", (int)curPos.x(), (int)curPos.y(), (int)curPos.z());
+  	RacquetApp::Send(buf, 50);
+  }
+
   for (int i = 0; i < 2; i++) {
     Ogre::Vector3 v = discolights[i]->getDirection();
     double x = v[0] + 0.02;

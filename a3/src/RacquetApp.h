@@ -20,6 +20,7 @@ This source file is part of the
 #include "BaseApplication.h"
 #include "Physics.h"
 #include "RacquetObject.h"
+#include "SDL_net.h"
 
 extern int highscore;
 extern int lastscore;
@@ -38,7 +39,6 @@ public:
 
     bool frameStarted(const Ogre::FrameEvent &evt);
     void restart();
-    void Server();
 
 protected:
     virtual void createScene(void);
@@ -58,6 +58,16 @@ protected:
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     int worldWidth,worldLength,worldHeight;
+
+/* server side stuff */ 
+    void Connect();
+    void Send(char *msg, int len);
+    void Close();
+
+    TCPsocket sd, csd; 
+    IPaddress ip, *remoteIP;
+    bool connected;
+/* end */ 
 
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
