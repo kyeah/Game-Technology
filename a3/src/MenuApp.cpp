@@ -37,20 +37,8 @@ void MenuApp::createScene(void)
   }
 
   Wmgr = CEGUI::WindowManager::getSingletonPtr();
-  try
-    {
-      try {
-        menu = Wmgr->getWindow("Menu/Background");
-      } catch (CEGUI::Exception &e) {
-        menu = Wmgr->loadWindowLayout("Menu.layout");
-      }
-      CEGUI::System::getSingleton().setGUISheet(menu);
-      // myRoot->addChildWindow(menu);
-    }
-  catch(CEGUI::Exception &e)
-    {
-      OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, std::string(e.getMessage().c_str()), "Error Parsing Menu");
-    }
+  menu = Wmgr->loadWindowLayout("Menu.layout");
+  menu = Wmgr->loadWindowLayout("MultiSubMenu.layout");
 
   const CEGUI::EventArgs* args;
   SwitchToMainMenu(*args);
@@ -159,21 +147,8 @@ bool MenuApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 
 //-------------------------------------------------------------------------------------
 bool MenuApp::SwitchToMultiMenu(const CEGUI::EventArgs& e) {
-  Wmgr = CEGUI::WindowManager::getSingletonPtr();
-  try
-    {
-      try {
-        menu = Wmgr->getWindow("Menu/MultiBackground");  
-      } catch (CEGUI::Exception &e) {
-        menu = Wmgr->loadWindowLayout("MultiSubMenu.layout");
-      }
-      CEGUI::System::getSingleton().setGUISheet(menu);
-      // myRoot->addChildWindow(menu);
-    }
-  catch(CEGUI::Exception &e)
-    {
-      OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, std::string(e.getMessage().c_str()), "Error Parsing Menu");
-    }
+  menu = Wmgr->getWindow("Menu/MultiBackground");  
+  CEGUI::System::getSingleton().setGUISheet(menu);
 
   CEGUI::PushButton* hostButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Host");
   CEGUI::PushButton* clientButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Client");
