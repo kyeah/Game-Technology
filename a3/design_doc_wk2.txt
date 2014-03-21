@@ -1,0 +1,21 @@
+Implementation Update
+========================
+SDL_Net Implementation: Working properly, with packet structs for easy send and receive. Still need to handle inputs sent from client to server, which should be easy after creating the Player class.
+
+Menu: Done. Needs to look better + provide a better UI for creating and connecting to a server. Options menu possible if time permits.
+
+Gameplay: Has not yet been modified; still have not modified the scene, and clients do not have their own racquet. Will be added soon, once a Player class has been created to hold players' socket and gameobject information.
+
+HUD and Scoring: Also not yet modified.
+
+Sound Toggle: DONE. Press M to toggle sound.
+
+Architecture Update
+========================
+We have decided to use TCP, which runs quick enough for us. The packet structure works fairly well, although we will likely change ServerPacket to send an array of objects containing gameobject ID, position, orientation, and velocity, instead of hardcoding each item.
+
+Multiplayer is currently split into two applications (Host and Client), but the client application is small enough that we can combine it with the main Host application (scene setup is exactly the same).
+
+Division of Labor
+========================
+Due to medical reasons, Patrick has been unable to work on the assignment this week, but we have still made good progress on implementing networking and upgrading the architecture. We will rebalance the load for implementing the gameplay and UI for multiplayer.

@@ -14,9 +14,13 @@
   http://www.ogre3d.org/tikiwiki/
   -----------------------------------------------------------------------------
 */
+#include <btBulletDynamicsCommon.h>
 #include "MultiPlayerApp.h"
 #include "SDL_net.h"
 #include "Networking.h"
+
+const static int SWING_DELAY = 5;
+const static int UNSWING_DELAY = 10;
 
 btVector3 racquetInitialPosition(0,700.0f,0);
 btVector3 playerInitialPosition(100, -1200, -2245);
