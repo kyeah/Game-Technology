@@ -239,7 +239,6 @@ void MultiPlayerApp::Connect(){
       }
     }
   }
-
 }
 
 ServerPacket* MultiPlayerApp::Receive(){
@@ -286,7 +285,7 @@ bool MultiPlayerApp::keyReleased(const OIS::KeyEvent &arg){
     ClientPacket msg;
     msg.type = KEY_RELEASED;
     msg.keyArg = arg.key;
-    // msg.userId = ;
+    msg.userID = myId;
     Send((char*)&msg, sizeof(msg));
     return true;
   }
@@ -298,7 +297,7 @@ bool MultiPlayerApp::mouseMoved( const OIS::MouseEvent& arg ) {
   ClientPacket msg;
   msg.type = MOUSE_MOVED;
   msg.mouseArg = arg.state;
-  // msg.userId = ;
+  msg.userID = myId;
   Send((char*)&msg, sizeof(msg));
   return true;
 }
@@ -308,7 +307,7 @@ bool MultiPlayerApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButton
   msg.type = MOUSE_RELEASED;
   msg.mouseArg = arg.state;
   msg.mouseID = id;
-  // msg.userId = ;
+  msg.userID = myId;
   Send((char*)&msg, sizeof(msg));
   return true;
 }
@@ -328,7 +327,7 @@ bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
     ClientPacket msg;
     msg.type = KEY_PRESSED;
     msg.keyArg = arg.key;
-    // msg.userId = ;
+    msg.userID = myId;
     Send((char*)&msg, sizeof(msg));
     return true;
   }
