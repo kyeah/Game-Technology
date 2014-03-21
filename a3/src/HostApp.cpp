@@ -604,16 +604,21 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt) {
   }
 
   if(sd){
-    Player *mPlayer = players[0]; // Should add all player information later on
-    
     ServerPacket msg;
     btVector3 ballPos = mBall->getPosition();
-    btVector3 playerPos = mPlayer->getNode()->getPosition();
-    btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
     msg.type = SERVER_UPDATE;
     msg.ballPos = ballPos;
-    msg.playerPos = playerPos;
-    msg.playerOrientation = playerOrientation;
+    
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+      Player *mPlayer = players[i];
+      if (mPlayer) {
+        btVector3 playerPos = mPlayer->getNode()->getPosition();
+        btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();  
+        msg.players[i].nodePos = playerPos;
+        msg.players[i].nodeOrientation = playerOrientation;
+      }
+    }
+      
     HostApp::Send((char*)&msg, sizeof(msg));
 
     /*

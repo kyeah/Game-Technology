@@ -29,12 +29,16 @@ typedef struct {
 } ClientPacket;
 
 typedef struct {
+  btVector3 nodePos;
+  btQuaternion nodeOrientation;
+} PlayerInfo;
+
+typedef struct {
   int type;
   int clientClosedId;
   char msg[512];
   btVector3 ballPos;
-  btVector3 playerPos;  // TODO: Extend for multiple players; add doubles matches.
-  btQuaternion playerOrientation;
+  PlayerInfo players[4];
 } ServerPacket;
 
 static void initSDLNet() {

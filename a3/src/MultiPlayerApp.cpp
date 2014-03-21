@@ -171,7 +171,7 @@ void MultiPlayerApp::createScene(void)
   scene_lights[4]->setPosition(0,-1800,0);
   scene_lights[5]->setPosition(0,-1800,0);
 
-
+  
   mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
                      playerInitialPosition, btVector3(0,0,0), 0);
   mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics,
@@ -316,11 +316,19 @@ bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
 bool MultiPlayerApp::frameStarted(const Ogre::FrameEvent &evt) {
   ServerPacket msg;
   if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
-    std::cout << msg.msg << std::endl;
-    std::cout << msg.ballPos[0] << " " << msg.ballPos[1] << " " << msg.ballPos[2] << std::endl;
     mBall->setPosition(msg.ballPos);
-    mPlayer->setPosition(msg.playerPos);
-    mPlayer->setOrientation(msg.playerOrientation);
+
+    /*    
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+      Player *mPlayer = players[i];
+      if (mPlayer) {
+        mPlayer->getNode()->setPosition(msg.players[i].nodePos);
+        mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+      }
+      }*/
+
+    mPlayer->setPosition(msg.players[0].nodePos);
+    mPlayer->setOrientation(msg.players[0].nodeOrientation);
   }
   return true;
 }
