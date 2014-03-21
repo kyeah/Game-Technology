@@ -14,18 +14,23 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
-#ifndef __RacquetApp_h_
-#define __RacquetApp_h_
+#ifndef __HostApp_h_
+#define __HostApp_h_
 
 #include "BaseApplication.h"
 #include "Physics.h"
 #include "RacquetObject.h"
+#include "SDL_net.h"
 
-class RacquetApp : public BaseApplication
+extern int highscore;
+extern int lastscore;
+extern int score;
+
+class HostApp : public BaseApplication
 {
 public:
-    RacquetApp(void);
-    virtual ~RacquetApp(void);
+    HostApp(void);
+    virtual ~HostApp(void);
 
     Ogre::RenderWindow * getWindow(void) { return mWindow; }
     Ogre::Timer * getTimer(void) { return mTimer; }
@@ -48,11 +53,22 @@ protected:
                                btVector3 angularFactor = btVector3(0,0,0));
     bool keyPressed( const OIS::KeyEvent &arg );
     bool keyReleased(const OIS::KeyEvent &arg);
+    bool handleKeyReleased(OIS::KeyCode arg, int userID);
 
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
     int worldWidth,worldLength,worldHeight;
+
+/* server side stuff */ 
+    void Connect();
+    void Send(char *msg, int len);
+    void Close();
+
+    TCPsocket sd, csd; 
+    IPaddress ip, *remoteIP;
+    bool connected;
+/* end */ 
 
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
@@ -71,7 +87,9 @@ protected:
     int unswing;
 };
 
-#endif
+//extern HostApp *sp_instance;
+
+#endif // #ifndef __HostApp_h_
 
 
 

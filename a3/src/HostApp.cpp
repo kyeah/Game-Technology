@@ -15,18 +15,23 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
-#include "RacquetApp.h"
+#include "HostApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
+#include "SDL_net.h"
 #include "common.h"
+#include "Networking.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <macUtils.h>
 #   include "AppDelegate.h"
 #endif
 
+#include <iostream>
+#include <string>
+
 //-------------------------------------------------------------------------------------
-RacquetApp::RacquetApp(void)
+HostApp::HostApp(void)
 {
   mPhysics = new Physics(btVector3(0,-gravMag,0));
   mTimer = OGRE_NEW Ogre::Timer();
@@ -38,19 +43,22 @@ RacquetApp::RacquetApp(void)
   unswing = 0;
   movementSpeed = 1;
   Sounds::init();
+  connected = false;
+  HostApp::Connect();
 }
 //-------------------------------------------------------------------------------------
-RacquetApp::~RacquetApp(void)
+HostApp::~HostApp(void)
 {
+  HostApp::Close();
 }
 
-void RacquetApp::createCamera(void) {
+void HostApp::createCamera(void) {
   BaseApplication::createCamera();
   mCamera->setPosition(0,0,-7000);
   mCamera->lookAt(0,0,500);
 }
 
-void RacquetApp::createFrameListener(void) {
+void HostApp::createFrameListener(void) {
   BaseApplication::createFrameListener();
 
   Ogre::StringVector items;
@@ -67,7 +75,7 @@ void RacquetApp::createFrameListener(void) {
   mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downwards");
 }
 
-bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
+bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
   static bool vert = false;
 
   switch(arg.key){
@@ -112,7 +120,7 @@ bool RacquetApp::keyPressed( const OIS::KeyEvent &arg ) {
   return BaseApplication::keyPressed(arg);
 }
 
-void RacquetApp::restart() {
+void HostApp::restart() {
   static int gamenum = 0;
   mPhysics->removeObject(mBall);
   mBall->setPosition(btVector3(0,0,0));
@@ -124,10 +132,60 @@ void RacquetApp::restart() {
   score = 0;
 }
 
-bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
+void HostApp::Connect(){
+	printf("in connect\nPlease enter your hostname (default: pastamancer.cs.utexas.edu):");
+        std::string host;
+        getline(std::cin, host);
+        if (host.length() == 0)
+          host = std::string("pastamancer.cs.utexas.edu");
+
+        int port = 65501;
+
+        printf("trying to connect to player 2...\n");
+        SDLNet_Init();
+        if(SDLNet_ResolveHost(&ip, host.c_str(), port) == -1){
+                printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+                exit(0);
+        }
+
+	sd =SDLNet_TCP_Open(&ip);
+        while(!sd){
+                sd = SDLNet_TCP_Open(&ip);
+                if(!sd){
+                        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+                        printf("trying again...\n");
+                }
+        }
+	connected = true;
+}
+
+void HostApp::Send(char *msg, int len){
+	if(connected){
+		printf("sending, %s\n", msg);
+		int result = SDLNet_TCP_Send(sd, (void*)msg, len);
+		if(result < len)
+			printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+	}	
+}
+
+void HostApp::Close(){
+	SDLNet_TCP_Close(csd);
+	SDLNet_TCP_Close(sd);
+	SDLNet_Quit();
+	connected = false;
+}
+
+bool HostApp::keyReleased(const OIS::KeyEvent &arg){
+  handleKeyReleased(arg.key, 0);
+}
+
+bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
   static bool vert = false;
 
-  switch(arg.key){
+  // Iterate here to search for correct player to modify
+  // Should keep its own mDirection, etc.
+
+  switch(arg){
   case OIS::KC_R:
     restart();
     return true;
@@ -189,10 +247,10 @@ bool RacquetApp::keyReleased(const OIS::KeyEvent &arg){
     return true;
   }
 
-  return BaseApplication::keyPressed(arg);
+  return false;
 }
 
-bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
+bool HostApp::mouseMoved( const OIS::MouseEvent& arg ) {
   if (swing == 0 && unswing == 0) {
     int x = arg.state.X.rel;
     int y = arg.state.Y.rel;
@@ -223,7 +281,7 @@ bool RacquetApp::mouseMoved( const OIS::MouseEvent& arg ) {
   }
 }
 
-bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+bool HostApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
   if(swing == 0 && unswing == 0) {
     
     if(id == OIS::MB_Left || id == OIS::MB_Right) {
@@ -240,7 +298,7 @@ bool RacquetApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID i
   return BaseApplication::mouseReleased(arg, id);
 }
 
-void RacquetApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
+void HostApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
   static int wallID;
   std::stringstream ss;
   ss << points << "wall";
@@ -263,7 +321,7 @@ void RacquetApp::createNewScoringPlane(int points, btVector3 pos, btVector3 spee
 }
 
 //-------------------------------------------------------------------------------------
-void RacquetApp::createScene(void)
+void HostApp::createScene(void)
 {
   mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f, .5f, .5f));
   mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
@@ -405,7 +463,7 @@ void RacquetApp::createScene(void)
 
 }
 
-bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) { 
+bool HostApp::frameStarted(const Ogre::FrameEvent &evt) { 
 
   for (int i = 0; i < 2; i++) {
     Ogre::Vector3 v = discolights[i]->getDirection();
@@ -438,7 +496,7 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   if (mPhysics != NULL) {
     mPhysics->stepSimulation(elapsedTime);
   }
-
+  
   //store original vectors
   int oldZ = mDirection.getZ();
   int oldX = mDirection.getX();
@@ -463,8 +521,6 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
   if(mRacquet->getPosition().getY() <= -2000){
     mDirection.setY(10);
   }
-
-
 
   mPlayer->getBody()->translate(mDirection*movementSpeed);
   mPlayer->translate(mDirection*movementSpeed);
@@ -505,6 +561,24 @@ bool RacquetApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   btVector3 pos = (pongMode ? mRacquet->getPosition() : mPlayer->getPosition());
   mCamera->lookAt(pos[0], pos[1], pos[2]);
+
+  if(sd){
+        ServerPacket msg;
+        btVector3 ballPos = mBall->getPosition();
+	btVector3 playerPos = mPlayer->getPosition();
+        btQuaternion playerOrientation = mPlayer->getOrientation();
+        msg.type = SERVER_UPDATE;
+        msg.ballPos = ballPos;
+        msg.playerPos = playerPos;
+        msg.playerOrientation = playerOrientation;
+        HostApp::Send((char*)&msg, sizeof(msg));
+
+        /*
+        ClientPacket cmsg;
+        if(SDLNet_TCP_Recv(sd, &cmsg, sizeof(cmsg)) > 0) {
+          std::cout << "Received msg" << std::endl;
+          }*/
+  }
 
   return result;
 }

@@ -22,18 +22,19 @@ typedef struct {
   int type;
   int userID;
   char msg[512];
-
-  OIS::KeyEvent keyArg;
-  OIS::MouseEvent mouseArg;
+  
+  OIS::KeyCode keyArg;
+  OIS::MouseState mouseArg;
   OIS::MouseButtonID mouseID;
 } ClientPacket;
 
 typedef struct {
   int type;
+  int clientClosedId;
   char msg[512];
-
-  // GameObjects? => contains pointers :( GameObject position and velocity vectors?
-  //Separate Ball, Racquet objects?
+  btVector3 ballPos;
+  btVector3 playerPos;  // TODO: Extend for multiple players; add doubles matches.
+  btQuaternion playerOrientation;
 } ServerPacket;
 
 static void initSDLNet() {

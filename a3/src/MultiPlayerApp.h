@@ -20,6 +20,7 @@ This source file is part of the
 #include "BaseApplication.h"
 #include "SDL_net.h"
 #include "RacquetObject.h"
+#include "Networking.h"
 
 class MultiPlayerApp : public BaseApplication
 {
@@ -33,7 +34,8 @@ protected:
     virtual void createScene(void);
     void createCamera(void);
     void Connect();
-    char* Receive();
+    ServerPacket* Receive();
+    void Send(char *msg, int len);
     void Close();
 
     void createFrameListener();
@@ -47,7 +49,6 @@ protected:
     IPaddress ip, *remoteIP;
     TCPsocket sd, csd;
     bool connected, isHost;
-    char buf[512];
 
     Physics *mPhysics;
     Racquet *mRacquet;

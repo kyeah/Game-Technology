@@ -1,21 +1,22 @@
 /*
------------------------------------------------------------------------------
-Filename:    MultiPlayerApp.cpp
------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  Filename:    MultiPlayerApp.cpp
+  -----------------------------------------------------------------------------
 
-This source file is part of the
-   ___                 __    __ _ _    _ 
+  This source file is part of the
+  ___                 __    __ _ _    _
   /___\__ _ _ __ ___  / / /\ \ (_) | _(_)
- //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
-/ \_// (_| | | |  __/  \  /\  /| |   <| |
-\___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
-      |___/                              
-      Tutorial Framework
-      http://www.ogre3d.org/tikiwiki/
------------------------------------------------------------------------------
+  //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
+  / \_// (_| | | |  __/  \  /\  /| |   <| |
+  \___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
+  |___/
+  Tutorial Framework
+  http://www.ogre3d.org/tikiwiki/
+  -----------------------------------------------------------------------------
 */
 #include "MultiPlayerApp.h"
 #include "SDL_net.h"
+#include "Networking.h"
 
 btVector3 racquetInitialPosition(0,700.0f,0);
 btVector3 playerInitialPosition(100, -1200, -2245);
@@ -25,31 +26,31 @@ Ogre::Light* scene_lights[6];
 //-------------------------------------------------------------------------------------
 MultiPlayerApp::MultiPlayerApp(bool _isHost) : isHost(_isHost)
 {
-	connected = false;
-	mPhysics = new Physics(btVector3(0, -7000, 0));
-        MultiPlayerApp::Connect();
+  connected = false;
+  mPhysics = new Physics(btVector3(0, -7000, 0));
+  MultiPlayerApp::Connect();
 }
 //-------------------------------------------------------------------------------------
 MultiPlayerApp::~MultiPlayerApp(void)
 {
-         MultiPlayerApp::Close();
+  MultiPlayerApp::Close();
 }
 
 //-------------------------------------------------------------------------------------
 void MultiPlayerApp::createCamera(void){
-	BaseApplication::createCamera();
-	mCamera->setPosition(0,0,7000);
-	mCamera->lookAt(0,0,500);
+  BaseApplication::createCamera();
+  mCamera->setPosition(0,0,7000);
+  mCamera->lookAt(0,0,500);
 }
 
 void MultiPlayerApp::createScene(void)
 {
-   printf("in create scene\n");
-	    // Set the scene's ambient light
-    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-    mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
- 
-	  // Boxed Environment
+  printf("in create scene\n");
+  // Set the scene's ambient light
+  mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+  mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
+  // Boxed Environment
   Ogre::Plane planes[] = {
     Ogre::Plane(Ogre::Vector3::UNIT_X, 0),
     Ogre::Plane(Ogre::Vector3::NEGATIVE_UNIT_X, 0),
@@ -126,7 +127,7 @@ void MultiPlayerApp::createScene(void)
     lights[z]->setType(Ogre::Light::LT_POINT);
     lights[z]->setDiffuseColour(.1,.1,.1);
     lights[z]->setSpecularColour(.1,.1,.1);
-    
+
     ss << z;
     if (z < 6) {
       scene_lights[z] = mSceneMgr->createLight(ss.str());
@@ -137,7 +138,7 @@ void MultiPlayerApp::createScene(void)
       scene_lights[z]->setSpotlightOuterAngle(Ogre::Radian(0.1));
     }
   }
-  
+
   lights[0]->setPosition(-1499,1499,0);
   lights[1]->setPosition(-1499,1499,1000);
   lights[2]->setPosition(-1499,1499,2000);
@@ -159,7 +160,7 @@ void MultiPlayerApp::createScene(void)
   scene_lights[3]->setDirection(-1,0,-1);
   scene_lights[2]->setPosition(0,-1800,0);
   scene_lights[3]->setPosition(0,-1800,0);
-  
+
   // Left Wall
   scene_lights[4]->setDirection(1,0,0);
   scene_lights[5]->setDirection(1,0,-1);
@@ -186,51 +187,58 @@ void MultiPlayerApp::createScene(void)
 }
 
 void MultiPlayerApp::Connect(){
-	 SDLNet_Init();
-        if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {
-                printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-                exit(0);
-        }
-        sd = SDLNet_TCP_Open(&ip);
-        if(!sd){
-                printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-                exit(0);
-        }
+  SDLNet_Init();
+  if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {
+    printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+    exit(0);
+  }
+  sd = SDLNet_TCP_Open(&ip);
+  if(!sd){
+    printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+    exit(0);
+  }
 
-        csd = SDLNet_TCP_Accept(sd);
-        while(!csd){
-                csd = SDLNet_TCP_Accept(sd);
-                printf("trying to accept...\n");
-                if(csd){
-                        remoteIP = SDLNet_TCP_GetPeerAddress(csd);
-                        if(remoteIP){
-                                printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
-                                connected = true;
-                        }
-                }
-        }
+  csd = SDLNet_TCP_Accept(sd);
+  while(!csd){
+    csd = SDLNet_TCP_Accept(sd);
+    printf("trying to accept...\n");
+    if(csd){
+      remoteIP = SDLNet_TCP_GetPeerAddress(csd);
+      if(remoteIP){
+        printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
+        connected = true;
+      }
+    }
+  }
 
 }
 
-char* MultiPlayerApp::Receive(){
-	for(int i = 0; i < 512; i++){
-		buf[i] = ' ';	
-	}	
-	if(SDLNet_TCP_Recv(csd, buf, 512) > 0){
-		return (char*)buf;
-	}
-	return "error";
+ServerPacket* MultiPlayerApp::Receive(){
+  /*  ServerPacket msg;
+      if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
+      return &msg;
+      }*/
+  return NULL;
+}
+
+void MultiPlayerApp::Send(char *msg, int len) {
+  if(connected){
+    printf("sending, %s\n", msg);
+    int result = SDLNet_TCP_Send(sd, (void*)msg, len);
+    if(result < len)
+      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  }
 }
 
 void MultiPlayerApp::Close(){
-	SDLNet_TCP_Close(csd);
-	SDLNet_TCP_Close(sd);
-	SDLNet_Quit();
-	connected = false;
+  SDLNet_TCP_Close(csd);
+  SDLNet_TCP_Close(sd);
+  SDLNet_Quit();
+  connected = false;
 }
 
 void MultiPlayerApp::createFrameListener(void){
-	BaseApplication::createFrameListener();
+  BaseApplication::createFrameListener();
 }
 
 bool MultiPlayerApp::keyReleased(const OIS::KeyEvent &arg){
@@ -238,113 +246,42 @@ bool MultiPlayerApp::keyReleased(const OIS::KeyEvent &arg){
 
   switch(arg.key){
   case OIS::KC_R:
-//    restart();
-    return true;
   case OIS::KC_P:
-/*    swing = unswing = 0;
-    pongMode = !pongMode;
-    mPlayer->setOrientation(btQuaternion(0,0,0,1));
-    mPlayer->setPosition(playerInitPos);
-    mPlayer->getEntity()->setVisible(!mPlayer->getEntity()->isVisible());
-*/    return true;
   case OIS::KC_J:
   case OIS::KC_D:
-//    mDirection -= btVector3(-40, 0, 0);
-//    oDirection.x -= -40;
-    return true;
   case OIS::KC_S:
-    if (vert) {
-//      mDirection -= btVector3(0, -40, 0);
-//      oDirection.y -= -40;
-    } else {
-//      mDirection -= btVector3(0, 0, -40);
-//      oDirection.z -= -40;
-    }
-    return true;
   case OIS::KC_A:
-//    mDirection -= btVector3(40, 0, 0);
-//    oDirection.x -= 40;
-    return true;
   case OIS::KC_W:
-    if (vert) {
-//      mDirection -= btVector3(0, 40, 0);
-//      oDirection.y -= 40;
-    } else {
-//        mDirection -= btVector3(0, 0, 40);
-//        oDirection.z -= 40;
-    }
-    return true;
   case OIS::KC_LSHIFT:
-//    movementSpeed = 1;
-    return true;
   case OIS::KC_G:
-/*    static int gravity = 0;
-    btDiscreteDynamicsWorld *world = mPhysics->getDynamicsWorld();
-    if (gravity == 0) {
-      world->setGravity(btVector3(0,0,0));
-      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Off");
-    } else if (gravity == 1) {
-      world->setGravity(btVector3(0,gravMag,0));
-      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Upward");
-    } else if (gravity == 2) {
-      world->setGravity(btVector3(0,-gravMag,0));
-      mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downward");                                                                                                     
-    }
-
-    gravity = (gravity+1)%3;
-*/    return true;
+    ClientPacket msg;
+    msg.type = KEY_RELEASED;
+    msg.keyArg = arg.key;
+    // msg.userId = ;
+    Send((char*)&msg, sizeof(msg));
+    return true;
   }
 
   return BaseApplication::keyPressed(arg);
 }
 
 bool MultiPlayerApp::mouseMoved( const OIS::MouseEvent& arg ) {
-/*  if (swing == 0 && unswing == 0) {
-    int x = arg.state.X.rel;
-    int y = arg.state.Y.rel;
-
-    static float rotfactor = 6.28 / 1800;
-
-    if (pongMode) {
-      //Boundaries
-      if(x < 0 && mRacquet->getPosition().getX() >= 2000){
-        x = 0;
-      }
-      if(x > 0 && mRacquet->getPosition().getX() <= -2000){
-        x = 0;
-      }
-      if(y < 0 && mRacquet->getPosition().getY() >= 2000){
-        y = 0;
-      }
-      if(y > 0 && mRacquet->getPosition().getY() <= -2000){
-        y = 0;
-      }
-
-
-
-      mPlayer->translate(btVector3(-x,-y,0));
-    } else {
-      mPlayer->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor)));
-    }
-  }
-*/
+  ClientPacket msg;
+  msg.type = MOUSE_MOVED;
+  msg.mouseArg = arg.state;
+  // msg.userId = ;
+  Send((char*)&msg, sizeof(msg));
+  return true;
 }
 
 bool MultiPlayerApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-/*  if(swing == 0 && unswing == 0) {
-
-    if(id == OIS::MB_Left || id == OIS::MB_Right) {
-      swing = SWING_DELAY;
-      Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
-
-      Ogre::Vector3 p = mRacquet->getNode()->getPosition();
-      axis = new btVector3(p[1], -p[0], 0);
-
-      right_mouse_button = (id == OIS::MB_Right);
-    }
-  }
-*/
-  return BaseApplication::mouseReleased(arg, id);
+  ClientPacket msg;
+  msg.type = MOUSE_RELEASED;
+  msg.mouseArg = arg.state;
+  msg.mouseID = id;
+  // msg.userId = ;
+  Send((char*)&msg, sizeof(msg));
+  return true;
 }
 
 
@@ -354,40 +291,16 @@ bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
 
   switch(arg.key){
   case OIS::KC_D:
-//    mDirection += btVector3(-40, 0, 0);
-//    oDirection.x += -40;
-    return true;
   case OIS::KC_S:
-    if (vert) {
-//      mDirection += btVector3(0, -40, 0);
-//      oDirection.y += -40;
-    } else {
-//      mDirection += btVector3(0, 0, -40);
-//      oDirection.z += -40;
-    }
-    return true;
   case OIS::KC_A:
-//    mDirection += btVector3(40, 0, 0);
-//    oDirection.x += 40;
-    return true;
   case OIS::KC_W:
-    if (vert) {
-//      mDirection += btVector3(0, 40, 0);
-//      oDirection.y += 40;
-    } else {
-//        mDirection += btVector3(0, 0, 40);
-//        oDirection.z += 40;
-    }
-
-    return true;
   case OIS::KC_LSHIFT:
-//    movementSpeed = 2;
-    return true;
   case OIS::KC_SPACE:
-//    if(swing == 0 && unswing == 0) {
-//      swing = SWING_DELAY;
-//      Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
-//    }
+    ClientPacket msg;
+    msg.type = KEY_PRESSED;
+    msg.keyArg = arg.key;
+    // msg.userId = ;
+    Send((char*)&msg, sizeof(msg));
     return true;
   }
 
@@ -397,12 +310,13 @@ bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
 
 
 bool MultiPlayerApp::frameStarted(const Ogre::FrameEvent &evt) {
-	char* msg = MultiPlayerApp::Receive();
-	int x,y,z; 
-	sscanf(msg, "Ball %d %d %d", &x, &y, &z);
-	mBall->setPosition(btVector3(x,y,z));
-        sscanf(msg, "Player %d %d %d", &x,&y,&z);	
-	mPlayer->setPosition(btVector3(x,y,z));
-
-	return true;
+  ServerPacket msg;
+  if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
+    std::cout << msg.msg << std::endl;
+    std::cout << msg.ballPos[0] << " " << msg.ballPos[1] << " " << msg.ballPos[2] << std::endl;
+    mBall->setPosition(msg.ballPos);
+    mPlayer->setPosition(msg.playerPos);
+    mPlayer->setOrientation(msg.playerOrientation);
+  }
+  return true;
 }

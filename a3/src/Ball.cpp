@@ -1,7 +1,9 @@
+#include <pthread.h>
+
 #include "RacquetApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
-#include <pthread.h>
+#include "common.h"
 
 struct args{
 	Ogre::Entity *entity;

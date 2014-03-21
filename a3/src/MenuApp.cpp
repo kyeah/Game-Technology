@@ -1,6 +1,8 @@
 #include "MenuApp.h"
 #include "RacquetApp.h"
+#include "HostApp.h"
 #include "MultiPlayerApp.h"
+#include "common.h"
 
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
@@ -249,7 +251,7 @@ extern "C" {
         }
       } else if (mode == MODE_SP) {
         RacquetApp app;
-        sp_instance = &app;
+        instance = &app;
         try {
           app.go();
         } catch( Ogre::Exception& e ) {
@@ -258,10 +260,20 @@ extern "C" {
         mode = MODE_QUIT;
       } else if (mode == MODE_MP_HOST || mode == MODE_MP_CLIENT) {
         bool isHost = (mode == MODE_MP_HOST);
-        MultiPlayerApp app(isHost);
+
+        // MultiPlayerApp app(isHost);  // Use one app for host and client
         //      mp_instance = &app;
+
+        // Use different apps for host and client
         try{
-          app.go();
+          if (isHost) {
+            HostApp app;
+            //            sp_instance = &app;
+            app.go();
+          } else {
+            MultiPlayerApp app(isHost);
+            app.go();
+          }
         } catch( Ogre::Exception& e) {
           handleException(e);
         }
