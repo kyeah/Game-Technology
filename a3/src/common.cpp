@@ -19,7 +19,15 @@ int lastscore = 0;
 int score = 0;
 
 btVector3 racquetInitPos(0,700.0f,0);
-btVector3 playerInitPos(100,-1200,-2245);
+
+btVector3 playerInitialPositions[] = {
+  btVector3(400,-1200,-2245),
+  btVector3(-400,-1200,2245),
+  btVector3(-400,-1200,-2245),
+  btVector3(400,-1200,2245)
+};
+
+btVector3 playerInitPos(100,-1200,-2245); // single player position
 btVector3 *axis;
 
 Ogre::Light* discolights[6];

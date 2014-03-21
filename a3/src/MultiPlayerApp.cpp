@@ -19,12 +19,6 @@
 #include "SDL_net.h"
 #include "Networking.h"
 
-const static int SWING_DELAY = 5;
-const static int UNSWING_DELAY = 10;
-
-btVector3 racquetInitialPosition(0,700.0f,0);
-btVector3 playerInitialPosition(100, -1200, -2245);
-static bool pongMode = false;
 Ogre::Light* scene_lights[6];
 
 //-------------------------------------------------------------------------------------
@@ -45,6 +39,38 @@ void MultiPlayerApp::createCamera(void){
   BaseApplication::createCamera();
   mCamera->setPosition(0,0,7000);
   mCamera->lookAt(0,0,500);
+}
+
+Player* MultiPlayerApp::findPlayer(int userID) {
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    if (players[i] && players[i]->getId() == userID) {
+      return players[i];
+    }
+  }
+  return NULL;
+}
+
+Player* MultiPlayerApp::addPlayer(int userID) {
+  Player* mPlayer = new Player(userID);
+
+  std::stringstream ss;
+  ss << "Player" << userID;
+  std::string playerEnt = ss.str();
+  ss << "node";
+
+  std::stringstream ssr;
+  ssr << "Racquet" << userID;
+  std::string racquetEnt = ssr.str();
+  ssr << "node";
+
+  mPlayer->setNode(new Dude(mSceneMgr, playerEnt, ss.str(), 0, mPhysics,
+                            playerInitPos, btVector3(0,0,0), 0));
+
+  mPlayer->setRacquet(new Racquet(mSceneMgr, racquetEnt, ssr.str(), mPlayer->getNode()->getNode(), mPhysics,
+                                  racquetInitPos));
+
+  players[userID] = mPlayer;
+  return mPlayer;
 }
 
 void MultiPlayerApp::createScene(void)
@@ -171,11 +197,10 @@ void MultiPlayerApp::createScene(void)
   scene_lights[4]->setPosition(0,-1800,0);
   scene_lights[5]->setPosition(0,-1800,0);
 
-  
-  mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
-                     playerInitialPosition, btVector3(0,0,0), 0);
-  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics,
-                         racquetInitialPosition);
+  myId = 1;
+  addPlayer(0);
+  Player *mPlayer = addPlayer(myId);
+
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
                    btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
@@ -318,17 +343,13 @@ bool MultiPlayerApp::frameStarted(const Ogre::FrameEvent &evt) {
   if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
     mBall->setPosition(msg.ballPos);
 
-    /*    
     for (int i = 0; i < MAX_PLAYERS; i++) {
       Player *mPlayer = players[i];
       if (mPlayer) {
         mPlayer->getNode()->setPosition(msg.players[i].nodePos);
         mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
       }
-      }*/
-
-    mPlayer->setPosition(msg.players[0].nodePos);
-    mPlayer->setOrientation(msg.players[0].nodeOrientation);
+    }
   }
   return true;
 }

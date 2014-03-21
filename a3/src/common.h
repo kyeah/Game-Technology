@@ -24,6 +24,7 @@ extern int score;
 
 extern btVector3 racquetInitPos; 
 extern btVector3 playerInitPos;  
+extern btVector3 playerInitialPositions[];
 extern btVector3 *axis; // Swing rotation axis                                                                
 
 extern Ogre::Light* discolights[6];

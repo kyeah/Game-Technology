@@ -17,6 +17,7 @@ This source file is part of the
 #ifndef __MultiPlayerApp_h_
 #define __MultiPlayerApp_h_
 
+#include "common.h"
 #include "BaseApplication.h"
 #include "SDL_net.h"
 #include "RacquetObject.h"
@@ -43,16 +44,17 @@ protected:
     bool keyReleased(const OIS::KeyEvent &arg);
 
     bool mouseMoved( const OIS::MouseEvent &arg );
-    bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+    bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ); 
 
+    Player* findPlayer(int userID);
+    Player* addPlayer(int userID);
 
     IPaddress ip, *remoteIP;
     TCPsocket sd, csd;
     bool connected, isHost;
 
+    int myId;
     Physics *mPhysics;
-    Racquet *mRacquet;
-    Dude *mPlayer;
     Ball *mBall;
 
     

@@ -187,11 +187,22 @@ Player* HostApp::findPlayer(int userID) {
 }
 
 Player* HostApp::addPlayer(int userID) {
-  Player* mPlayer = new Player(myId);
-  mPlayer->setNode(new Dude(mSceneMgr, "Player0", "Player0Node", 0, mPhysics,
-                            playerInitPos, btVector3(0,0,0), 0));
+  Player* mPlayer = new Player(userID);
+
+  std::stringstream ss;
+  ss << "Player" << userID;
+  std::string playerEnt = ss.str();
+  ss << "node";
+
+  std::stringstream ssr;
+  ssr << "Racquet" << userID;
+  std::string racquetEnt = ssr.str();
+  ssr << "node";
+
+  mPlayer->setNode(new Dude(mSceneMgr, playerEnt, ss.str(), 0, mPhysics,
+                            playerInitialPositions[userID], btVector3(0,0,0), 0));
   
-  mPlayer->setRacquet(new Racquet(mSceneMgr, "Racquet0", "Racquet0node", mPlayer->getNode()->getNode(), mPhysics,
+  mPlayer->setRacquet(new Racquet(mSceneMgr, racquetEnt, ssr.str(), mPlayer->getNode()->getNode(), mPhysics,
                                   racquetInitPos));
 
   players[userID] = mPlayer;
@@ -481,6 +492,8 @@ void HostApp::createScene(void)
 
   myId = 0;
   Player *mPlayer = addPlayer(myId);
+  addPlayer(1);
+
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
                    btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
