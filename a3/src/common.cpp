@@ -23,3 +23,7 @@ btVector3 *axis;
 Ogre::Light* discolights[6];
 
 BaseApplication *instance;
+
+Player::Player(int _id) : id(_id) {}
+
+Player* players[4];

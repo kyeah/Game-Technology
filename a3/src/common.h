@@ -2,6 +2,7 @@
 
 #include <btBulletDynamicsCommon.h>
 #include "BaseApplication.h"
+#include "RacquetObject.h"
 
 extern const int DETAILS_HIGHSCORE; 
 extern const int DETAILS_LASTSCORE;
@@ -25,3 +26,27 @@ extern btVector3 *axis; // Swing rotation axis
 
 extern Ogre::Light* discolights[6];
 extern BaseApplication *instance;
+
+class Player {
+ public:
+  Player(int id);
+  
+  int getId() { return id; }
+  Dude* getNode() { return mNode; }
+  Racquet* getRacquet() { return mRacquet; }
+  void setNode(Dude *d) { mNode = d; }
+  void setRacquet(Racquet *r) { mRacquet = r; }
+
+  btVector3 mDirection;
+  Ogre::Vector3 oDirection;
+  float swing, unswing;
+  float movementSpeed;
+  
+ private:
+  int id;
+
+  Dude *mNode;
+  Racquet *mRacquet;
+};
+
+extern Player* players[4];
