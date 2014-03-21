@@ -45,4 +45,4 @@ Player::Player(int _id) : id(_id) {
   right_mouse_button = false;
 }
 
-Player* players[4];
+Player* players[4]; // Doesn't allow using constants in array initialization :(

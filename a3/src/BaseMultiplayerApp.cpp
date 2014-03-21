@@ -1,6 +1,6 @@
 /*
   -----------------------------------------------------------------------------
-  Filename:    MultiPlayerApp.cpp
+  Filename:    TutorialApplication.cpp
   -----------------------------------------------------------------------------
 
   This source file is part of the
@@ -15,33 +15,73 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
-#include "MultiPlayerApp.h"
+#include "BaseMultiplayerApp.h"
+#include "RacquetObject.h"
+#include "Sounds.h"
 #include "SDL_net.h"
+#include "common.h"
 #include "Networking.h"
 
-Ogre::Light* scene_lights[6];
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#   include <macUtils.h>
+#   include "AppDelegate.h"
+#endif
+
+#include <iostream>
+#include <string>
 
 //-------------------------------------------------------------------------------------
-MultiPlayerApp::MultiPlayerApp(bool _isHost) : isHost(_isHost)
-{
+BaseMultiplayerApp::BaseMultiplayerApp(void) {
+  mPhysics = new Physics(btVector3(0,-gravMag,0));
+  mTimer = OGRE_NEW Ogre::Timer();
+  mTimer->reset();
+  MAX_SPEED = btScalar(8000);
+  Sounds::init();
   connected = false;
-  mPhysics = new Physics(btVector3(0, -7000, 0));
-  MultiPlayerApp::Connect();
-}
-//-------------------------------------------------------------------------------------
-MultiPlayerApp::~MultiPlayerApp(void)
-{
-  MultiPlayerApp::Close();
 }
 
 //-------------------------------------------------------------------------------------
-void MultiPlayerApp::createCamera(void){
+BaseMultiplayerApp::~BaseMultiplayerApp(void)
+{
+  Close();
+}
+
+void BaseMultiplayerApp::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(0,0,7000);
+  mCamera->setPosition(0,0,-7000);
   mCamera->lookAt(0,0,500);
 }
 
-Player* MultiPlayerApp::findPlayer(int userID) {
+void BaseMultiplayerApp::createFrameListener(void) {
+  BaseApplication::createFrameListener();
+
+  Ogre::StringVector items;
+  items.push_back("Highscore");
+  items.push_back("");
+  items.push_back("Last Score");
+  items.push_back("Current Score");
+  items.push_back("Gravity");
+
+  mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
+  mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_LASTSCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_SCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downwards");
+}
+
+void BaseMultiplayerApp::restart() {
+  /*  static int gamenum = 0;
+      mPhysics->removeObject(mBall);
+      mBall->setPosition(btVector3(0,0,0));
+      mBall->setVelocity(btVector3(0,0,0));
+      mBall->updateTransform();
+      mBall->addToSimulator();
+      std::cout << "Game " << gamenum++ << ": " << score << std::endl;
+      lastscore = score;
+      score = 0;*/
+}
+
+Player* BaseMultiplayerApp::findPlayer(int userID) {
   for (int i = 0; i < MAX_PLAYERS; i++) {
     if (players[i] && players[i]->getId() == userID) {
       return players[i];
@@ -50,7 +90,7 @@ Player* MultiPlayerApp::findPlayer(int userID) {
   return NULL;
 }
 
-Player* MultiPlayerApp::addPlayer(int userID) {
+Player* BaseMultiplayerApp::addPlayer(int userID) {
   Player* mPlayer = new Player(userID);
 
   std::stringstream ss;
@@ -64,7 +104,7 @@ Player* MultiPlayerApp::addPlayer(int userID) {
   ssr << "node";
 
   mPlayer->setNode(new Dude(mSceneMgr, playerEnt, ss.str(), 0, mPhysics,
-                            playerInitPos, btVector3(0,0,0), 0));
+                            playerInitialPositions[userID], btVector3(0,0,0), 0));
 
   mPlayer->setRacquet(new Racquet(mSceneMgr, racquetEnt, ssr.str(), mPlayer->getNode()->getNode(), mPhysics,
                                   racquetInitPos));
@@ -73,11 +113,32 @@ Player* MultiPlayerApp::addPlayer(int userID) {
   return mPlayer;
 }
 
-void MultiPlayerApp::createScene(void)
+void BaseMultiplayerApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
+  static int wallID;
+  std::stringstream ss;
+  ss << points << "wall";
+  std::string mesh = ss.str();
+  ss << wallID;
+  std::string ent = ss.str();
+  ss << "node";
+  std::string node = ss.str();
+  wallID++;
+
+  ScoringPlane *extra = new ScoringPlane(worldWidth, worldLength, worldHeight,
+                                         mSceneMgr, ent, mesh, node, 0, mPhysics,
+                                         pos, speed, 0.0, 1.0);
+
+  extra->points = points;
+
+  extra->cycleColor();
+  extra->getBody()->setLinearFactor(linearFactor);
+  extra->getBody()->setAngularFactor(angularFactor);
+}
+
+//-------------------------------------------------------------------------------------
+void BaseMultiplayerApp::createScene(void)
 {
-  printf("in create scene\n");
-  // Set the scene's ambient light
-  mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+  mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f, .5f, .5f));
   mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
   // Boxed Environment
@@ -104,7 +165,6 @@ void MultiPlayerApp::createScene(void)
   //h applies to ground/ceiling
   //l applies to farWall/nearWall
   int w, l, h;
-  int worldLength, worldWidth, worldHeight;
   worldLength = l = 5000;
   worldWidth = worldHeight = w = h = 4500;
 
@@ -160,12 +220,12 @@ void MultiPlayerApp::createScene(void)
 
     ss << z;
     if (z < 6) {
-      scene_lights[z] = mSceneMgr->createLight(ss.str());
-      scene_lights[z]->setType(Ogre::Light::LT_SPOTLIGHT);
-      scene_lights[z]->setDiffuseColour(rand(),rand(),rand());
-      scene_lights[z]->setSpecularColour(rand(),rand(),rand());
-      scene_lights[z]->setDirection(rand(), rand(), rand());
-      scene_lights[z]->setSpotlightOuterAngle(Ogre::Radian(0.1));
+      discolights[z] = mSceneMgr->createLight(ss.str());
+      discolights[z]->setType(Ogre::Light::LT_SPOTLIGHT);
+      discolights[z]->setDiffuseColour(rand(),rand(),rand());
+      discolights[z]->setSpecularColour(rand(),rand(),rand());
+      discolights[z]->setDirection(rand(), rand(), rand());
+      discolights[z]->setSpotlightOuterAngle(Ogre::Radian(0.1));
     }
   }
 
@@ -180,25 +240,23 @@ void MultiPlayerApp::createScene(void)
   lights[8]->setPosition(1499,1499,0);
 
   // Front Wall
-  scene_lights[0]->setDirection(-0.5,0,1);
-  scene_lights[1]->setDirection(0.5,0,1);
-  scene_lights[0]->setPosition(0,1800,0);
-  scene_lights[1]->setPosition(0,1800,0);
+  discolights[0]->setDirection(-0.5,0,1);
+  discolights[1]->setDirection(0.5,0,1);
+  discolights[0]->setPosition(0,1800,0);
+  discolights[1]->setPosition(0,1800,0);
 
   // Right Wall
-  scene_lights[2]->setDirection(-1,0,0);
-  scene_lights[3]->setDirection(-1,0,-1);
-  scene_lights[2]->setPosition(0,-1800,0);
-  scene_lights[3]->setPosition(0,-1800,0);
+  discolights[2]->setDirection(-1,0,0);
+  discolights[3]->setDirection(-1,0,-1);
+  discolights[2]->setPosition(0,-1800,0);
+  discolights[3]->setPosition(0,-1800,0);
 
   // Left Wall
-  scene_lights[4]->setDirection(1,0,0);
-  scene_lights[5]->setDirection(1,0,-1);
-  scene_lights[4]->setPosition(0,-1800,0);
-  scene_lights[5]->setPosition(0,-1800,0);
+  discolights[4]->setDirection(1,0,0);
+  discolights[5]->setDirection(1,0,-1);
+  discolights[4]->setPosition(0,-1800,0);
+  discolights[5]->setPosition(0,-1800,0);
 
-  myId = 1;
-  addPlayer(0);
   Player *mPlayer = addPlayer(myId);
 
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
@@ -206,149 +264,26 @@ void MultiPlayerApp::createScene(void)
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
                    1000);
 
-  printf("setting ball position initially\n");
-  mBall->setPosition(btVector3(0,0,0));
-
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain1", "Examples/PurpleFountain"));
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain2", "Examples/PurpleFountain"));
-  //if (pongMode) mPlayer->getEntity()->setVisible(false);
 
+  if (mPlayer->pongMode) mPlayer->getNode()->getEntity()->setVisible(false);
+
+  createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
+  createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
 }
 
-void MultiPlayerApp::Connect(){
-  SDLNet_Init();
-  if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {
-    printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-    exit(0);
+bool BaseMultiplayerApp::frameStarted(const Ogre::FrameEvent &evt) {
+  for (int i = 0; i < 2; i++) {                                                                                  
+    Ogre::Vector3 v = discolights[i]->getDirection();                                                            
+    double x = v[0] + 0.02;                                                                                      
+    if (x > 1.0) x = x - 2.0;                                                                                    
+    discolights[i]->setDirection(x, v[1], v[2]);                                                                 
+  }                                                                                                              
+  for (int i = 2; i < 6; i++) {                                                                                  
+    Ogre::Vector3 v = discolights[i]->getDirection();                                                            
+    double z = v[2] + 0.02;                                                                                      
+    if (z > 1.0) z = z - 2.0;                                                                                    
+    discolights[i]->setDirection(v[0], v[1], z);                                                                 
   }
-  sd = SDLNet_TCP_Open(&ip);
-  if(!sd){
-    printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-    exit(0);
-  }
-
-  csd = SDLNet_TCP_Accept(sd);
-  while(!csd){
-    csd = SDLNet_TCP_Accept(sd);
-    printf("trying to accept...\n");
-    if(csd){
-      remoteIP = SDLNet_TCP_GetPeerAddress(csd);
-      if(remoteIP){
-        printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
-        connected = true;
-      }
-    }
-  }
-}
-
-ServerPacket* MultiPlayerApp::Receive(){
-  /*  ServerPacket msg;
-      if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
-      return &msg;
-      }*/
-  return NULL;
-}
-
-void MultiPlayerApp::Send(char *msg, int len) {
-  if(connected){
-    printf("sending, %s\n", msg);
-    int result = SDLNet_TCP_Send(sd, (void*)msg, len);
-    if(result < len)
-      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-  }
-}
-
-void MultiPlayerApp::Close(){
-  SDLNet_TCP_Close(csd);
-  SDLNet_TCP_Close(sd);
-  SDLNet_Quit();
-  connected = false;
-}
-
-void MultiPlayerApp::createFrameListener(void){
-  BaseApplication::createFrameListener();
-}
-
-bool MultiPlayerApp::keyReleased(const OIS::KeyEvent &arg){
-  static bool vert = false;
-
-  switch(arg.key){
-  case OIS::KC_R:
-  case OIS::KC_P:
-  case OIS::KC_J:
-  case OIS::KC_D:
-  case OIS::KC_S:
-  case OIS::KC_A:
-  case OIS::KC_W:
-  case OIS::KC_LSHIFT:
-  case OIS::KC_G:
-    ClientPacket msg;
-    msg.type = KEY_RELEASED;
-    msg.keyArg = arg.key;
-    msg.userID = myId;
-    Send((char*)&msg, sizeof(msg));
-    return true;
-  }
-
-  return BaseApplication::keyPressed(arg);
-}
-
-bool MultiPlayerApp::mouseMoved( const OIS::MouseEvent& arg ) {
-  ClientPacket msg;
-  msg.type = MOUSE_MOVED;
-  msg.mouseArg = arg.state;
-  msg.userID = myId;
-  Send((char*)&msg, sizeof(msg));
-  return true;
-}
-
-bool MultiPlayerApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-  ClientPacket msg;
-  msg.type = MOUSE_RELEASED;
-  msg.mouseArg = arg.state;
-  msg.mouseID = id;
-  msg.userID = myId;
-  Send((char*)&msg, sizeof(msg));
-  return true;
-}
-
-
-
-bool MultiPlayerApp::keyPressed( const OIS::KeyEvent &arg ) {
-  static bool vert = false;
-
-  switch(arg.key){
-  case OIS::KC_D:
-  case OIS::KC_S:
-  case OIS::KC_A:
-  case OIS::KC_W:
-  case OIS::KC_LSHIFT:
-  case OIS::KC_SPACE:
-    ClientPacket msg;
-    msg.type = KEY_PRESSED;
-    msg.keyArg = arg.key;
-    msg.userID = myId;
-    Send((char*)&msg, sizeof(msg));
-    return true;
-  }
-
-  return BaseApplication::keyPressed(arg);
-}
-
-
-
-bool MultiPlayerApp::frameStarted(const Ogre::FrameEvent &evt) {
-  ServerPacket msg;
-  if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
-    mBall->setPosition(msg.ballPos);
-
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-      Player *mPlayer = players[i];
-      if (mPlayer) {
-        mPlayer->getNode()->setPosition(msg.players[i].nodePos);
-        mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
-      }
-    }
-  }
-  return true;
 }

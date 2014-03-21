@@ -1,7 +1,7 @@
 #include "MenuApp.h"
 #include "RacquetApp.h"
 #include "HostApp.h"
-#include "MultiPlayerApp.h"
+#include "ClientApp.h"
 #include "common.h"
 
 #include <CEGUI/CEGUI.h>
@@ -261,17 +261,13 @@ extern "C" {
       } else if (mode == MODE_MP_HOST || mode == MODE_MP_CLIENT) {
         bool isHost = (mode == MODE_MP_HOST);
 
-        // MultiPlayerApp app(isHost);  // Use one app for host and client
-        //      mp_instance = &app;
-
-        // Use different apps for host and client
         try{
           if (isHost) {
             HostApp app;
             //            sp_instance = &app;
             app.go();
           } else {
-            MultiPlayerApp app(isHost);
+            ClientApp app;
             app.go();
           }
         } catch( Ogre::Exception& e) {

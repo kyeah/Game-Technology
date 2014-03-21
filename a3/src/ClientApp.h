@@ -1,6 +1,6 @@
 /*
 -----------------------------------------------------------------------------
-Filename:    MultiPlayerApp.h
+Filename:    ClientApp.h
 -----------------------------------------------------------------------------
 
 This source file is part of the
@@ -14,50 +14,35 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
-#ifndef __MultiPlayerApp_h_
-#define __MultiPlayerApp_h_
+#ifndef __ClientApp_h_
+#define __ClientApp_h_
 
 #include "common.h"
 #include "BaseApplication.h"
+#include "BaseMultiplayerApp.h"
 #include "SDL_net.h"
 #include "RacquetObject.h"
 #include "Networking.h"
 
-class MultiPlayerApp : public BaseApplication
+class ClientApp : public BaseMultiplayerApp
 {
 public:
-    MultiPlayerApp(bool _isHost);
-    virtual ~MultiPlayerApp(void);
+    ClientApp(void);
     bool frameStarted(const Ogre::FrameEvent &evt);
 
-
 protected:
-    virtual void createScene(void);
     void createCamera(void);
     void Connect();
+
     ServerPacket* Receive();
     void Send(char *msg, int len);
     void Close();
 
-    void createFrameListener();
     bool keyPressed( const OIS::KeyEvent &arg );
     bool keyReleased(const OIS::KeyEvent &arg);
 
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ); 
-
-    Player* findPlayer(int userID);
-    Player* addPlayer(int userID);
-
-    IPaddress ip, *remoteIP;
-    TCPsocket sd, csd;
-    bool connected, isHost;
-
-    int myId;
-    Physics *mPhysics;
-    Ball *mBall;
-
-    
 };
 
-#endif // #ifndef __MultiPlayerApp_h_
+#endif // #ifndef __ClientApp_h_
