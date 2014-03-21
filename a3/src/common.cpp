@@ -8,6 +8,8 @@ const int DETAILS_GRAVITY = 4;
 const int SWING_DELAY = 5;
 const int UNSWING_DELAY = 10;
 
+const int MAX_PLAYERS = 4;
+
 int gravMag = 7000;
 bool pongMode = false;
 bool right_mouse_button = false;
@@ -24,6 +26,15 @@ Ogre::Light* discolights[6];
 
 BaseApplication *instance;
 
-Player::Player(int _id) : id(_id) {}
+Player::Player(int _id) : id(_id) {
+  mDirection = btVector3(0,0,0);
+  oDirection = Ogre::Vector3(0,0,0);
+  swing = 0;
+  unswing = 0;
+  movementSpeed = 1;
+  axis = new btVector3(0,0,0);
+  pongMode = false;
+  right_mouse_button = false;
+}
 
 Player* players[4];

@@ -36,12 +36,7 @@ HostApp::HostApp(void)
   mPhysics = new Physics(btVector3(0,-gravMag,0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
-  mDirection = btVector3(0, 0, 0);
-  oDirection = Ogre::Vector3(0, 0, 0);
   MAX_SPEED = btScalar(8000);
-  swing = 0;
-  unswing = 0;
-  movementSpeed = 1;
   Sounds::init();
   connected = false;
   HostApp::Connect();
@@ -76,52 +71,59 @@ void HostApp::createFrameListener(void) {
 }
 
 bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
+  return handleKeyPressed(arg.key, myId);
+}
+
+bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
   static bool vert = false;
 
-  switch(arg.key){
+  Player *mPlayer = findPlayer(userId);
+  if (!mPlayer) return false;
+
+  switch(arg){
   case OIS::KC_D:
-    mDirection += btVector3(-40, 0, 0);
-    oDirection.x += -40;
+    mPlayer->mDirection += btVector3(-40, 0, 0);
+    mPlayer->oDirection.x += -40;
     return true;
   case OIS::KC_S:
     if (vert) {
-      mDirection += btVector3(0, -40, 0);
-      oDirection.y += -40;
+      mPlayer->mDirection += btVector3(0, -40, 0);
+      mPlayer->oDirection.y += -40;
     } else {
-      mDirection += btVector3(0, 0, -40);
-      oDirection.z += -40;
+      mPlayer->mDirection += btVector3(0, 0, -40);
+      mPlayer->oDirection.z += -40;
     }
     return true;
   case OIS::KC_A:
-    mDirection += btVector3(40, 0, 0);
-    oDirection.x += 40;
+    mPlayer->mDirection += btVector3(40, 0, 0);
+    mPlayer->oDirection.x += 40;
     return true;
   case OIS::KC_W:
     if (vert) {
-      mDirection += btVector3(0, 40, 0);
-      oDirection.y += 40;
+      mPlayer->mDirection += btVector3(0, 40, 0);
+      mPlayer->oDirection.y += 40;
     } else {
-        mDirection += btVector3(0, 0, 40);
-        oDirection.z += 40;
+      mPlayer->mDirection += btVector3(0, 0, 40);
+      mPlayer->oDirection.z += 40;
     }
 
     return true;
   case OIS::KC_LSHIFT:
-    movementSpeed = 2;
+    mPlayer->movementSpeed = 2;
     return true;
   case OIS::KC_SPACE:
-    if(swing == 0 && unswing == 0) {
-      swing = SWING_DELAY;
+    if(mPlayer->swing == 0 && mPlayer->unswing == 0) {
+      mPlayer->swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
     }
     return true;
   }
 
-  return BaseApplication::keyPressed(arg);
+  return false;
 }
 
 void HostApp::restart() {
-  static int gamenum = 0;
+  /*  static int gamenum = 0;
   mPhysics->removeObject(mBall);
   mBall->setPosition(btVector3(0,0,0));
   mBall->setVelocity(btVector3(0,0,0));
@@ -129,105 +131,126 @@ void HostApp::restart() {
   mBall->addToSimulator();
   std::cout << "Game " << gamenum++ << ": " << score << std::endl;
   lastscore = score;
-  score = 0;
+  score = 0;*/
 }
 
 void HostApp::Connect(){
-	printf("in connect\nPlease enter your hostname (default: pastamancer.cs.utexas.edu):");
-        std::string host;
-        getline(std::cin, host);
-        if (host.length() == 0)
-          host = std::string("pastamancer.cs.utexas.edu");
+  printf("in connect\nPlease enter your hostname (default: pastamancer.cs.utexas.edu):");
+  std::string host;
+  getline(std::cin, host);
+  if (host.length() == 0)
+    host = std::string("pastamancer.cs.utexas.edu");
 
-        int port = 65501;
+  int port = 65501;
 
-        printf("trying to connect to player 2...\n");
-        SDLNet_Init();
-        if(SDLNet_ResolveHost(&ip, host.c_str(), port) == -1){
-                printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-                exit(0);
-        }
+  printf("trying to connect to player 2...\n");
+  SDLNet_Init();
+  if(SDLNet_ResolveHost(&ip, host.c_str(), port) == -1){
+    printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+    exit(0);
+  }
 
-	sd =SDLNet_TCP_Open(&ip);
-        while(!sd){
-                sd = SDLNet_TCP_Open(&ip);
-                if(!sd){
-                        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-                        printf("trying again...\n");
-                }
-        }
-	connected = true;
+  sd =SDLNet_TCP_Open(&ip);
+  while(!sd){
+    sd = SDLNet_TCP_Open(&ip);
+    if(!sd){
+      printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+      printf("trying again...\n");
+    }
+  }
+  connected = true;
 }
 
 void HostApp::Send(char *msg, int len){
-	if(connected){
-		printf("sending, %s\n", msg);
-		int result = SDLNet_TCP_Send(sd, (void*)msg, len);
-		if(result < len)
-			printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-	}	
+  if(connected){
+    printf("sending, %s\n", msg);
+    int result = SDLNet_TCP_Send(sd, (void*)msg, len);
+    if(result < len)
+      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  }
 }
 
 void HostApp::Close(){
-	SDLNet_TCP_Close(csd);
-	SDLNet_TCP_Close(sd);
-	SDLNet_Quit();
-	connected = false;
+  SDLNet_TCP_Close(csd);
+  SDLNet_TCP_Close(sd);
+  SDLNet_Quit();
+  connected = false;
+}
+
+Player* HostApp::findPlayer(int userID) {
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    if (players[i] && players[i]->getId() == userID) {
+      return players[i];
+    }
+  }
+  return NULL;
+}
+
+Player* HostApp::addPlayer(int userID) {
+  Player* mPlayer = new Player(myId);
+  mPlayer->setNode(new Dude(mSceneMgr, "Player0", "Player0Node", 0, mPhysics,
+                            playerInitPos, btVector3(0,0,0), 0));
+  
+  mPlayer->setRacquet(new Racquet(mSceneMgr, "Racquet0", "Racquet0node", mPlayer->getNode()->getNode(), mPhysics,
+                                  racquetInitPos));
+
+  players[userID] = mPlayer;
+  return mPlayer;
 }
 
 bool HostApp::keyReleased(const OIS::KeyEvent &arg){
-  handleKeyReleased(arg.key, 0);
+  handleKeyReleased(arg.key, myId);
 }
 
 bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
   static bool vert = false;
 
-  // Iterate here to search for correct player to modify
-  // Should keep its own mDirection, etc.
+  Player *mPlayer = findPlayer(userID);
+  if (!mPlayer) return false;
 
   switch(arg){
   case OIS::KC_R:
     restart();
     return true;
   case OIS::KC_P:
-    swing = unswing = 0;
-    pongMode = !pongMode;
-    mPlayer->setOrientation(btQuaternion(0,0,0,1));
-    mPlayer->setPosition(playerInitPos);
-    mPlayer->getEntity()->setVisible(!mPlayer->getEntity()->isVisible());
+    mPlayer->swing = mPlayer->unswing = 0;
+    mPlayer->pongMode = !mPlayer->pongMode;
+    mPlayer->getNode()->setOrientation(btQuaternion(0,0,0,1));
+    mPlayer->getNode()->setPosition(playerInitPos);
+    mPlayer->getNode()->getEntity()->setVisible(!mPlayer->getNode()->getEntity()->isVisible());
     return true;
   case OIS::KC_J:
   case OIS::KC_D:
-    mDirection -= btVector3(-40, 0, 0);
-    oDirection.x -= -40;
+    mPlayer->mDirection -= btVector3(-40, 0, 0);
+    mPlayer->oDirection.x -= -40;
     return true;
   case OIS::KC_S:
     if (vert) {
-      mDirection -= btVector3(0, -40, 0);
-      oDirection.y -= -40;
+      mPlayer->mDirection -= btVector3(0, -40, 0);
+      mPlayer->oDirection.y -= -40;
     } else {
-      mDirection -= btVector3(0, 0, -40);
-      oDirection.z -= -40;
+      mPlayer->mDirection -= btVector3(0, 0, -40);
+      mPlayer->oDirection.z -= -40;
     }
     return true;
   case OIS::KC_A:
-    mDirection -= btVector3(40, 0, 0);
-    oDirection.x -= 40;
+    mPlayer->mDirection -= btVector3(40, 0, 0);
+    mPlayer->oDirection.x -= 40;
     return true;
   case OIS::KC_W:
     if (vert) {
-      mDirection -= btVector3(0, 40, 0);
-      oDirection.y -= 40;
+      mPlayer->mDirection -= btVector3(0, 40, 0);
+      mPlayer->oDirection.y -= 40;
     } else {
-        mDirection -= btVector3(0, 0, 40);
-        oDirection.z -= 40;
+      mPlayer->mDirection -= btVector3(0, 0, 40);
+      mPlayer->oDirection.z -= 40;
     }
     return true;
   case OIS::KC_M:
     Sounds::enabled = !Sounds::enabled;
     return true;
   case OIS::KC_LSHIFT:
-    movementSpeed = 1;
+    mPlayer->movementSpeed = 1;
     return true;
   case OIS::KC_G:
     static int gravity = 0;
@@ -251,51 +274,65 @@ bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
 }
 
 bool HostApp::mouseMoved( const OIS::MouseEvent& arg ) {
-  if (swing == 0 && unswing == 0) {
-    int x = arg.state.X.rel;
-    int y = arg.state.Y.rel;
+  return handleMouseMoved(arg.state, myId);
+}
+
+bool HostApp::handleMouseMoved( OIS::MouseState arg, int userID ) {
+  Player *mPlayer = findPlayer(userID);
+  if (!mPlayer) return false;
+
+  if (mPlayer->swing == 0 && mPlayer->unswing == 0) {
+    int x = arg.X.rel;
+    int y = arg.Y.rel;
 
     static float rotfactor = 6.28 / 1800;
-    
-    if (pongMode) {
+
+    if (mPlayer->pongMode) {
       //Boundaries
-      if(x < 0 && mRacquet->getPosition().getX() >= 2000){
+      if(x < 0 && mPlayer->getRacquet()->getPosition().getX() >= 2000){
         x = 0;
       }
-      if(x > 0 && mRacquet->getPosition().getX() <= -2000){
+      if(x > 0 && mPlayer->getRacquet()->getPosition().getX() <= -2000){
         x = 0;
       }
-      if(y < 0 && mRacquet->getPosition().getY() >= 2000){
+      if(y < 0 && mPlayer->getRacquet()->getPosition().getY() >= 2000){
         y = 0;
       }
-      if(y > 0 && mRacquet->getPosition().getY() <= -2000){
+      if(y > 0 && mPlayer->getRacquet()->getPosition().getY() <= -2000){
         y = 0;
       }
 
 
 
-      mPlayer->translate(btVector3(-x,-y,0));
+      mPlayer->getNode()->translate(btVector3(-x,-y,0));
     } else {
-      mPlayer->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor)));
+      mPlayer->getNode()->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor)));
     }
   }
+  return true;
 }
 
 bool HostApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-  if(swing == 0 && unswing == 0) {
-    
+  return handleMouseReleased(arg.state, id, myId);
+}
+
+bool HostApp::handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, int userID ) {
+  Player *mPlayer = findPlayer(userID);
+  if (!mPlayer) return false;
+
+  if(mPlayer->swing == 0 && mPlayer->unswing == 0) {
     if(id == OIS::MB_Left || id == OIS::MB_Right) {
-      swing = SWING_DELAY;
+      mPlayer->swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
 
-      Ogre::Vector3 p = mRacquet->getNode()->getPosition();
-      axis = new btVector3(p[1], -p[0], 0);
+      Ogre::Vector3 p = mPlayer->getRacquet()->getNode()->getPosition();
+      mPlayer->axis = new btVector3(p[1], -p[0], 0);
 
-      right_mouse_button = (id == OIS::MB_Right);
+      mPlayer->right_mouse_button = (id == OIS::MB_Right);
     }
   }
-  
-  return BaseApplication::mouseReleased(arg, id);
+
+  return false;
 }
 
 void HostApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
@@ -402,7 +439,7 @@ void HostApp::createScene(void)
     lights[z]->setType(Ogre::Light::LT_POINT);
     lights[z]->setDiffuseColour(.1,.1,.1);
     lights[z]->setSpecularColour(.1,.1,.1);
-    
+
     ss << z;
     if (z < 6) {
       discolights[z] = mSceneMgr->createLight(ss.str());
@@ -413,7 +450,7 @@ void HostApp::createScene(void)
       discolights[z]->setSpotlightOuterAngle(Ogre::Radian(0.1));
     }
   }
-  
+
   lights[0]->setPosition(-1499,1499,0);
   lights[1]->setPosition(-1499,1499,1000);
   lights[2]->setPosition(-1499,1499,2000);
@@ -435,19 +472,15 @@ void HostApp::createScene(void)
   discolights[3]->setDirection(-1,0,-1);
   discolights[2]->setPosition(0,-1800,0);
   discolights[3]->setPosition(0,-1800,0);
-  
+
   // Left Wall
   discolights[4]->setDirection(1,0,0);
   discolights[5]->setDirection(1,0,-1);
   discolights[4]->setPosition(0,-1800,0);
   discolights[5]->setPosition(0,-1800,0);
 
-  mPlayer = new Dude(mSceneMgr, "Player", "PlayerNode", 0, mPhysics,
-                     playerInitPos, btVector3(0,0,0), 0);
-  
-  mRacquet = new Racquet(mSceneMgr, "Racquet", "Racquetnode", mPlayer->getNode(), mPhysics,
-                         racquetInitPos);
-
+  myId = 0;
+  Player *mPlayer = addPlayer(myId);
   mBall = new Ball(mSceneMgr, "Ball", "BallNode", 0, mPhysics,
                    btVector3(100,100,150),
                    btVector3( rand() % 120 - 60, rand() % 80 - 40, 6000),
@@ -456,14 +489,14 @@ void HostApp::createScene(void)
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain1", "Examples/PurpleFountain"));
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain2", "Examples/PurpleFountain"));
 
-  if (pongMode) mPlayer->getEntity()->setVisible(false);
+  if (mPlayer->pongMode) mPlayer->getNode()->getEntity()->setVisible(false);
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
   createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
 
 }
 
-bool HostApp::frameStarted(const Ogre::FrameEvent &evt) { 
+bool HostApp::frameStarted(const Ogre::FrameEvent &evt) {
 
   for (int i = 0; i < 2; i++) {
     Ogre::Vector3 v = discolights[i]->getDirection();
@@ -496,88 +529,98 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt) {
   if (mPhysics != NULL) {
     mPhysics->stepSimulation(elapsedTime);
   }
-  
-  //store original vectors
-  int oldZ = mDirection.getZ();
-  int oldX = mDirection.getX();
-  int oldY = mDirection.getY();
 
-  //boundaries
-  if(mRacquet->getPosition().getZ() >= 600){
-    mDirection.setZ(-10);
-  }
-  if(mRacquet->getPosition().getZ() <= -2400){
-    mDirection.setZ(10);
-  }
-  if(mRacquet->getPosition().getX() >= 2000){
-    mDirection.setX(-10);
-  }
-  if(mRacquet->getPosition().getX() <= -2000){
-    mDirection.setX(10);
-  }
-  if(mRacquet->getPosition().getY() >= 2000){
-    mDirection.setY(-10);
-  }
-  if(mRacquet->getPosition().getY() <= -2000){
-    mDirection.setY(10);
-  }
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    Player *mPlayer = players[i];
+    if (!mPlayer) continue; 
 
-  mPlayer->getBody()->translate(mDirection*movementSpeed);
-  mPlayer->translate(mDirection*movementSpeed);
+    //store original vectors
+    int oldZ = mPlayer->mDirection.getZ();
+    int oldX = mPlayer->mDirection.getX();
+    int oldY = mPlayer->mDirection.getY();
 
-  //reset the vector after translation
-  mDirection.setZ(oldZ);
-  mDirection.setX(oldX);
-  mDirection.setY(oldY);
-
-  
-  // Swings
-  if(unswing > 0){
-    if (pongMode || right_mouse_button) {
-      mPlayer->translate(btVector3(0, 0, -25));
-    } else if (axis) {
-      mPlayer->rotate(btQuaternion(*axis, btScalar(-0.1)));
+    //boundaries
+    if(mPlayer->getRacquet()->getPosition().getZ() >= 600){
+      mPlayer->mDirection.setZ(-10);
     }
-    unswing--;
-  }
-
-  if(swing > 0){
-    if (pongMode || right_mouse_button) {
-      mPlayer->translate(btVector3(0, 0, 50));
-    } else if (axis) {
-      mPlayer->rotate(btQuaternion(*axis, btScalar(0.2)));
+    if(mPlayer->getRacquet()->getPosition().getZ() <= -2400){
+      mPlayer->mDirection.setZ(10);
     }
-    swing--;
-    if(swing == 0)
-      unswing = UNSWING_DELAY;
-  }
+    if(mPlayer->getRacquet()->getPosition().getX() >= 2000){
+      mPlayer->mDirection.setX(-10);
+    }
+    if(mPlayer->getRacquet()->getPosition().getX() <= -2000){
+      mPlayer->mDirection.setX(10);
+    }
+    if(mPlayer->getRacquet()->getPosition().getY() >= 2000){
+      mPlayer->mDirection.setY(-10);
+    }
+    if(mPlayer->getRacquet()->getPosition().getY() <= -2000){
+      mPlayer->mDirection.setY(10);
+    }
 
+    mPlayer->getNode()->getBody()->translate(mPlayer->mDirection*mPlayer->movementSpeed);
+    mPlayer->getNode()->translate(mPlayer->mDirection*mPlayer->movementSpeed);
+
+    //reset the vector after translation
+    mPlayer->mDirection.setZ(oldZ);
+    mPlayer->mDirection.setX(oldX);
+    mPlayer->mDirection.setY(oldY);
+
+
+    // Swings
+    if(mPlayer->unswing > 0){
+      if (mPlayer->pongMode || mPlayer->right_mouse_button) {
+        mPlayer->getNode()->translate(btVector3(0, 0, -25));
+      } else if (mPlayer->axis) {
+        mPlayer->getNode()->rotate(btQuaternion(*mPlayer->axis, btScalar(-0.1)));
+      }
+      mPlayer->unswing--;
+    }
+
+    if(mPlayer->swing > 0){
+      if (mPlayer->pongMode || mPlayer->right_mouse_button) {
+        mPlayer->getNode()->translate(btVector3(0, 0, 50));
+      } else if (mPlayer->axis) {
+        mPlayer->getNode()->rotate(btQuaternion(*mPlayer->axis, btScalar(0.2)));
+      }
+      mPlayer->swing--;
+      if(mPlayer->swing == 0)
+        mPlayer->unswing = UNSWING_DELAY;
+    }
+  }
   mDetailsPanel->setParamValue(DETAILS_LASTSCORE, std::to_string(lastscore));
+
   mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));
   if (score > highscore) {
     highscore = score;
     mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(highscore));
   }
 
-  btVector3 pos = (pongMode ? mRacquet->getPosition() : mPlayer->getPosition());
-  mCamera->lookAt(pos[0], pos[1], pos[2]);
+  Player *mPlayer = players[myId];
+  if (mPlayer) {
+    btVector3 pos = (mPlayer->pongMode ? mPlayer->getRacquet()->getPosition() : mPlayer->getNode()->getPosition());
+    mCamera->lookAt(pos[0], pos[1], pos[2]);
+  }
 
   if(sd){
-        ServerPacket msg;
-        btVector3 ballPos = mBall->getPosition();
-	btVector3 playerPos = mPlayer->getPosition();
-        btQuaternion playerOrientation = mPlayer->getOrientation();
-        msg.type = SERVER_UPDATE;
-        msg.ballPos = ballPos;
-        msg.playerPos = playerPos;
-        msg.playerOrientation = playerOrientation;
-        HostApp::Send((char*)&msg, sizeof(msg));
+    Player *mPlayer = players[0]; // Should add all player information later on
+    
+    ServerPacket msg;
+    btVector3 ballPos = mBall->getPosition();
+    btVector3 playerPos = mPlayer->getNode()->getPosition();
+    btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
+    msg.type = SERVER_UPDATE;
+    msg.ballPos = ballPos;
+    msg.playerPos = playerPos;
+    msg.playerOrientation = playerOrientation;
+    HostApp::Send((char*)&msg, sizeof(msg));
 
-        /*
-        ClientPacket cmsg;
-        if(SDLNet_TCP_Recv(sd, &cmsg, sizeof(cmsg)) > 0) {
-          std::cout << "Received msg" << std::endl;
-          }*/
+    /*
+      ClientPacket cmsg;
+      if(SDLNet_TCP_Recv(sd, &cmsg, sizeof(cmsg)) > 0) {
+      std::cout << "Received msg" << std::endl;
+      }*/
   }
 
   return result;

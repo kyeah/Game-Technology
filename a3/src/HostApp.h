@@ -17,6 +17,7 @@ This source file is part of the
 #ifndef __HostApp_h_
 #define __HostApp_h_
 
+#include "common.h"
 #include "BaseApplication.h"
 #include "Physics.h"
 #include "RacquetObject.h"
@@ -51,12 +52,21 @@ protected:
                                btVector3 speed = btVector3(50,0,0),
                                btVector3 linearFactor = btVector3(1,0,0), 
                                btVector3 angularFactor = btVector3(0,0,0));
+
     bool keyPressed( const OIS::KeyEvent &arg );
     bool keyReleased(const OIS::KeyEvent &arg);
-    bool handleKeyReleased(OIS::KeyCode arg, int userID);
 
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+    bool handleKeyPressed(OIS::KeyCode arg, int userID);
+    bool handleKeyReleased(OIS::KeyCode arg, int userID);
+
+    bool handleMouseMoved( OIS::MouseState arg, int userID );
+    bool handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, int userID );
+
+    Player* findPlayer(int userID);
+    Player* addPlayer(int userID);
 
     int worldWidth,worldLength,worldHeight;
 
@@ -70,21 +80,14 @@ protected:
     bool connected;
 /* end */ 
 
+    int myId;
     Ogre::Timer *mTimer;
     //    Ogre::Plane walls[4];
     Physics *mPhysics;
-    Racquet *mRacquet;
-    Dude *mPlayer;
     Ball *mBall;
 
     btVector3 ballVelocity;
     btScalar MAX_SPEED;
-    btVector3 mDirection;
-    Ogre::Vector3 oDirection;
-    
-    int movementSpeed;
-    int swing;
-    int unswing;
 };
 
 //extern HostApp *sp_instance;

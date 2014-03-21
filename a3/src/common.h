@@ -12,6 +12,8 @@ extern const int DETAILS_GRAVITY;
 extern const int SWING_DELAY;
 extern const int UNSWING_DELAY;
 
+extern const int MAX_PLAYERS;
+
 extern int gravMag;
 extern bool pongMode;
 extern bool right_mouse_button;
@@ -40,7 +42,10 @@ class Player {
   btVector3 mDirection;
   Ogre::Vector3 oDirection;
   float swing, unswing;
+  btVector3 *axis;  // Swing axis
   float movementSpeed;
+  bool pongMode;
+  bool right_mouse_button;
   
  private:
   int id;

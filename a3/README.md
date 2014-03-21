@@ -1,4 +1,4 @@
-CS354R - Assignment 2 (Multiplayer Extension)
+CS354R - Assignment 3 (Multiplayer Extension)
 ======================================================
 Alyssa Sallean, Kevin Yeh, Patrick Grayson
 
