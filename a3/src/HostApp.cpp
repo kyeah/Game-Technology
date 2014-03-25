@@ -367,6 +367,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     } else {
       for (int i = 0; i < MAX_PLAYERS; i++) {
         if (!players[i]) {
+
+          // Send ack with its new user ID
           ConnectAck ack;
           for (int j = 0; j < MAX_PLAYERS; j++) {
             if (players[j])
@@ -379,6 +381,15 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
           players[i]->csd = csd_t;
           ack.id = i;
           Send(csd_t, (char*)&ack, sizeof(ack));
+
+          // Send notifications to rest of players
+          ServerPacket packet;
+          packet.type = SERVER_CLIENT_CONNECT;
+          packet.clientId = i;
+          for (int j = 1; j < MAX_PLAYERS; j++) {
+            if (i != j && players[j])
+              Send(players[j]->csd, (char*)&packet, sizeof(packet));
+          }
           break;
         }
       }
@@ -408,7 +419,20 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
             case KEY_RELEASED:
               handleKeyReleased(cmsg.keyArg, cmsg.userID);
               break;
-            case CLIENT_CLOSE:
+            case CLIENT_CLOSE:              
+              mPhysics->removeObject(players[cmsg.userID]->getNode());
+              mPhysics->removeObject(players[cmsg.userID]->getRacquet());
+              mSceneMgr->destroyEntity(players[cmsg.userID]->getNode()->getEntity());
+              mSceneMgr->destroyEntity(players[cmsg.userID]->getRacquet()->getEntity());
+              players[cmsg.userID] = NULL;
+              ServerPacket closemsg;
+              closemsg.type = SERVER_CLIENT_CLOSED;
+              closemsg.clientId = cmsg.userID;
+              for (int i = 1; i < MAX_PLAYERS; i++) {
+                if (players[i]) {
+                  Send(players[i]->csd, (char*)&closemsg, sizeof(closemsg));
+                }
+              }
               break;
             case CLIENT_CHAT:
               break;

@@ -35,7 +35,7 @@ typedef struct {
 
 typedef struct {
   int type;
-  int clientClosedId;
+  int clientId;
   char msg[512];
   btVector3 ballPos;
   PlayerInfo players[4];

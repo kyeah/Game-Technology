@@ -75,6 +75,11 @@ void ClientApp::Connect(){
 }
 
 void ClientApp::Close(){
+  ClientPacket msg;
+  msg.type = CLIENT_CLOSE;
+  msg.userID = myId;
+  Send(sd, (char*)&msg, sizeof(msg));
+
   SDLNet_TCP_Close(csd);
   SDLNet_TCP_Close(sd);
   SDLNet_Quit();
@@ -158,18 +163,30 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
     first = false;
   }
 
-  //int active = SDLNet_CheckSockets(socketset, 1);
   while (SDLNet_CheckSockets(socketset, 1) > 0 && SDLNet_SocketReady(sd)) {
     ServerPacket msg;
     if(SDLNet_TCP_Recv(sd, &msg, sizeof(msg)) > 0){
-      mBall->setPosition(msg.ballPos);
-
-      for (int i = 0; i < MAX_PLAYERS; i++) {
-        Player *mPlayer = players[i];
-        if (mPlayer) {
-          mPlayer->getNode()->setPosition(msg.players[i].nodePos);
-          mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+      switch (msg.type) {
+      case SERVER_UPDATE:
+        mBall->setPosition(msg.ballPos);
+        
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+          Player *mPlayer = players[i];
+          if (mPlayer) {
+            mPlayer->getNode()->setPosition(msg.players[i].nodePos);
+            mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+          }
         }
+        break;
+      case SERVER_CLIENT_CONNECT:
+        addPlayer(msg.clientId);
+      case SERVER_CLIENT_CLOSED:
+        mPhysics->removeObject(players[msg.clientId]->getNode());
+        mPhysics->removeObject(players[msg.clientId]->getRacquet());
+        mSceneMgr->destroyEntity(players[msg.clientId]->getNode()->getEntity());
+        mSceneMgr->destroyEntity(players[msg.clientId]->getRacquet()->getEntity());        
+        players[msg.clientId] = NULL;
+        break;
       }
     }
   }
