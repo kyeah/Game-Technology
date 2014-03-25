@@ -34,34 +34,36 @@ void ClientApp::createCamera(void) {
 }
 
 void ClientApp::Connect(){
+  printf("in connect\nPlease enter your hostname (default: pastamancer.cs.utexas.edu):");
+  std::string host;
+  getline(std::cin, host);
+  if (host.length() == 0)
+    host = std::string("pastamancer.cs.utexas.edu");
+
+  int port = 65501;
+
+  printf("trying to connect to player 2...\n");
   SDLNet_Init();
-  if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {
+  if(SDLNet_ResolveHost(&ip, host.c_str(), port) == -1){
     printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
     exit(0);
   }
-  sd = SDLNet_TCP_Open(&ip);
-  if(!sd){
-    printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-    exit(0);
-  }
 
-  csd = SDLNet_TCP_Accept(sd);
-  while(!csd){
-    csd = SDLNet_TCP_Accept(sd);
-    printf("trying to accept...\n");
-    if(csd){
-      remoteIP = SDLNet_TCP_GetPeerAddress(csd);
-      if(remoteIP){
-        printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
-        connected = true;
-      }
+  sd =SDLNet_TCP_Open(&ip);
+  while(!sd){
+    sd = SDLNet_TCP_Open(&ip);
+    if(!sd){
+      printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+      printf("trying again...\n");
     }
   }
 
   socketset = SDLNet_AllocSocketSet(1);
-  if (SDLNet_TCP_AddSocket(socketset, csd) == -1) {
-    printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());
+  if (SDLNet_TCP_AddSocket(socketset, sd) == -1) {
+    printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError()); // Probably need to make the socketset bigger
   }
+
+  connected = true;
 }
 
 ServerPacket* ClientApp::Receive(){
@@ -75,7 +77,7 @@ ServerPacket* ClientApp::Receive(){
 void ClientApp::Send(char *msg, int len) {
   if(connected){
     printf("sending, %s\n", msg);
-    int result = SDLNet_TCP_Send(csd, (void*)msg, len);
+    int result = SDLNet_TCP_Send(sd, (void*)msg, len);
     if(result < len)
       printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
   }
@@ -160,11 +162,11 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
   }
 
   int active = SDLNet_CheckSockets(socketset, 1);
-  if (active > 0 && SDLNet_SocketReady(csd)) {
+  if (active > 0 && SDLNet_SocketReady(sd)) {
     ServerPacket msg;
-    if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
+    if(SDLNet_TCP_Recv(sd, &msg, sizeof(msg)) > 0){
       mBall->setPosition(msg.ballPos);
-      
+
       for (int i = 0; i < MAX_PLAYERS; i++) {
         Player *mPlayer = players[i];
         if (mPlayer) {
