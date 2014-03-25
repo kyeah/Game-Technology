@@ -15,6 +15,9 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
+#include <CEGUI/CEGUI.h>
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
+
 #include "BaseMultiplayerApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
@@ -271,19 +274,35 @@ void BaseMultiplayerApp::createScene(void)
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
   createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
+
+  // Initialize CEGUI
+  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
+
+  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
+
+  //  CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
+  //  CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
+  //  CEGUI::Window *quit = wmgr.createWindow("TaharezLook/Button", "CEGUIDemo/QuitButton");
+  //  quit->setText("Quit");
+  //  quit->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
+  //  sheet->addChildWindow(quit);
+  //  CEGUI::System::getSingleton().setGUISheet(sheet);
 }
 
 bool BaseMultiplayerApp::frameStarted(const Ogre::FrameEvent &evt) {
-  for (int i = 0; i < 2; i++) {                                                                                  
-    Ogre::Vector3 v = discolights[i]->getDirection();                                                            
-    double x = v[0] + 0.02;                                                                                      
-    if (x > 1.0) x = x - 2.0;                                                                                    
-    discolights[i]->setDirection(x, v[1], v[2]);                                                                 
-  }                                                                                                              
-  for (int i = 2; i < 6; i++) {                                                                                  
-    Ogre::Vector3 v = discolights[i]->getDirection();                                                            
-    double z = v[2] + 0.02;                                                                                      
-    if (z > 1.0) z = z - 2.0;                                                                                    
-    discolights[i]->setDirection(v[0], v[1], z);                                                                 
+  for (int i = 0; i < 2; i++) {
+    Ogre::Vector3 v = discolights[i]->getDirection();
+    double x = v[0] + 0.02;
+    if (x > 1.0) x = x - 2.0;
+    discolights[i]->setDirection(x, v[1], v[2]);
+  }
+  for (int i = 2; i < 6; i++) {
+    Ogre::Vector3 v = discolights[i]->getDirection();
+    double z = v[2] + 0.02;
+    if (z > 1.0) z = z - 2.0;
+    discolights[i]->setDirection(v[0], v[1], z);
   }
 }

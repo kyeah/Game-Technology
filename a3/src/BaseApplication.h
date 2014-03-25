@@ -1,21 +1,24 @@
 /*
------------------------------------------------------------------------------
-Filename:    BaseApplication.h
------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  Filename:    BaseApplication.h
+  -----------------------------------------------------------------------------
 
-This source file is part of the
-   ___                 __    __ _ _    _ 
+  This source file is part of the
+  ___                 __    __ _ _    _
   /___\__ _ _ __ ___  / / /\ \ (_) | _(_)
- //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
-/ \_// (_| | | |  __/  \  /\  /| |   <| |
-\___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
-      |___/                              
-      Tutorial Framework
-      http://www.ogre3d.org/tikiwiki/
------------------------------------------------------------------------------
+  //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
+  / \_// (_| | | |  __/  \  /\  /| |   <| |
+  \___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
+  |___/
+  Tutorial Framework
+  http://www.ogre3d.org/tikiwiki/
+  -----------------------------------------------------------------------------
 */
 #ifndef __BaseApplication_h_
 #define __BaseApplication_h_
+
+#include <CEGUI/CEGUI.h>
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 
 #include <OgreCamera.h>
 #include <OgreEntity.h>
@@ -46,10 +49,10 @@ This source file is part of the
 #ifdef OGRE_IS_IOS
 class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, OIS::KeyListener, OIS::MultiTouchListener, OgreBites::SdkTrayListener
 #else
-class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener, OgreBites::SdkTrayListener
+  class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener, OgreBites::SdkTrayListener
 #endif
-{
-public:
+  {
+  public:
     BaseApplication(void);
     virtual ~BaseApplication(void);
 
@@ -58,7 +61,7 @@ public:
     // Ogre::FrameListener
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
-protected:
+  protected:
     virtual bool setup();
     virtual bool configure(void);
     virtual void chooseSceneManager(void);
@@ -103,6 +106,11 @@ protected:
     OIS::InputManager* mInputManager;
     OIS::Mouse*    mMouse;
     OIS::Keyboard* mKeyboard;
-};
+
+    //CEGUI
+    CEGUI::OgreRenderer* mRenderer;
+    CEGUI::WindowManager* Wmgr;
+    CEGUI::Window* menu;
+  };
 
 #endif // #ifndef __BaseApplication_h_

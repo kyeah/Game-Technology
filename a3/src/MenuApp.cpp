@@ -17,6 +17,7 @@ MenuApp::MenuApp(void)
 //-------------------------------------------------------------------------------------
 MenuApp::~MenuApp(void)
 {
+  CEGUI::OgreRenderer::destroySystem();
 }
 //-------------------------------------------------------------------------------------
 void MenuApp::createScene(void)
@@ -28,15 +29,12 @@ void MenuApp::createScene(void)
   CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
 
-  if (!bootstrapped) {
-    bootstrapped = true;
-    mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-    // CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
-    CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-    CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
-    CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
-    CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
-  }
+  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  // CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
+  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
 
   Wmgr = CEGUI::WindowManager::getSingletonPtr();
   menu = Wmgr->loadWindowLayout("Menu.layout");
@@ -257,7 +255,7 @@ extern "C" {
         } catch( Ogre::Exception& e ) {
           handleException(e);
         }
-        mode = MODE_QUIT;
+        mode = MODE_MENU;
       } else if (mode == MODE_MP_HOST || mode == MODE_MP_CLIENT) {
         bool isHost = (mode == MODE_MP_HOST);
 
@@ -273,7 +271,7 @@ extern "C" {
         } catch( Ogre::Exception& e) {
           handleException(e);
         }
-        mode = MODE_QUIT;
+        mode = MODE_MENU;
       } else {
         break;
       }

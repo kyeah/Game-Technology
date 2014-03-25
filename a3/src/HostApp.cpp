@@ -15,6 +15,7 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
+
 #include "HostApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
@@ -473,6 +474,5 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
       Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
-
   return result;
 }
