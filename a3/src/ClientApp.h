@@ -28,6 +28,7 @@ class ClientApp : public BaseMultiplayerApp
 {
 public:
     ClientApp(void);
+    ~ClientApp(void);
     bool frameStarted(const Ogre::FrameEvent &evt);
 
 protected:

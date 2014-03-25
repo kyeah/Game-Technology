@@ -26,6 +26,11 @@ ClientApp::ClientApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
   Connect();
 }
 
+ClientApp::~ClientApp(void)
+{
+  Close();
+}
+
 //-------------------------------------------------------------------------------------
 void ClientApp::createCamera(void) {
   BaseMultiplayerApp::createCamera();
@@ -79,7 +84,6 @@ void ClientApp::Close(){
   msg.type = CLIENT_CLOSE;
   msg.userID = myId;
   Send(sd, (char*)&msg, sizeof(msg));
-
   SDLNet_TCP_Close(csd);
   SDLNet_TCP_Close(sd);
   SDLNet_Quit();
@@ -180,6 +184,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         break;
       case SERVER_CLIENT_CONNECT:
         addPlayer(msg.clientId);
+        break;
       case SERVER_CLIENT_CLOSED:
         mPhysics->removeObject(players[msg.clientId]->getNode());
         mPhysics->removeObject(players[msg.clientId]->getRacquet());

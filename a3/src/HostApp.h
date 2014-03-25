@@ -28,6 +28,7 @@ class HostApp : public BaseMultiplayerApp
 {
 public:
     HostApp(void);
+    ~HostApp(void);
     bool frameStarted(const Ogre::FrameEvent &evt);
 
 protected:

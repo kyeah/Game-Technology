@@ -37,6 +37,11 @@ HostApp::HostApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
   Connect();
 }
 
+HostApp::~HostApp(void)
+{
+  Close();
+}
+
 void HostApp::createCamera(void)
 {
   BaseMultiplayerApp::createCamera();
@@ -403,6 +408,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
         TCPsocket csd = players[i]->csd;
         if (SDLNet_SocketReady(csd)) {
           ClientPacket cmsg;
+          ServerPacket closemsg;
+
           if(SDLNet_TCP_Recv(csd, &cmsg, sizeof(cmsg)) > 0) {
             switch (cmsg.type) {
             case MOUSE_MOVED:
@@ -419,13 +426,13 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
             case KEY_RELEASED:
               handleKeyReleased(cmsg.keyArg, cmsg.userID);
               break;
-            case CLIENT_CLOSE:              
+            case CLIENT_CLOSE:
               mPhysics->removeObject(players[cmsg.userID]->getNode());
               mPhysics->removeObject(players[cmsg.userID]->getRacquet());
               mSceneMgr->destroyEntity(players[cmsg.userID]->getNode()->getEntity());
               mSceneMgr->destroyEntity(players[cmsg.userID]->getRacquet()->getEntity());
               players[cmsg.userID] = NULL;
-              ServerPacket closemsg;
+
               closemsg.type = SERVER_CLIENT_CLOSED;
               closemsg.clientId = cmsg.userID;
               for (int i = 1; i < MAX_PLAYERS; i++) {
@@ -433,6 +440,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
                   Send(players[i]->csd, (char*)&closemsg, sizeof(closemsg));
                 }
               }
+
+              SDLNet_TCP_Close(csd);
               break;
             case CLIENT_CHAT:
               break;
