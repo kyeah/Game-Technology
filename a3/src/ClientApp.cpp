@@ -22,7 +22,7 @@
 //-------------------------------------------------------------------------------------
 ClientApp::ClientApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
 {
-  myId = 1;
+  //  myId = 1;
   Connect();
 }
 
@@ -64,23 +64,14 @@ void ClientApp::Connect(){
   }
 
   connected = true;
-}
 
-ServerPacket* ClientApp::Receive(){
-  /*  ServerPacket msg;
-      if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
-      return &msg;
-      }*/
-  return NULL;
-}
-
-void ClientApp::Send(char *msg, int len) {
-  if(connected){
-    printf("sending, %s\n", msg);
-    int result = SDLNet_TCP_Send(sd, (void*)msg, len);
-    if(result < len)
-      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  ConnectAck ack;
+  SDLNet_TCP_Recv(sd, &ack, sizeof(ack));
+  myId = ack.id;
+  for (int i = 0; i < MAX_PLAYERS; i++) {    
+    ids[i] = ack.ids[i];
   }
+  printf("myID: %d\n", myId);
 }
 
 void ClientApp::Close(){
@@ -107,7 +98,7 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
     msg.type = KEY_RELEASED;
     msg.keyArg = arg.key;
     msg.userID = myId;
-    Send((char*)&msg, sizeof(msg));
+    Send(sd, (char*)&msg, sizeof(msg));
     return true;
   }
 
@@ -119,7 +110,7 @@ bool ClientApp::mouseMoved( const OIS::MouseEvent& arg ) {
   msg.type = MOUSE_MOVED;
   msg.mouseArg = arg.state;
   msg.userID = myId;
-  Send((char*)&msg, sizeof(msg));
+  Send(sd, (char*)&msg, sizeof(msg));
   return true;
 }
 
@@ -129,7 +120,7 @@ bool ClientApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id
   msg.mouseArg = arg.state;
   msg.mouseID = id;
   msg.userID = myId;
-  Send((char*)&msg, sizeof(msg));
+  Send(sd, (char*)&msg, sizeof(msg));
   return true;
 }
 
@@ -147,7 +138,7 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
     msg.type = KEY_PRESSED;
     msg.keyArg = arg.key;
     msg.userID = myId;
-    Send((char*)&msg, sizeof(msg));
+    Send(sd, (char*)&msg, sizeof(msg));
     return true;
   }
 
@@ -157,12 +148,18 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
 bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
   BaseMultiplayerApp::frameStarted(evt);
 
-  if (!players[0]) {
-    addPlayer(0);
+  static bool first = true;
+  if (first) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+      if (ids[i] && !players[i]) {
+        addPlayer(i);
+      }
+    }
+    first = false;
   }
 
-  int active = SDLNet_CheckSockets(socketset, 1);
-  if (active > 0 && SDLNet_SocketReady(sd)) {
+  //int active = SDLNet_CheckSockets(socketset, 1);
+  while (SDLNet_CheckSockets(socketset, 1) > 0 && SDLNet_SocketReady(sd)) {
     ServerPacket msg;
     if(SDLNet_TCP_Recv(sd, &msg, sizeof(msg)) > 0){
       mBall->setPosition(msg.ballPos);

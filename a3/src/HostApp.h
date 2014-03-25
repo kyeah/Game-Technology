@@ -47,7 +47,6 @@ protected:
 
 /* server side stuff */ 
     void Connect();
-    void Send(char *msg, int len);
     void Close();
 
     TCPsocket sd, csd; 

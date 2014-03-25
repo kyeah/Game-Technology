@@ -3,6 +3,7 @@
 #include <btBulletDynamicsCommon.h>
 #include "BaseApplication.h"
 #include "RacquetObject.h"
+#include "SDL_net.h"
 
 extern const int DETAILS_HIGHSCORE; 
 extern const int DETAILS_LASTSCORE;
@@ -40,6 +41,7 @@ class Player {
   void setNode(Dude *d) { mNode = d; }
   void setRacquet(Racquet *r) { mRacquet = r; }
 
+  TCPsocket csd;
   btVector3 mDirection;
   Ogre::Vector3 oDirection;
   float swing, unswing;
@@ -50,7 +52,6 @@ class Player {
   
  private:
   int id;
-
   Dude *mNode;
   Racquet *mRacquet;
 };

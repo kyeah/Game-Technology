@@ -66,11 +66,10 @@ protected:
 
 /* server side stuff */ 
     virtual void Connect() {}
-    virtual void Send(char *msg, int len) = 0;
     virtual void Close() {}
 
     SDLNet_SocketSet socketset;
-    TCPsocket sd, csd; 
+    TCPsocket sd, csd;
     IPaddress ip, *remoteIP;
     bool connected;
 

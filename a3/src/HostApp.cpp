@@ -37,7 +37,7 @@ HostApp::HostApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
   Connect();
 }
 
-void HostApp::createCamera(void) 
+void HostApp::createCamera(void)
 {
   BaseMultiplayerApp::createCamera();
   mCamera->setPosition(0,0,-7000);
@@ -97,43 +97,18 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
 }
 
 void HostApp::Connect(){
-  SDLNet_Init();                                                                                                 
-  if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {                                                               
-    printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());                                                       
-    exit(0);                                                                                                     
-  }                                                                                                              
-  sd = SDLNet_TCP_Open(&ip);                                                                                     
-  if(!sd){                                                                                                       
-    printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());                                                          
-    exit(0);                                                                                                     
-  }                                                                                                              
-                                                                                                                 
-  csd = SDLNet_TCP_Accept(sd);                                                                                   
-  while(!csd){                                                                                                   
-    csd = SDLNet_TCP_Accept(sd);                                                                                 
-    printf("trying to accept...\n");                                                                             
-    if(csd){                                                                                                     
-      remoteIP = SDLNet_TCP_GetPeerAddress(csd);                                                                 
-      if(remoteIP){                                                                                              
-        printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
-        connected = true;                                                                                        
-      }                                                                                                          
-    }                                                                                                            
-  }                                                                                                              
-                                                                                                                 
-  socketset = SDLNet_AllocSocketSet(1);                                                                          
-  if (SDLNet_TCP_AddSocket(socketset, csd) == -1) {                                                              
-    printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());                                                     
-  }                         
-}
-
-void HostApp::Send(char *msg, int len){
-  if(connected){
-    printf("sending, %s\n", msg);
-    int result = SDLNet_TCP_Send(csd, (void*)msg, len);
-    if(result < len)
-      printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  SDLNet_Init();
+  if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {
+    printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+    exit(0);
   }
+  sd = SDLNet_TCP_Open(&ip);
+  if(!sd){
+    printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+    exit(0);
+  }
+
+  socketset = SDLNet_AllocSocketSet(3);
 }
 
 void HostApp::Close(){
@@ -284,7 +259,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
 {
   BaseMultiplayerApp::frameStarted(evt);
 
-  if (!players[1]) addPlayer(1);
+  //  if (!players[1]) addPlayer(1);
 
   bool result = BaseApplication::frameStarted(evt);
   static Ogre::Real time = mTimer->getMilliseconds();
@@ -379,51 +354,90 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     mCamera->lookAt(pos[0], pos[1], pos[2]);
   }
 
-  if(csd){
-    int active = SDLNet_CheckSockets(socketset, 1);
-    if (active > 0 && SDLNet_SocketReady(csd)) {
-      ClientPacket cmsg;
-      // Network is not two-way yet :(
-      if(SDLNet_TCP_Recv(csd, &cmsg, sizeof(cmsg)) > 0) {
-        switch (cmsg.type) {
-        case MOUSE_MOVED:
-          handleMouseMoved(cmsg.mouseArg, cmsg.userID);
-          break;
-        case MOUSE_PRESSED:
-          break;
-        case MOUSE_RELEASED:
-          handleMouseReleased(cmsg.mouseArg, cmsg.mouseID, cmsg.userID);
-          break;
-        case KEY_PRESSED:
-          handleKeyPressed(cmsg.keyArg, cmsg.userID);
-          break;
-        case KEY_RELEASED:
-          handleKeyReleased(cmsg.keyArg, cmsg.userID);
-          break;
-        case CLIENT_CLOSE:
-          break;
-        case CLIENT_CHAT:
-          break;
-        } 
-      }
-    }      
-
-    ServerPacket msg;
-    btVector3 ballPos = mBall->getPosition();
-    msg.type = SERVER_UPDATE;
-    msg.ballPos = ballPos;
-
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-      Player *mPlayer = players[i];
-      if (mPlayer) {
-        btVector3 playerPos = mPlayer->getNode()->getPosition();
-        btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
-        msg.players[i].nodePos = playerPos;
-        msg.players[i].nodeOrientation = playerOrientation;
-      }
+  // Handle New Connections
+  TCPsocket csd_t = SDLNet_TCP_Accept(sd);
+  if(csd_t){
+    remoteIP = SDLNet_TCP_GetPeerAddress(csd_t);
+    if(remoteIP){
+      printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
     }
 
-    HostApp::Send((char*)&msg, sizeof(msg));
+    if (SDLNet_TCP_AddSocket(socketset, csd_t) == -1) {
+      printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());
+    } else {
+      for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (!players[i]) {
+          ConnectAck ack;
+          for (int j = 0; j < MAX_PLAYERS; j++) {
+            if (players[j])
+              ack.ids[j] = 1;
+            else
+              ack.ids[j] = 0;
+          }
+
+          addPlayer(i);
+          players[i]->csd = csd_t;
+          ack.id = i;
+          Send(csd_t, (char*)&ack, sizeof(ack));
+          break;
+        }
+      }
+    }
+  }
+
+  int active = SDLNet_CheckSockets(socketset, 1);
+  if (active > 0) {
+    for (int i = 1; i < MAX_PLAYERS; i++) {
+      if (players[i]) {
+        TCPsocket csd = players[i]->csd;
+        if (SDLNet_SocketReady(csd)) {
+          ClientPacket cmsg;
+          if(SDLNet_TCP_Recv(csd, &cmsg, sizeof(cmsg)) > 0) {
+            switch (cmsg.type) {
+            case MOUSE_MOVED:
+              handleMouseMoved(cmsg.mouseArg, cmsg.userID);
+              break;
+            case MOUSE_PRESSED:
+              break;
+            case MOUSE_RELEASED:
+              handleMouseReleased(cmsg.mouseArg, cmsg.mouseID, cmsg.userID);
+              break;
+            case KEY_PRESSED:
+              handleKeyPressed(cmsg.keyArg, cmsg.userID);
+              break;
+            case KEY_RELEASED:
+              handleKeyReleased(cmsg.keyArg, cmsg.userID);
+              break;
+            case CLIENT_CLOSE:
+              break;
+            case CLIENT_CHAT:
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ServerPacket msg;
+  btVector3 ballPos = mBall->getPosition();
+  msg.type = SERVER_UPDATE;
+  msg.ballPos = ballPos;
+
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    Player *mPlayer = players[i];
+    if (mPlayer) {
+      btVector3 playerPos = mPlayer->getNode()->getPosition();
+      btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
+      msg.players[i].nodePos = playerPos;
+      msg.players[i].nodeOrientation = playerOrientation;
+    }
+  }
+
+  for (int i = 1; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      Send(players[i]->csd, (char*)&msg, sizeof(msg));
+    }
   }
 
   return result;

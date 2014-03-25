@@ -43,6 +43,7 @@ Player::Player(int _id) : id(_id) {
   axis = new btVector3(0,0,0);
   pongMode = false;
   right_mouse_button = false;
+  csd = 0;
 }
 
 Player* players[4]; // Doesn't allow using constants in array initialization :(

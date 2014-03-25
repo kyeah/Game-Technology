@@ -41,17 +41,28 @@ typedef struct {
   PlayerInfo players[4];
 } ServerPacket;
 
+typedef struct {
+  int ids[4];
+  int id;
+} ConnectAck;
+
 static void initSDLNet() {
   /* Initialize SDL */
-  if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+  /*  if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
     fprintf(stderr, "Couldn't initialize SDL: %s\n",SDL_GetError());
     exit(1);
-  }
+  }/
   
   /* Initialize the network */
   if ( SDLNet_Init() < 0 ) {
     fprintf(stderr, "Couldn't initialize net: %s\n", SDLNet_GetError());
     SDL_Quit();
     exit(1);
+  }
+}
+
+static void Send(TCPsocket socket, char *msg, int len) {
+  if (SDLNet_TCP_Send(socket, (void*)msg, len) < len) {
+    printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
   }
 }

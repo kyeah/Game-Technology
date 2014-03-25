@@ -34,8 +34,6 @@ protected:
     void createCamera(void);
     void Connect();
 
-    ServerPacket* Receive();
-    void Send(char *msg, int len);
     void Close();
 
     bool keyPressed( const OIS::KeyEvent &arg );
@@ -43,6 +41,8 @@ protected:
 
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ); 
+
+    int ids[4];
 };
 
 #endif // #ifndef __ClientApp_h_
