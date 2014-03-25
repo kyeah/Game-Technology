@@ -121,6 +121,11 @@ void HostApp::Connect(){
     }
   }
 
+  socketset = SDLNet_AllocSocketSet(1);
+  if (SDLNet_TCP_AddSocket(socketset, sd) == -1) {
+    printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError()); // Probably need to make the socketset bigger
+  }
+
   connected = true;
 }
 
@@ -377,6 +382,34 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
   }
 
   if(sd){
+    int active = SDLNet_CheckSockets(socketset, 1);
+    if (active > 0 && SDLNet_SocketReady(sd)) {
+      ClientPacket cmsg;
+      // Network is not two-way yet :(
+      if(SDLNet_TCP_Recv(sd, &cmsg, sizeof(cmsg)) > 0) {
+        switch (cmsg.type) {
+        case MOUSE_MOVED:
+          handleMouseMoved(cmsg.mouseArg, cmsg.userID);
+          break;
+        case MOUSE_PRESSED:
+          break;
+        case MOUSE_RELEASED:
+          handleMouseReleased(cmsg.mouseArg, cmsg.mouseID, cmsg.userID);
+          break;
+        case KEY_PRESSED:
+          handleKeyPressed(cmsg.keyArg, cmsg.userID);
+          break;
+        case KEY_RELEASED:
+          handleKeyReleased(cmsg.keyArg, cmsg.userID);
+          break;
+        case CLIENT_CLOSE:
+          break;
+        case CLIENT_CHAT:
+          break;
+        } 
+      }
+    }      
+
     ServerPacket msg;
     btVector3 ballPos = mBall->getPosition();
     msg.type = SERVER_UPDATE;
@@ -393,12 +426,6 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     }
 
     HostApp::Send((char*)&msg, sizeof(msg));
-
-    ClientPacket cmsg;
-    // Network is not two-way yet :(
-    //      if(SDLNet_TCP_Recv(sd, &cmsg, sizeof(cmsg)) > 0) {
-    //  std::cout << "Received msg" << std::endl;
-    //}
   }
 
   return result;

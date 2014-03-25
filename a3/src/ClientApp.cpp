@@ -57,6 +57,11 @@ void ClientApp::Connect(){
       }
     }
   }
+
+  socketset = SDLNet_AllocSocketSet(1);
+  if (SDLNet_TCP_AddSocket(socketset, csd) == -1) {
+    printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());
+  }
 }
 
 ServerPacket* ClientApp::Receive(){
@@ -70,7 +75,7 @@ ServerPacket* ClientApp::Receive(){
 void ClientApp::Send(char *msg, int len) {
   if(connected){
     printf("sending, %s\n", msg);
-    int result = SDLNet_TCP_Send(sd, (void*)msg, len);
+    int result = SDLNet_TCP_Send(csd, (void*)msg, len);
     if(result < len)
       printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
   }
@@ -154,15 +159,18 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
     addPlayer(0);
   }
 
-  ServerPacket msg;
-  if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
-    mBall->setPosition(msg.ballPos);
-
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-      Player *mPlayer = players[i];
-      if (mPlayer) {
-        mPlayer->getNode()->setPosition(msg.players[i].nodePos);
-        mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+  int active = SDLNet_CheckSockets(socketset, 1);
+  if (active > 0 && SDLNet_SocketReady(csd)) {
+    ServerPacket msg;
+    if(SDLNet_TCP_Recv(csd, &msg, sizeof(msg)) > 0){
+      mBall->setPosition(msg.ballPos);
+      
+      for (int i = 0; i < MAX_PLAYERS; i++) {
+        Player *mPlayer = players[i];
+        if (mPlayer) {
+          mPlayer->getNode()->setPosition(msg.players[i].nodePos);
+          mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+        }
       }
     }
   }
