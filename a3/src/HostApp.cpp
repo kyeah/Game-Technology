@@ -385,8 +385,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     }
   }
 
-  int active = SDLNet_CheckSockets(socketset, 1);
-  if (active > 0) {
+  // RECEIVE INPUTS
+  while (SDLNet_CheckSockets(socketset, 1) > 0) {
     for (int i = 1; i < MAX_PLAYERS; i++) {
       if (players[i]) {
         TCPsocket csd = players[i]->csd;
@@ -419,6 +419,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     }
   }
 
+  // UPDATE ALL CLIENTS
   ServerPacket msg;
   btVector3 ballPos = mBall->getPosition();
   msg.type = SERVER_UPDATE;
