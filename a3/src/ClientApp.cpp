@@ -73,7 +73,7 @@ void ClientApp::Connect(){
   ConnectAck ack;
   SDLNet_TCP_Recv(sd, &ack, sizeof(ack));
   myId = ack.id;
-  for (int i = 0; i < MAX_PLAYERS; i++) {    
+  for (int i = 0; i < MAX_PLAYERS; i++) {
     ids[i] = ack.ids[i];
   }
   printf("myID: %d\n", myId);
@@ -92,6 +92,10 @@ void ClientApp::Close(){
 
 bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   static bool vert = false;
+
+  if (chatFocus) {
+    return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  }
 
   switch(arg.key){
   case OIS::KC_R:
@@ -136,7 +140,18 @@ bool ClientApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id
 bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
   static bool vert = false;
 
+  if (chatFocus) {
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.injectKeyDown(arg.key);
+    sys.injectChar(arg.text);
+    return true;
+  }
+
   switch(arg.key){
+  case OIS::KC_RETURN:
+    toggleChat();
+    chatEditBox->setText("");
+    return true;
   case OIS::KC_D:
   case OIS::KC_S:
   case OIS::KC_A:
@@ -153,6 +168,26 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
 
   return BaseApplication::keyPressed(arg);
 }
+
+bool ClientApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String msg = chatEditBox->getText();
+  toggleChat();
+  chatEditBox->setText("");
+  addChatMessage(msg.c_str());
+
+  ClientPacket packet;
+  packet.type = CLIENT_CHAT;
+  packet.userID = myId;
+  memcpy(packet.msg, msg.c_str(), msg.size());
+  Send(sd, (char*)&packet, sizeof(packet));
+}
+
+void ClientApp::createScene(void) {
+  BaseMultiplayerApp::createScene();
+  chatEditBox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+                              CEGUI::Event::Subscriber(&ClientApp::handleTextSubmitted,this));
+}
+
 
 bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
   BaseMultiplayerApp::frameStarted(evt);
@@ -173,7 +208,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
       switch (msg.type) {
       case SERVER_UPDATE:
         mBall->setPosition(msg.ballPos);
-        
+
         for (int i = 0; i < MAX_PLAYERS; i++) {
           Player *mPlayer = players[i];
           if (mPlayer) {
@@ -189,8 +224,11 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         mPhysics->removeObject(players[msg.clientId]->getNode());
         mPhysics->removeObject(players[msg.clientId]->getRacquet());
         mSceneMgr->destroyEntity(players[msg.clientId]->getNode()->getEntity());
-        mSceneMgr->destroyEntity(players[msg.clientId]->getRacquet()->getEntity());        
+        mSceneMgr->destroyEntity(players[msg.clientId]->getRacquet()->getEntity());
         players[msg.clientId] = NULL;
+        break;
+      case SERVER_CLIENT_MESSAGE:
+        addChatMessage(msg.msg);
         break;
       }
     }

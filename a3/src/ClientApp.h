@@ -43,6 +43,9 @@ protected:
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ); 
 
+    bool handleTextSubmitted( const CEGUI::EventArgs &e );
+    virtual void createScene(void);
+
     int ids[4];
 };
 

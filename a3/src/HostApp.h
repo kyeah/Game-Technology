@@ -46,6 +46,9 @@ protected:
     bool handleMouseMoved( OIS::MouseState arg, int userID );
     bool handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, int userID );
 
+    bool handleTextSubmitted( const CEGUI::EventArgs &e );
+    virtual void createScene(void);
+
 /* server side stuff */ 
     void Connect();
     void Close();

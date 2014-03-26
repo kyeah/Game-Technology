@@ -16,8 +16,9 @@ static const int CLIENT_CHAT = 6;
 
 static const int SERVER_CLIENT_CONNECT = 7;
 static const int SERVER_CLIENT_CLOSED = 8;
-static const int SERVER_CLOSED = 9;
-static const int SERVER_UPDATE = 10;
+static const int SERVER_CLIENT_MESSAGE = 9;
+static const int SERVER_CLOSED = 10;
+static const int SERVER_UPDATE = 11;
 
 typedef struct {
   int type;

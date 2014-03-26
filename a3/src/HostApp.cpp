@@ -51,6 +51,12 @@ void HostApp::createCamera(void)
 }
 
 bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
+  if (chatFocus) {
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.injectKeyDown(arg.key);
+    sys.injectChar(arg.text);
+    return true;
+  }
   return handleKeyPressed(arg.key, myId);
 }
 
@@ -61,6 +67,10 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
   if (!mPlayer) return false;
 
   switch(arg){
+  case OIS::KC_RETURN:
+    toggleChat();
+    chatEditBox->setText("");
+    return true;
   case OIS::KC_D:
     mPlayer->mDirection += btVector3(-40, 0, 0);
     mPlayer->oDirection.x += -40;
@@ -125,7 +135,9 @@ void HostApp::Close(){
 }
 
 bool HostApp::keyReleased(const OIS::KeyEvent &arg){
-  handleKeyReleased(arg.key, myId);
+  if (chatFocus)
+    return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  return handleKeyReleased(arg.key, myId);
 }
 
 bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
@@ -261,11 +273,32 @@ bool HostApp::handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, i
   return false;
 }
 
+bool HostApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String msg = chatEditBox->getText();
+  toggleChat();
+  chatEditBox->setText("");
+  addChatMessage(msg.c_str());
+
+  ServerPacket packet;
+  packet.type = SERVER_CLIENT_MESSAGE;
+  packet.clientId = myId;
+  memcpy(packet.msg, msg.c_str(), msg.size());
+  for (int i = 1; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      Send(players[i]->csd, (char*)&packet, sizeof(packet));
+    }
+  }
+}
+
+void HostApp::createScene(void) {
+  BaseMultiplayerApp::createScene();
+  chatEditBox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+                              CEGUI::Event::Subscriber(&HostApp::handleTextSubmitted,this));
+}
+
 bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
 {
   BaseMultiplayerApp::frameStarted(evt);
-
-  //  if (!players[1]) addPlayer(1);
 
   bool result = BaseApplication::frameStarted(evt);
   static Ogre::Real time = mTimer->getMilliseconds();
@@ -445,6 +478,16 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
               SDLNet_TCP_Close(csd);
               break;
             case CLIENT_CHAT:
+              addChatMessage(cmsg.msg);
+
+              ServerPacket packet;
+              packet.type = SERVER_CLIENT_MESSAGE;
+              packet.clientId = myId;
+              memcpy(packet.msg, cmsg.msg, 512);
+              for (int j = 1; j < MAX_PLAYERS; j++) {
+                if (i != j && players[j])
+                  Send(players[j]->csd, (char*)&packet, sizeof(packet));
+              }
               break;
             }
           }

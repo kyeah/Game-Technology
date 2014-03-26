@@ -41,6 +41,7 @@ BaseMultiplayerApp::BaseMultiplayerApp(void) {
   MAX_SPEED = btScalar(8000);
   Sounds::init();
   connected = false;
+  chatFocus = false;
 }
 
 //-------------------------------------------------------------------------------------
@@ -114,6 +115,34 @@ Player* BaseMultiplayerApp::addPlayer(int userID) {
 
   players[userID] = mPlayer;
   return mPlayer;
+}
+
+void BaseMultiplayerApp::toggleChat() {
+ chatFocus = !chatFocus;
+  chat->setVisible(!chat->isVisible());
+  if (chatFocus)
+    chatEditBox->activate();
+  else
+    chatEditBox->deactivate();
+}
+
+void BaseMultiplayerApp::addChatMessage(const char* msg) {
+  CEGUI::ListboxTextItem* chatItem;
+  if(chatBox->getItemCount() == 7)
+    {
+      chatItem = static_cast<CEGUI::ListboxTextItem*>(chatBox->getListboxItemFromIndex(0));
+      chatItem->setAutoDeleted(false);
+      chatBox->removeItem(chatItem);
+      chatItem->setAutoDeleted(true);
+      chatItem->setText(msg);
+    }
+  else
+    {
+      // Create a new listbox item
+      chatItem = new CEGUI::ListboxTextItem(msg);
+    }
+  chatBox->addItem(chatItem);
+  chatBox->ensureItemIsVisible(chatBox->getItemCount());
 }
 
 void BaseMultiplayerApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
@@ -279,17 +308,20 @@ void BaseMultiplayerApp::createScene(void)
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
   CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
 
-  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
+  CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
+  CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
+  chat = wmgr.loadWindowLayout("Chat.layout");
+  chatBox = (CEGUI::Listbox*)wmgr.getWindow("ConsoleRoot/ChatBox");
+  chatEditBox = (CEGUI::Editbox*)wmgr.getWindow("ConsoleRoot/EditBox");
 
-  //  CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
-  //  CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
-  //  CEGUI::Window *quit = wmgr.createWindow("TaharezLook/Button", "CEGUIDemo/QuitButton");
-  //  quit->setText("Quit");
-  //  quit->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
-  //  sheet->addChildWindow(quit);
-  //  CEGUI::System::getSingleton().setGUISheet(sheet);
+  chat->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0),
+                                    CEGUI::UDim(0.65f, 0)));
+  sheet->addChildWindow(chat);
+  CEGUI::System::getSingleton().setGUISheet(sheet);
+  chat->setVisible(false);
 }
 
 bool BaseMultiplayerApp::frameStarted(const Ogre::FrameEvent &evt) {
