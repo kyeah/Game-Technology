@@ -120,7 +120,7 @@ Player* BaseMultiplayerApp::addPlayer(int userID) {
 
 void BaseMultiplayerApp::toggleChat() {
  chatFocus = !chatFocus;
-  chat->setVisible(!chat->isVisible());
+  chatEditBox->setVisible(!chatEditBox->isVisible());
   if (chatFocus)
     chatEditBox->activate();
   else
@@ -314,7 +314,7 @@ void BaseMultiplayerApp::createScene(void)
 
   CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
   CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
-  chat = wmgr.loadWindowLayout("Chat.layout");
+  chat = wmgr.loadWindowLayout("Chatbox.layout");
   chatBox = (CEGUI::Listbox*)wmgr.getWindow("ConsoleRoot/ChatBox");
   chatEditBox = (CEGUI::Editbox*)wmgr.getWindow("ConsoleRoot/EditBox");
 
@@ -322,7 +322,7 @@ void BaseMultiplayerApp::createScene(void)
                                     CEGUI::UDim(0.65f, 0)));
   sheet->addChildWindow(chat);
   CEGUI::System::getSingleton().setGUISheet(sheet);
-  chat->setVisible(false);
+  chatEditBox->setVisible(false);
 }
 
 bool BaseMultiplayerApp::frameStarted(const Ogre::FrameEvent &evt) {
