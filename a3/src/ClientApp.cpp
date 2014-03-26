@@ -1,4 +1,4 @@
-/*
+B1;2802;0c/*
   -----------------------------------------------------------------------------
   Filename:    ClientApp.cpp
   -----------------------------------------------------------------------------
@@ -94,7 +94,16 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   static bool vert = false;
 
   if (chatFocus) {
-    return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+    if (arg.key == OIS::KC_ESCAPE) {
+      toggleChat();
+      chatEditBox->setText("");
+      return true;
+    } else {
+      return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+    }
+  } else if (!allowKeyRelease) {
+    allowKeyRelease = true;
+    return BaseApplication::keyPressed(arg);
   }
 
   switch(arg.key){
@@ -147,10 +156,16 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
     return true;
   }
 
+  allowKeyRelease = true;
+
+  ClientPacket msg;
   switch(arg.key){
   case OIS::KC_RETURN:
     toggleChat();
     chatEditBox->setText("");
+    msg.type = CLIENT_CLEAR_DIR;
+    msg.userID = myId;
+    Send(sd, (char*)&msg, sizeof(msg));
     return true;
   case OIS::KC_D:
   case OIS::KC_S:
@@ -158,7 +173,6 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
   case OIS::KC_W:
   case OIS::KC_LSHIFT:
   case OIS::KC_SPACE:
-    ClientPacket msg;
     msg.type = KEY_PRESSED;
     msg.keyArg = arg.key;
     msg.userID = myId;

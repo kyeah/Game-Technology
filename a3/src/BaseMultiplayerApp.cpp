@@ -42,6 +42,7 @@ BaseMultiplayerApp::BaseMultiplayerApp(void) {
   Sounds::init();
   connected = false;
   chatFocus = false;
+  allowKeyRelease = true;
 }
 
 //-------------------------------------------------------------------------------------

@@ -52,11 +52,18 @@ void HostApp::createCamera(void)
 
 bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
   if (chatFocus) {
-    CEGUI::System &sys = CEGUI::System::getSingleton();
-    sys.injectKeyDown(arg.key);
-    sys.injectChar(arg.text);
-    return true;
+    if (arg.key == OIS::KC_ESCAPE) {
+      toggleChat();
+      chatEditBox->setText("");
+      return true;
+    } else {
+      CEGUI::System &sys = CEGUI::System::getSingleton();
+      sys.injectKeyDown(arg.key);
+      sys.injectChar(arg.text);
+      return true;
+    }
   }
+  
   return handleKeyPressed(arg.key, myId);
 }
 
@@ -66,10 +73,18 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
   Player *mPlayer = findPlayer(userId);
   if (!mPlayer) return false;
 
+  allowKeyRelease = true;
+
   switch(arg){
   case OIS::KC_RETURN:
     toggleChat();
     chatEditBox->setText("");
+    if (chatFocus) {
+      mPlayer->mDirection = btVector3(0, 0, 0);
+      mPlayer->oDirection.x = 0;
+      mPlayer->oDirection.y = 0;
+      mPlayer->oDirection.z = 0;
+    }
     return true;
   case OIS::KC_D:
     mPlayer->mDirection += btVector3(-40, 0, 0);
@@ -135,17 +150,23 @@ void HostApp::Close(){
 }
 
 bool HostApp::keyReleased(const OIS::KeyEvent &arg){
-  if (chatFocus)
+  if (chatFocus) {
     return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  }
   return handleKeyReleased(arg.key, myId);
 }
 
 bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
   static bool vert = false;
 
+  if (!allowKeyRelease) {
+    allowKeyRelease = true;
+    return false;
+  }
+
   Player *mPlayer = findPlayer(userID);
   if (!mPlayer) return false;
-
+  
   switch(arg){
   case OIS::KC_R:
     restart();
@@ -288,6 +309,8 @@ bool HostApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
       Send(players[i]->csd, (char*)&packet, sizeof(packet));
     }
   }
+
+  allowKeyRelease = false;  // Don't allow keyrelease without the keypress
 }
 
 void HostApp::createScene(void) {
@@ -476,6 +499,12 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
               }
 
               SDLNet_TCP_Close(csd);
+              break;
+            case CLIENT_CLEAR_DIR:
+              players[cmsg.userID]->mDirection = btVector3(0,0,0);
+              players[cmsg.userID]->oDirection.x = 0;
+              players[cmsg.userID]->oDirection.y = 0;
+              players[cmsg.userID]->oDirection.z = 0;
               break;
             case CLIENT_CHAT:
               addChatMessage(cmsg.msg);

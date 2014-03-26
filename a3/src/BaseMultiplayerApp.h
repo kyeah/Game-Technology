@@ -93,6 +93,7 @@ protected:
     CEGUI::Listbox *chatBox;
     CEGUI::Editbox *chatEditBox;
     bool chatFocus;
+    bool allowKeyRelease;
 };
 
 #endif
