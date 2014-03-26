@@ -80,14 +80,17 @@ void ClientApp::Connect(){
 }
 
 void ClientApp::Close(){
-  ClientPacket msg;
-  msg.type = CLIENT_CLOSE;
-  msg.userID = myId;
-  Send(sd, (char*)&msg, sizeof(msg));
-  SDLNet_TCP_Close(csd);
-  SDLNet_TCP_Close(sd);
+  if (sd) {
+    ClientPacket msg;
+    msg.type = CLIENT_CLOSE;
+    msg.userID = myId;
+    Send(sd, (char*)&msg, sizeof(msg));
+    SDLNet_TCP_Close(sd);
+  }
+
   SDLNet_Quit();
   connected = false;
+  CEGUI::OgreRenderer::destroySystem();
 }
 
 bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
@@ -184,15 +187,20 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
 }
 
 bool ClientApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
-  CEGUI::String msg = chatEditBox->getText();
+  CEGUI::String cmsg = chatEditBox->getText();
+
+  std::stringstream ss;
+  ss << "Player " << myId << ": " << cmsg.c_str();
+  const char *msg = ss.str().c_str();
+
   toggleChat();
   chatEditBox->setText("");
-  addChatMessage(msg.c_str());
+  addChatMessage(msg);
 
   ClientPacket packet;
   packet.type = CLIENT_CHAT;
   packet.userID = myId;
-  memcpy(packet.msg, msg.c_str(), msg.size());
+  strcpy(packet.msg, msg);
   Send(sd, (char*)&packet, sizeof(packet));
 }
 
@@ -243,6 +251,11 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         break;
       case SERVER_CLIENT_MESSAGE:
         addChatMessage(msg.msg);
+        break;
+      case SERVER_CLOSED:
+        SDLNet_TCP_Close(sd);
+        sd = 0;
+        mShutDown = true;
         break;
       }
     }

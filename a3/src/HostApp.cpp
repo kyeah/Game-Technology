@@ -143,10 +143,24 @@ void HostApp::Connect(){
 }
 
 void HostApp::Close(){
-  SDLNet_TCP_Close(csd);
+  ServerPacket msg;
+  msg.type = SERVER_CLOSED;
+  for(int i = 1; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      Send(players[i]->csd, (char*)&msg, sizeof(msg));
+      SDLNet_TCP_Close(csd);    
+    }
+  }
+  
+  //  for(int i = 1; i < MAX_PLAYERS; i++) {
+  //    if (players[i])
+  //
+  //  }
+
   SDLNet_TCP_Close(sd);
   SDLNet_Quit();
   connected = false;
+  CEGUI::OgreRenderer::destroySystem();
 }
 
 bool HostApp::keyReleased(const OIS::KeyEvent &arg){
@@ -295,15 +309,20 @@ bool HostApp::handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, i
 }
 
 bool HostApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
-  CEGUI::String msg = chatEditBox->getText();
+  CEGUI::String cmsg = chatEditBox->getText();
+
+  std::stringstream ss;
+  ss << "Player " << myId << ": " << cmsg.c_str();
+  const char *msg = ss.str().c_str();
+
   toggleChat();
   chatEditBox->setText("");
-  addChatMessage(msg.c_str());
+  addChatMessage(msg);
 
   ServerPacket packet;
   packet.type = SERVER_CLIENT_MESSAGE;
   packet.clientId = myId;
-  memcpy(packet.msg, msg.c_str(), msg.size());
+  strcpy(packet.msg, msg);
   for (int i = 1; i < MAX_PLAYERS; i++) {
     if (players[i]) {
       Send(players[i]->csd, (char*)&packet, sizeof(packet));

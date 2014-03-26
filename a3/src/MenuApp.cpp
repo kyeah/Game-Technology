@@ -271,7 +271,7 @@ extern "C" {
         } catch( Ogre::Exception& e) {
           handleException(e);
         }
-        mode = MODE_MENU;
+        mode = MODE_QUIT;
       } else {
         break;
       }
