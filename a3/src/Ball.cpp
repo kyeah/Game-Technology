@@ -4,6 +4,8 @@
 #include "RacquetObject.h"
 #include "Sounds.h"
 #include "common.h"
+#include "Networking.h"
+
 
 struct args{
 	Ogre::Entity *entity;
@@ -73,7 +75,7 @@ void Ball::update(float elapsedTime) {
         distance = (distance * 128) / 215;
 
         Sounds::playSound(Sounds::BALL_HIT, (int)distance);
-
+	Networking::soundState = Sounds::BALL_HIT;
         // Check Wall hits
         Plane *p = dynamic_cast<Plane*>(contexts[i]->object);
         if (p) {
@@ -96,6 +98,7 @@ void Ball::update(float elapsedTime) {
               if (points > 1) {
                 sp->cycleColor();
                 Sounds::playSound(Sounds::SCORE_POINT, (int)distance);
+		Networking::soundState = Sounds::SCORE_POINT;
               }
               pointsTimeDelay = 300;
             }

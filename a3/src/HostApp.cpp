@@ -37,7 +37,7 @@ HostApp::HostApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
   myId = 0;
   Networking::serverConnect();
   connected = true;
-  soundState = Sounds::NO_SOUND;
+  Networking::soundState = Sounds::NO_SOUND;
 }
 
 HostApp::~HostApp(void)
@@ -122,7 +122,7 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
     if(mPlayer->swing == 0 && mPlayer->unswing == 0) {
       mPlayer->swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
-      soundState = Sounds::RACQUET_SWOOSH;
+      Networking::soundState = Sounds::RACQUET_SWOOSH;
     }
     return true;
   }
@@ -295,7 +295,7 @@ bool HostApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
   strcpy(packet.msg, msg);
   for (int i = 1; i < MAX_PLAYERS; i++) {
     if (players[i]) {
-      Send(players[i]->csd, (char*)&packet, sizeof(packet));
+      Networking::Send(players[i]->csd, (char*)&packet, sizeof(packet));
     }
   }
 
@@ -483,7 +483,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
               closemsg.clientId = cmsg.userID;
               for (int i = 1; i < MAX_PLAYERS; i++) {
                 if (players[i]) {
-                  Send(players[i]->csd, (char*)&closemsg, sizeof(closemsg));
+                  Networking::Send(players[i]->csd, (char*)&closemsg, sizeof(closemsg));
                 }
               }
 
@@ -504,7 +504,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
               memcpy(packet.msg, cmsg.msg, 512);
               for (int j = 1; j < MAX_PLAYERS; j++) {
                 if (i != j && players[j])
-                  Send(players[j]->csd, (char*)&packet, sizeof(packet));
+                  Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
               }
               break;
             }
