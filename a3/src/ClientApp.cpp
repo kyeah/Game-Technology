@@ -31,13 +31,22 @@ ClientApp::ClientApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
 
 ClientApp::~ClientApp(void)
 {
+  if (sd) {
+    ClientPacket msg;
+    msg.type = CLIENT_CLOSE;
+    msg.userID = myId;
+    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+  }
   Networking::Close();
 }
 
 //-------------------------------------------------------------------------------------
 void ClientApp::createCamera(void) {
   BaseMultiplayerApp::createCamera();
-  mCamera->setPosition(0,0,7000);
+  if (myId % 2 == 0)
+    mCamera->setPosition(0,0,-7000);
+  else
+    mCamera->setPosition(0,0,7000);
   mCamera->lookAt(0,0,500);
 }
 
@@ -58,18 +67,23 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   }
 
   switch(arg.key){
+  case OIS::KC_M:
+    Sounds::enabled = !Sounds::enabled;
+    return true;
   case OIS::KC_C:
     chatBox->setVisible(!chatBox->isVisible());
     return true;
-  case OIS::KC_R:
   case OIS::KC_P:
+    players[myId]->getNode()->getEntity()->setVisible(!players[myId]->getNode()->getEntity()->isVisible());
+    players[myId]->pongMode = !players[myId]->getNode()->getEntity()->isVisible();
   case OIS::KC_J:
   case OIS::KC_D:
   case OIS::KC_S:
   case OIS::KC_A:
+  case OIS::KC_R:
+  case OIS::KC_G:
   case OIS::KC_W:
   case OIS::KC_LSHIFT:
-  case OIS::KC_G:
     ClientPacket msg;
     msg.type = KEY_RELEASED;
     msg.keyArg = arg.key;
@@ -179,10 +193,9 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
   while (SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)) {
     ServerPacket msg;
     if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
-      switch(msg.type){
-	case SERVER_UPDATE: 
+      switch (msg.type) {
+      case SERVER_UPDATE:
         mBall->setPosition(msg.ballPos);
-	
         for (int i = 0; i < MAX_PLAYERS; i++) {
           Player *mPlayer = players[i];
           if (mPlayer) {
@@ -206,13 +219,19 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         addChatMessage(msg.msg);
         break;
       case SERVER_CLOSED:
-        SDLNet_TCP_Close(sd);
+        //        SDLNet_TCP_Close(sd);
         sd = 0;
         mShutDown = true;
         break;
       }
       if(msg.playSound != Sounds::NO_SOUND)
 	Sounds::playSound(msg.playSound, 75);
+    }
+
+    Player *me = players[myId];
+    if (me) {
+      btVector3 pos = me->getNode()->getPosition();
+      mCamera->lookAt(pos[0], pos[1], pos[2]);
     }
   }
 

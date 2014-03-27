@@ -22,19 +22,42 @@ Mouse - X-Y Paddle Movement
 Left Click / Spacebar - Push
 
 Keyboard Options:
+C - Toggle Chat Visibility
+Enter - Toggle Chat Message
+
+M - Toggle Sound
 P - Toggle Pong Mode
 G - Toggle Gravity, for dishonest CHEATERS (Down -> Off -> Up)
-R - Restart
 
 FINAL IMPLEMENTATION OVERVIEW
 =================================
+SDL_Net Implementation: Working perfectly; sends updates for the gamestate as well as notifications for local events (e.g. sounds).
 
+Menu: Basic functionality. Client connection is done through the command-line, instead of through a server list. There is no options menu.
+
+Gameplay: We scaled back our plans and extended our single-player gameplay to work two-way. We used our basic scene room and added scoring functionality to the walls on either side. Teams gain points by hitting the wall on the far side.
+
+HUD and Scoring: Still uses the OGRE panels. Shows basic information on team scores and gravity status. Scoring is an extension of our single-player gameplay, with 2-point and 4-point walls.
+
+Sound Toggle: Yep. Press M to toggle sound.
+
+Chat: Not initially planned, but implemented and working properly using CEGUI widgets. Currently uses user ID instead of custom names.
+
+Architecture: Uses TCP with BaseMultiplayerApp for shared multiplayer functions, + Host and Client child applications for further specifics of each user's functions. Players have their own states stored in a Player class.
 
 FILES
 =================================
+common.h/cpp (Program-wide variables + Player definitions)
+
 BaseApplication.h/cpp
-RacquetApp.h/cpp (Main application files, Game Logic)
+Menu.h/cpp (Basic Menu)
+RacquetApp.h/cpp (Main Single-Playeer application files, Game Logic)
+BaseMultiplayerApp.h/cpp (Multiplayer setup application files)
+Host.h/cpp, Client.h/cpp (Main Multiplayer app files)
+
 Physics.h/cpp, OgreMotionState.h/cpp, Collisions.h (Bullet integration files)
 SDL.h, SDL_mixer.h, Sounds.cpp/h (SDL/Mixer integration files)
+Networking.h/cpp (SDLNet integration files + other networking specifics)
+
 GameObject.h, RacquetObject.h (General Game Object Definitions)
 Racquet.cpp, Ball.cpp, Plane.cpp, Dude.cpp (Specific Game Object Definitions)
