@@ -29,7 +29,9 @@ Ball::Ball(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeNam
   collisionShape = new btSphereShape(s[0]);
   addToSimulator();
 
+  isMultiplayer = false;
   bouncedOnce = false;
+  lastHit = 1;
 
   body->setCcdMotionThreshold(1);
   body->setCcdSweptSphereRadius(0.4);
@@ -48,6 +50,10 @@ void *Ball::changeWall(void *params){
 		ent->setMaterialName("Court/Wall");	
 	}
 }
+void Ball::setMultiplayer(bool yesOrNo){
+  isMultiplayer = yesOrNo;
+}
+
 
 void Ball::update(float elapsedTime) {
   static float pointsTimeDelay = 0;
@@ -65,53 +71,105 @@ void Ball::update(float elapsedTime) {
 
   // Check Collisions
   if (physics->checkCollisions(this)) {
-    for (int i = 0; i < contexts.size(); i++) {
-      if (contexts[i]->object) {
-        btVector3 point = contexts[i]->point;
-        float distance = sqrt(((point.getX())*(point.getX())) + 
-                              ((point.getY())*(point.getY())) + 
-                              ((point.getZ() + 100) * (point.getZ() + 100)));
+    if(isMultiplayer){
+      for (int i = 0; i < contexts.size(); i++) {
+        if (contexts[i]->object) {
+          btVector3 point = contexts[i]->point;
+          float distance = sqrt(((point.getX())*(point.getX())) + 
+                                ((point.getY())*(point.getY())) + 
+                                ((point.getZ() + 100) * (point.getZ() + 100)));
 
-        distance = (distance * 128) / 215;
+          distance = (distance * 128) / 215;
 
-        Sounds::playSound(Sounds::BALL_HIT, (int)distance);
-	Networking::soundState = Sounds::BALL_HIT;
-        // Check Wall hits
-        Plane *p = dynamic_cast<Plane*>(contexts[i]->object);
-        if (p) {
-          ScoringPlane *sp = dynamic_cast<ScoringPlane*>(p);
+          Sounds::playSound(Sounds::BALL_HIT, (int)distance);
+	  Networking::soundState = Sounds::BALL_HIT;
 
-          if (!sp) {
-            struct args *arg = (struct args*)malloc(sizeof(struct args*));
-            arg->entity = p->getEntity();
-            arg->p = p;
-            pthread_t thread;
-            pthread_create(&thread, 0, changeWall, (void*)(arg)); 
-          }
+          // Check Wall hits
+          Plane *p = dynamic_cast<Plane*>(contexts[i]->object);
+          if (p) {
+            btVector3 pos = this->getPosition();
+            int whichTeam = 2;
+            if (pos.getZ() >= 600)
+              whichTeam = 1;
+            ScoringPlane *sp = dynamic_cast<ScoringPlane*>(p);
 
-	  Ogre::String name = p->getEntityName();
-          int points = p->points;
-          if (points > 0) {
-            if (pointsTimeDelay == 0) {
-              bouncedOnce = false;
-              score += points;
-              if (points > 1) {
-                sp->cycleColor();
-                Sounds::playSound(Sounds::SCORE_POINT, (int)distance);
-		Networking::soundState = Sounds::SCORE_POINT;
+            if (!sp) {
+              struct args *arg = (struct args*)malloc(sizeof(struct args*));
+              arg->entity = p->getEntity();
+              arg->p = p;
+              pthread_t thread;
+              pthread_create(&thread, 0, changeWall, (void*)(arg)); 
+            }
+
+            Ogre::String name = p->getEntityName();
+            int points = p->points;
+            if (points > 0) {
+              if (pointsTimeDelay == 0) {
+                if(whichTeam == 1)
+                  team1Score += points;
+                else
+                  team2Score += points;
+                if (points > 1) {
+                  sp->cycleColor();
+                  Sounds::playSound(Sounds::SCORE_POINT, (int)distance);
+                  Networking::soundState = Sounds::SCORE_POINT;
+		}
+                pointsTimeDelay = 300;
               }
-              pointsTimeDelay = 300;
-            }
-          } else if (name.compare("ground") == 0) {
-            if (bouncedOnce) {
-              bouncedOnce = false;
-              lastscore = score;
-              score = 0;
-            } else {
-              bouncedOnce = true;
-            }
+            } 
+            break;
           }
-          break;
+        }
+      }
+    }
+    else {
+      for (int i = 0; i < contexts.size(); i++) {
+        if (contexts[i]->object) {
+          btVector3 point = contexts[i]->point;
+          float distance = sqrt(((point.getX())*(point.getX())) + 
+                                ((point.getY())*(point.getY())) + 
+                                ((point.getZ() + 100) * (point.getZ() + 100)));
+
+          distance = (distance * 128) / 215;
+
+          Sounds::playSound(Sounds::BALL_HIT, (int)distance);
+
+          // Check Wall hits
+          Plane *p = dynamic_cast<Plane*>(contexts[i]->object);
+          if (p) {
+            ScoringPlane *sp = dynamic_cast<ScoringPlane*>(p);
+
+            if (!sp) {
+              struct args *arg = (struct args*)malloc(sizeof(struct args*));
+              arg->entity = p->getEntity();
+              arg->p = p;
+              pthread_t thread;
+              pthread_create(&thread, 0, changeWall, (void*)(arg)); 
+            }
+
+  	  Ogre::String name = p->getEntityName();
+            int points = p->points;
+            if (points > 0) {
+              if (pointsTimeDelay == 0) {
+                bouncedOnce = false;
+                score += points;
+                if (points > 1) {
+                  sp->cycleColor();
+                  Sounds::playSound(Sounds::SCORE_POINT, (int)distance);
+                }
+                pointsTimeDelay = 300;
+              }
+            } else if (name.compare("ground") == 0) {
+              if (bouncedOnce) {
+                bouncedOnce = false;
+                lastscore = score;
+                score = 0;
+              } else {
+                bouncedOnce = true;
+              }
+            }
+            break;
+          }
         }
       }
     }
