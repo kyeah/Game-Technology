@@ -153,14 +153,32 @@ void BaseMultiplayerApp::addChatMessage(const char* msg) {
 
 void BaseMultiplayerApp::createNewScoringPlane(bool nearWall, int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
   static int wallID;
-  std::stringstream ss;
-  ss << points << "wall";
-  std::string mesh = ss.str();
-  ss << wallID;
-  std::string ent = ss.str();
-  ss << "node";
-  std::string node = ss.str();
-  wallID++;
+  std::string mesh;
+  std::string ent;
+  std::string node;
+
+  if(!nearWall){
+  
+    std::stringstream ss;
+    ss << points << "wall";
+    mesh = ss.str();
+    ss << wallID;
+    ent = ss.str();
+    ss << "node";
+    node = ss.str();
+    wallID++;
+  }
+
+  else{
+    std::stringstream ss;
+    ss << points << "wall-p2";
+    mesh = ss.str();
+    ss << wallID;
+    ent = ss.str();
+    ss << "node";
+    node = ss.str();
+    wallID++;
+  }
 
   ScoringPlane *extra = new ScoringPlane(worldWidth, worldLength, worldHeight,
                                          mSceneMgr, ent, mesh, node, 0, mPhysics,
@@ -171,11 +189,6 @@ void BaseMultiplayerApp::createNewScoringPlane(bool nearWall, int points, btVect
   extra->cycleColor();
   extra->getBody()->setLinearFactor(linearFactor);
   extra->getBody()->setAngularFactor(angularFactor);
-  if(nearWall){
-    btVector3 y = btVector3(0, 1, 0);
-    btScalar rot = btScalar(90);
-    extra->rotate(btQuaternion(y, rot));
-  }
   
 }
 
@@ -252,13 +265,13 @@ void BaseMultiplayerApp::createScene(void)
                                                 Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                 planes[5], w/6, w/6, 20, 20, true, 1, 5, 5, up[5]);
 
-//  Ogre::MeshManager::getSingleton().createPlane("2wall-p2", 
-//						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-//						planes[4], w/4, w/4, 20, 20, true, 1, 5, 5, up[4]);
+ Ogre::MeshManager::getSingleton().createPlane("2wall-p2", 
+						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+						planes[4], w/4, w/4, 20, 20, true, 1, 5, 5, up[4]);
 
-  //Ogre::MeshManager::getSingleton().createPlane("4wall-p2", 
-//						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-//						planes[4], w/6, w/6, 20, 20, true, 1, 5, 5, up[4]);
+  Ogre::MeshManager::getSingleton().createPlane("4wall-p2", 
+						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+						planes[4], w/6, w/6, 20, 20, true, 1, 5, 5, up[4]);
   // Lights
   Ogre::Light* lights[9];
   int z;
