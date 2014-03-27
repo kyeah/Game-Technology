@@ -74,6 +74,9 @@ bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
     }
   }
   
+  if (arg.key == OIS::KC_ESCAPE) {
+    return BaseApplication::keyPressed(arg);
+  }
   return handleKeyPressed(arg.key, myId);
 }
 
@@ -141,6 +144,10 @@ bool HostApp::keyReleased(const OIS::KeyEvent &arg){
   if (chatFocus) {
     return CEGUI::System::getSingleton().injectKeyUp(arg.key);
   }
+
+  if (arg.key == OIS::KC_ESCAPE) {
+    return BaseApplication::keyReleased(arg);
+  }
   return handleKeyReleased(arg.key, myId);
 }
 
@@ -166,7 +173,7 @@ bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
     mPlayer->swing = mPlayer->unswing = 0;
     mPlayer->pongMode = !mPlayer->pongMode;
     mPlayer->getNode()->setOrientation(btQuaternion(0,0,0,1));
-    mPlayer->getNode()->setPosition(playerInitPos);
+    mPlayer->getNode()->setPosition(playerInitialPositions[userID]);
     mPlayer->getNode()->getEntity()->setVisible(!mPlayer->getNode()->getEntity()->isVisible());
     return true;
   case OIS::KC_J:
@@ -230,6 +237,7 @@ bool HostApp::mouseMoved( const OIS::MouseEvent& arg ) {
 bool HostApp::handleMouseMoved( OIS::MouseState arg, int userID ) {
   Player *mPlayer = findPlayer(userID);
   if (!mPlayer) return false;
+  int scalar = (userID % 2 == 0 ? 1 : -1);
 
   if (mPlayer->swing == 0 && mPlayer->unswing == 0) {
     int x = arg.X.rel;
@@ -239,10 +247,10 @@ bool HostApp::handleMouseMoved( OIS::MouseState arg, int userID ) {
 
     if (mPlayer->pongMode) {
       //Boundaries
-      if(x < 0 && mPlayer->getRacquet()->getPosition().getX() >= 2000){
+      if(x < 0 && mPlayer->getRacquet()->getPosition().getX()*scalar >= 2000){
         x = 0;
       }
-      if(x > 0 && mPlayer->getRacquet()->getPosition().getX() <= -2000){
+      if(x > 0 && mPlayer->getRacquet()->getPosition().getX()*scalar <= -2000){
         x = 0;
       }
       if(y < 0 && mPlayer->getRacquet()->getPosition().getY() >= 2000){
@@ -251,12 +259,10 @@ bool HostApp::handleMouseMoved( OIS::MouseState arg, int userID ) {
       if(y > 0 && mPlayer->getRacquet()->getPosition().getY() <= -2000){
         y = 0;
       }
-
-
-
-      mPlayer->getNode()->translate(btVector3(-x,-y,0));
+      
+      mPlayer->getNode()->translate(btVector3(-x*scalar,-y,0));
     } else {
-      mPlayer->getNode()->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor)));
+      mPlayer->getNode()->rotate(btQuaternion(btVector3(0,0,1), btScalar(x*rotfactor*scalar)));
     }
   }
   return true;
@@ -355,15 +361,15 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     //boundaries
     
     if(mPlayer->getRacquet()->getPosition().getZ()*scalar >= 0){
-      mPlayer->mDirection.setZ(-10*scalar);
+      mPlayer->mDirection.setZ(-10);
     }
     if(mPlayer->getRacquet()->getPosition().getZ()*scalar <= -2400){
       mPlayer->mDirection.setZ(10);
     }
-    if(mPlayer->getRacquet()->getPosition().getX() >= 2000){
+    if(mPlayer->getRacquet()->getPosition().getX()*scalar >= 2000){
       mPlayer->mDirection.setX(-10);
     }
-    if(mPlayer->getRacquet()->getPosition().getX() <= -2000){
+    if(mPlayer->getRacquet()->getPosition().getX()*scalar <= -2000){
       mPlayer->mDirection.setX(10);
     }
     if(mPlayer->getRacquet()->getPosition().getY() >= 2000){

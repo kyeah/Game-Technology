@@ -35,7 +35,7 @@ ClientApp::~ClientApp(void)
     ClientPacket msg;
     msg.type = CLIENT_CLOSE;
     msg.userID = myId;
-    Send(Networking::server_socket, (char*)&msg, sizeof(msg));
+    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
   }
   Networking::Close();
 }
@@ -225,7 +225,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
 
     Player *me = players[myId];
     if (me) {
-      btVector3 pos = (mPlayer->pongMode ? mPlayer->getRacquet()->getPosition() : mPlayer->getNode()->getPosition());
+      btVector3 pos = (me->pongMode ? me->getRacquet()->getPosition() : me->getNode()->getPosition());
       mCamera->lookAt(pos[0], pos[1], pos[2]);
     }
   }
