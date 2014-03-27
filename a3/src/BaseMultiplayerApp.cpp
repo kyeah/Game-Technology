@@ -306,6 +306,7 @@ void BaseMultiplayerApp::createScene(void)
 
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain1", "Examples/PurpleFountain"));
   mBall->getNode()->attachObject(mSceneMgr->createParticleSystem("fountain2", "Examples/PurpleFountain"));
+  mBall->setMultiplayer(true);
 
   if (mPlayer->pongMode) mPlayer->getNode()->getEntity()->setVisible(false);
 
