@@ -23,8 +23,12 @@ Left Click / Spacebar - Push
 
 Keyboard Options:
 P - Toggle Pong Mode
+C - Toggle Chat Visibility
+Enter - Toggle Chat Message
+M - Toggle Sound
+
+Host Controls:
 G - Toggle Gravity, for dishonest CHEATERS (Down -> Off -> Up)
-R - Restart
 
 FINAL IMPLEMENTATION OVERVIEW
 =================================
@@ -32,9 +36,17 @@ FINAL IMPLEMENTATION OVERVIEW
 
 FILES
 =================================
+common.h/cpp (Program-wide variables + Player definitions)
+
 BaseApplication.h/cpp
-RacquetApp.h/cpp (Main application files, Game Logic)
+Menu.h/cpp (Basic Menu)
+RacquetApp.h/cpp (Main Single-Playeer application files, Game Logic)
+BaseMultiplayerApp.h/cpp (Multiplayer setup application files)
+Host.h/cpp, Client.h/cpp (Main Multiplayer app files)
+
 Physics.h/cpp, OgreMotionState.h/cpp, Collisions.h (Bullet integration files)
 SDL.h, SDL_mixer.h, Sounds.cpp/h (SDL/Mixer integration files)
+Networking.h/cpp (SDLNet integration files + other networking specifics)
+
 GameObject.h, RacquetObject.h (General Game Object Definitions)
 Racquet.cpp, Ball.cpp, Plane.cpp, Dude.cpp (Specific Game Object Definitions)
