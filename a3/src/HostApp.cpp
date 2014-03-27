@@ -42,7 +42,15 @@ HostApp::HostApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
 
 HostApp::~HostApp(void)
 {
+  ServerPacket msg;
+  msg.type = SERVER_CLOSED;
+  for(int i = 1; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+    }
+  }
   Networking::Close();
+  CEGUI::OgreRenderer::destroySystem();
 }
 
 void HostApp::createCamera(void)

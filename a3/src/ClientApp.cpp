@@ -31,6 +31,12 @@ ClientApp::ClientApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
 
 ClientApp::~ClientApp(void)
 {
+  if (sd) {
+    ClientPacket msg;
+    msg.type = CLIENT_CLOSE;
+    msg.userID = myId;
+    Send(Networking::server_socket, (char*)&msg, sizeof(msg));
+  }
   Networking::Close();
 }
 
