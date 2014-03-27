@@ -28,6 +28,7 @@ class ClientApp : public BaseMultiplayerApp
 {
 public:
     ClientApp(void);
+    ~ClientApp(void);
     bool frameStarted(const Ogre::FrameEvent &evt);
 
 protected:
@@ -41,6 +42,9 @@ protected:
 
     bool mouseMoved( const OIS::MouseEvent &arg );
     bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ); 
+
+    bool handleTextSubmitted( const CEGUI::EventArgs &e );
+    virtual void createScene(void);
 
     int ids[4];
 };

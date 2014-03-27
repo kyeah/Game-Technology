@@ -17,10 +17,6 @@ class MenuApp : public BaseApplication
   virtual ~MenuApp(void);
  
  protected:
-  CEGUI::OgreRenderer* mRenderer;
-  CEGUI::WindowManager* Wmgr;
-  CEGUI::Window* menu;
- 
   virtual void createScene(void);
   virtual void createFrameListener(void);
  

@@ -19,10 +19,13 @@ static const int KEY_PRESSED = 3;
 static const int KEY_RELEASED = 4;
 static const int CLIENT_CLOSE = 5;
 static const int CLIENT_CHAT = 6;
+static const int CLIENT_CLEAR_DIR = 7;
 
-static const int SERVER_CLIENT_CLOSED = 7;
-static const int SERVER_CLOSED = 8;
-static const int SERVER_UPDATE = 9;
+static const int SERVER_CLIENT_CONNECT = 8;
+static const int SERVER_CLIENT_CLOSED = 9;
+static const int SERVER_CLIENT_MESSAGE = 10;
+static const int SERVER_CLOSED = 11;
+static const int SERVER_UPDATE = 12;
 
 static const int SEND_TO_SERV = 10;
 static const int SEND_TO_CLIENT = 11;
@@ -51,7 +54,7 @@ typedef struct {
 
 typedef struct {
   int type;
-  int clientClosedId;
+  int clientId;
   char msg[512];
   int playSound;
   btVector3 ballPos;

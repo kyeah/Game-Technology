@@ -28,6 +28,7 @@ class HostApp : public BaseMultiplayerApp
 {
 public:
     HostApp(void);
+    ~HostApp(void);
     bool frameStarted(const Ogre::FrameEvent &evt);
 
 protected:
@@ -47,6 +48,9 @@ protected:
 
     int soundState; 
     bool connected;
+    bool handleTextSubmitted( const CEGUI::EventArgs &e );
+    virtual void createScene(void);
+
 /* server side stuff */ 
 //    void Connect();
 //    void Close();

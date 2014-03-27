@@ -15,6 +15,7 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
+
 #include "HostApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
@@ -39,6 +40,10 @@ HostApp::HostApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
   soundState = Sounds::NO_SOUND;
 }
 
+HostApp::~HostApp(void)
+{
+  Networking::Close();
+}
 
 void HostApp::createCamera(void)
 {
@@ -48,12 +53,20 @@ void HostApp::createCamera(void)
 }
 
 bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
+  if (chatFocus) {
+    if (arg.key == OIS::KC_ESCAPE) {
+      toggleChat();
+      chatEditBox->setText("");
+      return true;
+    } else {
+      CEGUI::System &sys = CEGUI::System::getSingleton();
+      sys.injectKeyDown(arg.key);
+      sys.injectChar(arg.text);
+      return true;
+    }
+  }
   
-   bool result = handleKeyPressed(arg.key, myId);
-   if(!result)
-	return BaseApplication::keyPressed(arg);
-   else
-	return result;
+  return handleKeyPressed(arg.key, myId);
 }
 
 bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
@@ -62,7 +75,19 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
   Player *mPlayer = findPlayer(userId);
   if (!mPlayer) return false;
 
+  allowKeyRelease = true;
+
   switch(arg){
+  case OIS::KC_RETURN:
+    toggleChat();
+    chatEditBox->setText("");
+    if (chatFocus) {
+      mPlayer->mDirection = btVector3(0, 0, 0);
+      mPlayer->oDirection.x = 0;
+      mPlayer->oDirection.y = 0;
+      mPlayer->oDirection.z = 0;
+    }
+    return true;
   case OIS::KC_D:
     mPlayer->mDirection += btVector3(-40, 0, 0);
     mPlayer->oDirection.x += -40;
@@ -104,18 +129,28 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
 
   return false;
 }
- 
 bool HostApp::keyReleased(const OIS::KeyEvent &arg){
-  handleKeyReleased(arg.key, myId);
+  if (chatFocus) {
+    return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  }
+  return handleKeyReleased(arg.key, myId);
 }
 
 bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
   static bool vert = false;
 
+  if (!allowKeyRelease) {
+    allowKeyRelease = true;
+    return false;
+  }
+
   Player *mPlayer = findPlayer(userID);
   if (!mPlayer) return false;
-
+  
   switch(arg){
+  case OIS::KC_C:
+    chatBox->setVisible(!chatBox->isVisible());
+    return true;
   case OIS::KC_R:
     restart();
     return true;
@@ -243,11 +278,39 @@ bool HostApp::handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, i
   return false;
 }
 
+bool HostApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String cmsg = chatEditBox->getText();
+
+  std::stringstream ss;
+  ss << "Player " << myId << ": " << cmsg.c_str();
+  const char *msg = ss.str().c_str();
+
+  toggleChat();
+  chatEditBox->setText("");
+  addChatMessage(msg);
+
+  ServerPacket packet;
+  packet.type = SERVER_CLIENT_MESSAGE;
+  packet.clientId = myId;
+  strcpy(packet.msg, msg);
+  for (int i = 1; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      Send(players[i]->csd, (char*)&packet, sizeof(packet));
+    }
+  }
+
+  allowKeyRelease = false;  // Don't allow keyrelease without the keypress
+}
+
+void HostApp::createScene(void) {
+  BaseMultiplayerApp::createScene();
+  chatEditBox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+                              CEGUI::Event::Subscriber(&HostApp::handleTextSubmitted,this));
+}
+
 bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
 {
   BaseMultiplayerApp::frameStarted(evt);
-
-  //  if (!players[1]) addPlayer(1);
 
   bool result = BaseApplication::frameStarted(evt);
   static Ogre::Real time = mTimer->getMilliseconds();
@@ -355,6 +418,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     } else {
       for (int i = 0; i < MAX_PLAYERS; i++) {
         if (!players[i]) {
+
+          // Send ack with its new user ID
           ConnectAck ack;
           for (int j = 0; j < MAX_PLAYERS; j++) {
             if (players[j])
@@ -367,6 +432,15 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
           players[i]->csd = csd_t;
           ack.id = i;
           Networking::Send(csd_t, (char*)&ack, sizeof(ack));
+
+          // Send notifications to rest of players
+          ServerPacket packet;
+          packet.type = SERVER_CLIENT_CONNECT;
+          packet.clientId = i;
+          for (int j = 1; j < MAX_PLAYERS; j++) {
+            if (i != j && players[j])
+              Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
+          }
           break;
         }
       }
@@ -380,6 +454,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
         TCPsocket csd = players[i]->csd;
         if (SDLNet_SocketReady(csd)) {
           ClientPacket cmsg;
+          ServerPacket closemsg;
+
           if(SDLNet_TCP_Recv(csd, &cmsg, sizeof(cmsg)) > 0) {
             switch (cmsg.type) {
             case MOUSE_MOVED:
@@ -397,8 +473,39 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
               handleKeyReleased(cmsg.keyArg, cmsg.userID);
               break;
             case CLIENT_CLOSE:
+              mPhysics->removeObject(players[cmsg.userID]->getNode());
+              mPhysics->removeObject(players[cmsg.userID]->getRacquet());
+              mSceneMgr->destroyEntity(players[cmsg.userID]->getNode()->getEntity());
+              mSceneMgr->destroyEntity(players[cmsg.userID]->getRacquet()->getEntity());
+              players[cmsg.userID] = NULL;
+
+              closemsg.type = SERVER_CLIENT_CLOSED;
+              closemsg.clientId = cmsg.userID;
+              for (int i = 1; i < MAX_PLAYERS; i++) {
+                if (players[i]) {
+                  Send(players[i]->csd, (char*)&closemsg, sizeof(closemsg));
+                }
+              }
+
+              SDLNet_TCP_Close(csd);
+              break;
+            case CLIENT_CLEAR_DIR:
+              players[cmsg.userID]->mDirection = btVector3(0,0,0);
+              players[cmsg.userID]->oDirection.x = 0;
+              players[cmsg.userID]->oDirection.y = 0;
+              players[cmsg.userID]->oDirection.z = 0;
               break;
             case CLIENT_CHAT:
+              addChatMessage(cmsg.msg);
+
+              ServerPacket packet;
+              packet.type = SERVER_CLIENT_MESSAGE;
+              packet.clientId = myId;
+              memcpy(packet.msg, cmsg.msg, 512);
+              for (int j = 1; j < MAX_PLAYERS; j++) {
+                if (i != j && players[j])
+                  Send(players[j]->csd, (char*)&packet, sizeof(packet));
+              }
               break;
             }
           }

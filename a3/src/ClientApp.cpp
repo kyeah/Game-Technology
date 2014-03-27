@@ -29,6 +29,11 @@ ClientApp::ClientApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
   Sounds::init();
 }
 
+ClientApp::~ClientApp(void)
+{
+  Networking::Close();
+}
+
 //-------------------------------------------------------------------------------------
 void ClientApp::createCamera(void) {
   BaseMultiplayerApp::createCamera();
@@ -39,7 +44,23 @@ void ClientApp::createCamera(void) {
 bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   static bool vert = false;
 
+  if (chatFocus) {
+    if (arg.key == OIS::KC_ESCAPE) {
+      toggleChat();
+      chatEditBox->setText("");
+      return true;
+    } else {
+      return CEGUI::System::getSingleton().injectKeyUp(arg.key);
+    }
+  } else if (!allowKeyRelease) {
+    allowKeyRelease = true;
+    return BaseApplication::keyPressed(arg);
+  }
+
   switch(arg.key){
+  case OIS::KC_C:
+    chatBox->setVisible(!chatBox->isVisible());
+    return true;
   case OIS::KC_R:
   case OIS::KC_P:
   case OIS::KC_J:
@@ -82,14 +103,30 @@ bool ClientApp::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id
 bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
   static bool vert = false;
 
+  if (chatFocus) {
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.injectKeyDown(arg.key);
+    sys.injectChar(arg.text);
+    return true;
+  }
+
+  allowKeyRelease = true;
+
+  ClientPacket msg;
   switch(arg.key){
+  case OIS::KC_RETURN:
+    toggleChat();
+    chatEditBox->setText("");
+    msg.type = CLIENT_CLEAR_DIR;
+    msg.userID = myId;
+    Send(sd, (char*)&msg, sizeof(msg));
+    return true;
   case OIS::KC_D:
   case OIS::KC_S:
   case OIS::KC_A:
   case OIS::KC_W:
   case OIS::KC_LSHIFT:
   case OIS::KC_SPACE:
-    ClientPacket msg;
     msg.type = KEY_PRESSED;
     msg.keyArg = arg.key;
     msg.userID = myId;
@@ -99,6 +136,31 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
 
   return BaseApplication::keyPressed(arg);
 }
+
+bool ClientApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String cmsg = chatEditBox->getText();
+
+  std::stringstream ss;
+  ss << "Player " << myId << ": " << cmsg.c_str();
+  const char *msg = ss.str().c_str();
+
+  toggleChat();
+  chatEditBox->setText("");
+  addChatMessage(msg);
+
+  ClientPacket packet;
+  packet.type = CLIENT_CHAT;
+  packet.userID = myId;
+  strcpy(packet.msg, msg);
+  Send(sd, (char*)&packet, sizeof(packet));
+}
+
+void ClientApp::createScene(void) {
+  BaseMultiplayerApp::createScene();
+  chatEditBox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+                              CEGUI::Event::Subscriber(&ClientApp::handleTextSubmitted,this));
+}
+
 
 bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
   BaseMultiplayerApp::frameStarted(evt);
@@ -119,12 +181,32 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
     if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
       mBall->setPosition(msg.ballPos);
 
-      for (int i = 0; i < MAX_PLAYERS; i++) {
-        Player *mPlayer = players[i];
-        if (mPlayer) {
-          mPlayer->getNode()->setPosition(msg.players[i].nodePos);
-          mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+          Player *mPlayer = players[i];
+          if (mPlayer) {
+            mPlayer->getNode()->setPosition(msg.players[i].nodePos);
+            mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
+          }
         }
+        break;
+      case SERVER_CLIENT_CONNECT:
+        addPlayer(msg.clientId);
+        break;
+      case SERVER_CLIENT_CLOSED:
+        mPhysics->removeObject(players[msg.clientId]->getNode());
+        mPhysics->removeObject(players[msg.clientId]->getRacquet());
+        mSceneMgr->destroyEntity(players[msg.clientId]->getNode()->getEntity());
+        mSceneMgr->destroyEntity(players[msg.clientId]->getRacquet()->getEntity());
+        players[msg.clientId] = NULL;
+        break;
+      case SERVER_CLIENT_MESSAGE:
+        addChatMessage(msg.msg);
+        break;
+      case SERVER_CLOSED:
+        SDLNet_TCP_Close(sd);
+        sd = 0;
+        mShutDown = true;
+        break;
       }
     }
   }

@@ -15,6 +15,9 @@
   -----------------------------------------------------------------------------
 */
 #include <btBulletDynamicsCommon.h>
+#include <CEGUI/CEGUI.h>
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
+
 #include "BaseMultiplayerApp.h"
 #include "RacquetObject.h"
 #include "Sounds.h"
@@ -38,6 +41,8 @@ BaseMultiplayerApp::BaseMultiplayerApp(void) {
   MAX_SPEED = btScalar(8000);
   Sounds::init();
   connected = false;
+  chatFocus = false;
+  allowKeyRelease = true;
 }
 
 //-------------------------------------------------------------------------------------
@@ -111,6 +116,34 @@ Player* BaseMultiplayerApp::addPlayer(int userID) {
 
   players[userID] = mPlayer;
   return mPlayer;
+}
+
+void BaseMultiplayerApp::toggleChat() {
+ chatFocus = !chatFocus;
+  chatEditBox->setVisible(!chatEditBox->isVisible());
+  if (chatFocus)
+    chatEditBox->activate();
+  else
+    chatEditBox->deactivate();
+}
+
+void BaseMultiplayerApp::addChatMessage(const char* msg) {
+  CEGUI::ListboxTextItem* chatItem;
+  if(chatBox->getItemCount() == 7)
+    {
+      chatItem = static_cast<CEGUI::ListboxTextItem*>(chatBox->getListboxItemFromIndex(0));
+      chatItem->setAutoDeleted(false);
+      chatBox->removeItem(chatItem);
+      chatItem->setAutoDeleted(true);
+      chatItem->setText(msg);
+    }
+  else
+    {
+      // Create a new listbox item
+      chatItem = new CEGUI::ListboxTextItem(msg);
+    }
+  chatBox->addItem(chatItem);
+  chatBox->ensureItemIsVisible(chatBox->getItemCount());
 }
 
 void BaseMultiplayerApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
@@ -278,19 +311,38 @@ void BaseMultiplayerApp::createScene(void)
 
   createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
   createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
+
+  // Initialize CEGUI
+  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
+  CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
+
+  CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
+  CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
+  chat = wmgr.loadWindowLayout("Chatbox.layout");
+  chatBox = (CEGUI::Listbox*)wmgr.getWindow("ConsoleRoot/ChatBox");
+  chatEditBox = (CEGUI::Editbox*)wmgr.getWindow("ConsoleRoot/EditBox");
+
+  chat->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0),
+                                    CEGUI::UDim(0.65f, 0)));
+  sheet->addChildWindow(chat);
+  CEGUI::System::getSingleton().setGUISheet(sheet);
+  chatEditBox->setVisible(false);
 }
 
 bool BaseMultiplayerApp::frameStarted(const Ogre::FrameEvent &evt) {
-  for (int i = 0; i < 2; i++) {                                                                                  
-    Ogre::Vector3 v = discolights[i]->getDirection();                                                            
-    double x = v[0] + 0.02;                                                                                      
-    if (x > 1.0) x = x - 2.0;                                                                                    
-    discolights[i]->setDirection(x, v[1], v[2]);                                                                 
-  }                                                                                                              
-  for (int i = 2; i < 6; i++) {                                                                                  
-    Ogre::Vector3 v = discolights[i]->getDirection();                                                            
-    double z = v[2] + 0.02;                                                                                      
-    if (z > 1.0) z = z - 2.0;                                                                                    
-    discolights[i]->setDirection(v[0], v[1], z);                                                                 
+  for (int i = 0; i < 2; i++) {
+    Ogre::Vector3 v = discolights[i]->getDirection();
+    double x = v[0] + 0.02;
+    if (x > 1.0) x = x - 2.0;
+    discolights[i]->setDirection(x, v[1], v[2]);
+  }
+  for (int i = 2; i < 6; i++) {
+    Ogre::Vector3 v = discolights[i]->getDirection();
+    double z = v[2] + 0.02;
+    if (z > 1.0) z = z - 2.0;
+    discolights[i]->setDirection(v[0], v[1], z);
   }
 }

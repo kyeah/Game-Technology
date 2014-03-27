@@ -23,6 +23,9 @@ This source file is part of the
 #include "RacquetObject.h"
 #include "SDL_net.h"
 
+#include <CEGUI/CEGUI.h>                                                                                         
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
+
 extern int highscore;
 extern int lastscore;
 extern int score;
@@ -62,6 +65,9 @@ protected:
     Player* findPlayer(int userID);
     Player* addPlayer(int userID);
 
+    void toggleChat();
+    void addChatMessage(const char* msg);
+
     int worldWidth,worldLength,worldHeight;
 
 /* server side stuff */ 
@@ -82,9 +88,12 @@ protected:
 
     btVector3 ballVelocity;
     btScalar MAX_SPEED;
+
+    CEGUI::Window *chat;
+    CEGUI::Listbox *chatBox;
+    CEGUI::Editbox *chatEditBox;
+    bool chatFocus;
+    bool allowKeyRelease;
 };
 
 #endif
-
-
-
