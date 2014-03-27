@@ -70,8 +70,10 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   case OIS::KC_C:
     chatBox->setVisible(!chatBox->isVisible());
     return true;
-  case OIS::KC_R:
   case OIS::KC_P:
+    players[myId]->getNode()->getEntity()->setVisible(!players[myId]->getNode()->getEntity()->isVisible());
+    players[myId]->pongMode = !players[myId]->getNode()->getEntity()->isVisible();
+  case OIS::KC_R:
   case OIS::KC_J:
   case OIS::KC_D:
   case OIS::KC_S:
@@ -225,7 +227,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
 
     Player *me = players[myId];
     if (me) {
-      btVector3 pos = (me->pongMode ? me->getRacquet()->getPosition() : me->getNode()->getPosition());
+      btVector3 pos = me->getNode()->getPosition();
       mCamera->lookAt(pos[0], pos[1], pos[2]);
     }
   }
