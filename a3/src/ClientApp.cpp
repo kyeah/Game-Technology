@@ -173,6 +173,7 @@ void ClientApp::createScene(void) {
   BaseMultiplayerApp::createScene();
   chatEditBox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
                               CEGUI::Event::Subscriber(&ClientApp::handleTextSubmitted,this));
+
 }
 
 
@@ -203,6 +204,9 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
             mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
           }
         }
+        team1Score = msg.team1;
+        team2Score = msg.team2;
+
       
         break;
       case SERVER_CLIENT_CONNECT:
@@ -234,6 +238,8 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
       mCamera->lookAt(pos[0], pos[1], pos[2]);
     }
   }
+  mDetailsPanel->setParamValue(DETAILS_TEAM1, std::to_string(team1Score));
+  mDetailsPanel->setParamValue(DETAILS_TEAM2, std::to_string(team2Score));
 
   return true;
 }

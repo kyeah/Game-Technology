@@ -541,6 +541,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
   msg.type = SERVER_UPDATE;
   msg.ballPos = ballPos;
   msg.playSound = soundState;
+  msg.team1 = team1Score;
+  msg.team2 = team2Score;
 
   for (int i = 0; i < MAX_PLAYERS; i++) {
     Player *mPlayer = players[i];

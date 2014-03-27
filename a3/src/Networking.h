@@ -50,6 +50,8 @@ typedef struct {
   int clientId;
   char msg[512];
   int playSound;
+  int team1;
+  int team2;
   btVector3 ballPos;
   PlayerInfo players[4];
 } ServerPacket;
