@@ -30,13 +30,6 @@ static const int SERVER_UPDATE = 12;
 static const int SEND_TO_SERV = 10;
 static const int SEND_TO_CLIENT = 11;
 
-//int MAX_PLAYERS = 4;
-//static const int MAX_PLAYERS = 4;
-/*const IPaddress serv_ip, client_ip;
-const SDLNet_SocketSet client_socketset, server_socketset;
-const int client_ids[4];
-*/
-
 typedef struct {
   int type;
   int userID;
@@ -72,12 +65,13 @@ public:
 	static void Send(TCPsocket socket, char* msg, int len);
 	static void serverConnect();
 	static void Close();
-	static bool clientConnect(); 
+	static bool clientConnect(int *id); 
 
 	static TCPsocket server_socket, client_socket;
 	static IPaddress serv_ip, client_ip;
 	static SDLNet_SocketSet client_socketset, server_socketset;
 	static int client_ids[4];
+	static int soundState;
 
 };
 

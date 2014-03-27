@@ -17,8 +17,8 @@ bool right_mouse_button = false;
 int highscore = 0;
 int lastscore = 0;
 int score = 0;
-int team1score = 0;
-int team2score = 0;
+int team1Score = 0;
+int team2Score = 0;
 
 btVector3 racquetInitPos(0,700.0f,0);
 

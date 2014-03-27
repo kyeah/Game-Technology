@@ -23,8 +23,8 @@
 //-------------------------------------------------------------------------------------
 ClientApp::ClientApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
 {
-  //  myId = 1;
-  Networking::clientConnect();
+  myId = 1;
+  Networking::clientConnect(&myId);
   connected = true;
   Sounds::init();
 }
@@ -122,7 +122,7 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
     chatEditBox->setText("");
     msg.type = CLIENT_CLEAR_DIR;
     msg.userID = myId;
-    Send(sd, (char*)&msg, sizeof(msg));
+    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
     return true;
   case OIS::KC_D:
   case OIS::KC_S:
@@ -155,7 +155,7 @@ bool ClientApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
   packet.type = CLIENT_CHAT;
   packet.userID = myId;
   strcpy(packet.msg, msg);
-  Send(sd, (char*)&packet, sizeof(packet));
+  Networking::Send(Networking::client_socket, (char*)&packet, sizeof(packet));
 }
 
 void ClientApp::createScene(void) {
@@ -185,7 +185,6 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
       switch (msg.type) {
       case SERVER_UPDATE:
         mBall->setPosition(msg.ballPos);
-
         for (int i = 0; i < MAX_PLAYERS; i++) {
           Player *mPlayer = players[i];
           if (mPlayer) {
@@ -193,6 +192,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
             mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
           }
         }
+      
         break;
       case SERVER_CLIENT_CONNECT:
         addPlayer(msg.clientId);
@@ -213,6 +213,8 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         mShutDown = true;
         break;
       }
+      if(msg.playSound != Sounds::NO_SOUND)
+	Sounds::playSound(msg.playSound, 75);
     }
 
     Player *me = players[myId];
