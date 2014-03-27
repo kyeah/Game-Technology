@@ -22,8 +22,8 @@
 #include "RacquetObject.h"
 #include "Sounds.h"
 #include "SDL_net.h"
-#include "common.h"
 #include "Networking.h"
+#include "common.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <macUtils.h>
@@ -48,7 +48,7 @@ BaseMultiplayerApp::BaseMultiplayerApp(void) {
 //-------------------------------------------------------------------------------------
 BaseMultiplayerApp::~BaseMultiplayerApp(void)
 {
-  Close();
+  Networking::Close();
 }
 
 void BaseMultiplayerApp::createCamera(void) {
@@ -240,6 +240,13 @@ void BaseMultiplayerApp::createScene(void)
                                                 Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                 planes[5], w/6, w/6, 20, 20, true, 1, 5, 5, up[5]);
 
+//  Ogre::MeshManager::getSingleton().createPlane("2wall-p2", 
+//						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+//						planes[4], w/4, w/4, 20, 20, true, 1, 5, 5, up[4]);
+
+  //Ogre::MeshManager::getSingleton().createPlane("4wall-p2", 
+//						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+//						planes[4], w/6, w/6, 20, 20, true, 1, 5, 5, up[4]);
   // Lights
   Ogre::Light* lights[9];
   int z;

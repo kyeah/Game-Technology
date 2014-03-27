@@ -34,16 +34,18 @@ void Sounds::playSound(int sound_type, int volume){
   Mix_Music *sound = NULL;
   switch(sound_type){
   case 0:
+    return;
+  case 1:
     sound = Mix_LoadMUS("media/sounds/swoosh-sound.mp3");
     break;
-  case 1:
+  case 2:
     sound = Mix_LoadMUS("media/sounds/hit-sound.mp3");
     break;
-  case 2:
+  case 3:
     //doesn't play in the background.
     sound = Mix_LoadMUS("media/sounds/jazz.mp3");
     break;
-  case 3:
+  case 4:
     //doesn't play in the background.
     sound = Mix_LoadMUS("media/sounds/point.mp3");
     break;

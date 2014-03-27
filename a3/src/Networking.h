@@ -1,10 +1,16 @@
-#pragma once
-#include <OISEvents.h>
-#include <OISKeyboard.h>
-#include <OISMouse.h>
+#ifndef NETWORKING_H
+#define NETWORKING_H
 
+#include <btBulletDynamicsCommon.h>
+#include "RacquetObject.h"
+#include <iostream>
+#include <string>
 #include "SDL.h"
 #include <SDL_net.h>
+#include <OISEvents.h>
+#include <OISInputManager.h>
+#include <OISMouse.h>
+#include <OISKeyboard.h>
 
 static const int MOUSE_MOVED = 0;
 static const int MOUSE_PRESSED = 1;
@@ -20,6 +26,16 @@ static const int SERVER_CLIENT_CLOSED = 9;
 static const int SERVER_CLIENT_MESSAGE = 10;
 static const int SERVER_CLOSED = 11;
 static const int SERVER_UPDATE = 12;
+
+static const int SEND_TO_SERV = 10;
+static const int SEND_TO_CLIENT = 11;
+
+//int MAX_PLAYERS = 4;
+//static const int MAX_PLAYERS = 4;
+/*const IPaddress serv_ip, client_ip;
+const SDLNet_SocketSet client_socketset, server_socketset;
+const int client_ids[4];
+*/
 
 typedef struct {
   int type;
@@ -40,6 +56,7 @@ typedef struct {
   int type;
   int clientId;
   char msg[512];
+  int playSound;
   btVector3 ballPos;
   PlayerInfo players[4];
 } ServerPacket;
@@ -49,23 +66,20 @@ typedef struct {
   int id;
 } ConnectAck;
 
-static void initSDLNet() {
-  /* Initialize SDL */
-  /*  if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-    fprintf(stderr, "Couldn't initialize SDL: %s\n",SDL_GetError());
-    exit(1);
-  }/
-  
-  /* Initialize the network */
-  if ( SDLNet_Init() < 0 ) {
-    fprintf(stderr, "Couldn't initialize net: %s\n", SDLNet_GetError());
-    SDL_Quit();
-    exit(1);
-  }
-}
+class Networking{
+public:
+	static void initSDLNet();
+	static void Send(TCPsocket socket, char* msg, int len);
+	static void serverConnect();
+	static void Close();
+	static bool clientConnect(); 
 
-static void Send(TCPsocket socket, char *msg, int len) {
-  if (SDLNet_TCP_Send(socket, (void*)msg, len) < len) {
-    printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-  }
-}
+	static TCPsocket server_socket, client_socket;
+	static IPaddress serv_ip, client_ip;
+	static SDLNet_SocketSet client_socketset, server_socketset;
+	static int client_ids[4];
+
+};
+
+
+#endif

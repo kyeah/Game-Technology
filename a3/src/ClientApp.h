@@ -22,7 +22,7 @@ This source file is part of the
 #include "BaseMultiplayerApp.h"
 #include "SDL_net.h"
 #include "RacquetObject.h"
-#include "Networking.h"
+//#include "Networking.h"
 
 class ClientApp : public BaseMultiplayerApp
 {
@@ -33,9 +33,9 @@ public:
 
 protected:
     void createCamera(void);
-    void Connect();
+//    void Connect();
 
-    void Close();
+//    void Close();
 
     bool keyPressed( const OIS::KeyEvent &arg );
     bool keyReleased(const OIS::KeyEvent &arg);
