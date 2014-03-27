@@ -67,20 +67,23 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   }
 
   switch(arg.key){
+  case OIS::KC_M:
+    Sounds::enabled = !Sounds::enabled;
+    return true;
   case OIS::KC_C:
     chatBox->setVisible(!chatBox->isVisible());
     return true;
   case OIS::KC_P:
     players[myId]->getNode()->getEntity()->setVisible(!players[myId]->getNode()->getEntity()->isVisible());
     players[myId]->pongMode = !players[myId]->getNode()->getEntity()->isVisible();
-  case OIS::KC_R:
   case OIS::KC_J:
   case OIS::KC_D:
   case OIS::KC_S:
   case OIS::KC_A:
+  case OIS::KC_R:
+  case OIS::KC_G:
   case OIS::KC_W:
   case OIS::KC_LSHIFT:
-  case OIS::KC_G:
     ClientPacket msg;
     msg.type = KEY_RELEASED;
     msg.keyArg = arg.key;
@@ -216,7 +219,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         addChatMessage(msg.msg);
         break;
       case SERVER_CLOSED:
-        SDLNet_TCP_Close(sd);
+        //        SDLNet_TCP_Close(sd);
         sd = 0;
         mShutDown = true;
         break;
