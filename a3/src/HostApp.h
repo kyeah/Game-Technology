@@ -45,12 +45,14 @@ protected:
     bool handleMouseMoved( OIS::MouseState arg, int userID );
     bool handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, int userID );
 
+    int soundState; 
+    bool connected;
 /* server side stuff */ 
-    void Connect();
-    void Close();
+//    void Connect();
+//    void Close();
 
-    TCPsocket sd, csd; 
-    IPaddress ip, *remoteIP;
+//    TCPsocket sd, csd; 
+//    IPaddress ip, *remoteIP;
 /* end */ 
 };
 

@@ -34,8 +34,11 @@
 HostApp::HostApp(void) : BaseMultiplayerApp::BaseMultiplayerApp()
 {
   myId = 0;
-  Connect();
+  Networking::serverConnect();
+  connected = true;
+  soundState = Sounds::NO_SOUND;
 }
+
 
 void HostApp::createCamera(void)
 {
@@ -45,7 +48,12 @@ void HostApp::createCamera(void)
 }
 
 bool HostApp::keyPressed( const OIS::KeyEvent &arg ) {
-  return handleKeyPressed(arg.key, myId);
+  
+   bool result = handleKeyPressed(arg.key, myId);
+   if(!result)
+	return BaseApplication::keyPressed(arg);
+   else
+	return result;
 }
 
 bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
@@ -89,35 +97,14 @@ bool HostApp::handleKeyPressed( OIS::KeyCode arg, int userId ) {
     if(mPlayer->swing == 0 && mPlayer->unswing == 0) {
       mPlayer->swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
+      soundState = Sounds::RACQUET_SWOOSH;
     }
     return true;
   }
 
   return false;
 }
-
-void HostApp::Connect(){
-  SDLNet_Init();
-  if(SDLNet_ResolveHost(&ip, NULL, 65501) == -1) {
-    printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-    exit(0);
-  }
-  sd = SDLNet_TCP_Open(&ip);
-  if(!sd){
-    printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-    exit(0);
-  }
-
-  socketset = SDLNet_AllocSocketSet(3);
-}
-
-void HostApp::Close(){
-  SDLNet_TCP_Close(csd);
-  SDLNet_TCP_Close(sd);
-  SDLNet_Quit();
-  connected = false;
-}
-
+ 
 bool HostApp::keyReleased(const OIS::KeyEvent &arg){
   handleKeyReleased(arg.key, myId);
 }
@@ -244,6 +231,7 @@ bool HostApp::handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, i
     if(id == OIS::MB_Left || id == OIS::MB_Right) {
       mPlayer->swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
+      soundState = Sounds::RACQUET_SWOOSH;
 
       Ogre::Vector3 p = mPlayer->getRacquet()->getNode()->getPosition();
       mPlayer->axis = new btVector3(p[1], -p[0], 0);
@@ -354,15 +342,15 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     mCamera->lookAt(pos[0], pos[1], pos[2]);
   }
 
-  // Handle New Connections
-  TCPsocket csd_t = SDLNet_TCP_Accept(sd);
+ // Handle New Connections
+  TCPsocket csd_t = SDLNet_TCP_Accept(Networking::server_socket);
   if(csd_t){
     remoteIP = SDLNet_TCP_GetPeerAddress(csd_t);
     if(remoteIP){
       printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
     }
 
-    if (SDLNet_TCP_AddSocket(socketset, csd_t) == -1) {
+    if (SDLNet_TCP_AddSocket(Networking::server_socketset, csd_t) == -1) {
       printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());
     } else {
       for (int i = 0; i < MAX_PLAYERS; i++) {
@@ -378,7 +366,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
           addPlayer(i);
           players[i]->csd = csd_t;
           ack.id = i;
-          Send(csd_t, (char*)&ack, sizeof(ack));
+          Networking::Send(csd_t, (char*)&ack, sizeof(ack));
           break;
         }
       }
@@ -386,7 +374,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
   }
 
   // RECEIVE INPUTS
-  while (SDLNet_CheckSockets(socketset, 1) > 0) {
+  while (SDLNet_CheckSockets(Networking::server_socketset, 1) > 0) {
     for (int i = 1; i < MAX_PLAYERS; i++) {
       if (players[i]) {
         TCPsocket csd = players[i]->csd;
@@ -424,6 +412,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
   btVector3 ballPos = mBall->getPosition();
   msg.type = SERVER_UPDATE;
   msg.ballPos = ballPos;
+  msg.playSound = soundState;
 
   for (int i = 0; i < MAX_PLAYERS; i++) {
     Player *mPlayer = players[i];
@@ -437,9 +426,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
 
   for (int i = 1; i < MAX_PLAYERS; i++) {
     if (players[i]) {
-      Send(players[i]->csd, (char*)&msg, sizeof(msg));
+      Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
-
   return result;
 }
