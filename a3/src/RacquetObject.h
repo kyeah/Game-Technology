@@ -11,7 +11,10 @@ class Ball : public GameObject {
 
   static void *changeWall(void *entity);
   void update(float elapsedTime);
+  void setMultiplayer(bool yesOrNo);
   bool bouncedOnce;
+  bool isMultiplayer;
+  int lastHit;
 };
 
 class Racquet : public GameObject {

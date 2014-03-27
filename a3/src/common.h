@@ -22,6 +22,8 @@ extern bool right_mouse_button;
 extern int highscore;
 extern int lastscore;
 extern int score;
+extern int team1Score;
+extern int team2Score;
 
 extern btVector3 racquetInitPos; 
 extern btVector3 playerInitPos;  
