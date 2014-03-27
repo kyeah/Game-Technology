@@ -110,6 +110,9 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   }
 
   switch(arg.key){
+  case OIS::KC_C:
+    chatBox->setVisible(!chatBox->isVisible());
+    return true;
   case OIS::KC_R:
   case OIS::KC_P:
   case OIS::KC_J:

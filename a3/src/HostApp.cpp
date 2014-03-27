@@ -182,6 +182,9 @@ bool HostApp::handleKeyReleased(OIS::KeyCode arg, int userID) {
   if (!mPlayer) return false;
   
   switch(arg){
+  case OIS::KC_C:
+    chatBox->setVisible(!chatBox->isVisible());
+    return true;
   case OIS::KC_R:
     restart();
     return true;
