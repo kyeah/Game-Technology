@@ -335,6 +335,9 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     Player *mPlayer = players[i];
     if (!mPlayer) continue;
 
+    btVector3 playerDir = (i % 2 == 0 ? btVector3(1,1,1) : btVector3(-1,1,-1));
+    btScalar playerScalar = (i % 2 == 0 ? btScalar(1) : btScalar(-1));
+
     //store original vectors
     int oldZ = mPlayer->mDirection.getZ();
     int oldX = mPlayer->mDirection.getX();
@@ -360,8 +363,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
       mPlayer->mDirection.setY(10);
     }
 
-    mPlayer->getNode()->getBody()->translate(mPlayer->mDirection*mPlayer->movementSpeed);
-    mPlayer->getNode()->translate(mPlayer->mDirection*mPlayer->movementSpeed);
+    mPlayer->getNode()->getBody()->translate(mPlayer->mDirection*mPlayer->movementSpeed*playerDir);
+    mPlayer->getNode()->translate(mPlayer->mDirection*mPlayer->movementSpeed*playerDir);
 
     //reset the vector after translation
     mPlayer->mDirection.setZ(oldZ);
@@ -372,18 +375,18 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     // Swings
     if(mPlayer->unswing > 0){
       if (mPlayer->pongMode || mPlayer->right_mouse_button) {
-        mPlayer->getNode()->translate(btVector3(0, 0, -25));
+        mPlayer->getNode()->translate(btVector3(0, 0, -25)*playerDir);
       } else if (mPlayer->axis) {
-        mPlayer->getNode()->rotate(btQuaternion(*mPlayer->axis, btScalar(-0.1)));
+        mPlayer->getNode()->rotate(btQuaternion(*mPlayer->axis, btScalar(-0.1)*playerScalar));
       }
       mPlayer->unswing--;
     }
 
     if(mPlayer->swing > 0){
       if (mPlayer->pongMode || mPlayer->right_mouse_button) {
-        mPlayer->getNode()->translate(btVector3(0, 0, 50));
+        mPlayer->getNode()->translate(btVector3(0, 0, 50)*playerDir);
       } else if (mPlayer->axis) {
-        mPlayer->getNode()->rotate(btQuaternion(*mPlayer->axis, btScalar(0.2)));
+        mPlayer->getNode()->rotate(btQuaternion(*mPlayer->axis, btScalar(0.2)*playerScalar));
       }
       mPlayer->swing--;
       if(mPlayer->swing == 0)

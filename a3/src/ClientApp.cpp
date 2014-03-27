@@ -37,7 +37,10 @@ ClientApp::~ClientApp(void)
 //-------------------------------------------------------------------------------------
 void ClientApp::createCamera(void) {
   BaseMultiplayerApp::createCamera();
-  mCamera->setPosition(0,0,7000);
+  if (myId % 2 == 0)
+    mCamera->setPosition(0,0,-7000);
+  else
+    mCamera->setPosition(0,0,7000);
   mCamera->lookAt(0,0,500);
 }
 
@@ -179,7 +182,9 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
   while (SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)) {
     ServerPacket msg;
     if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
-      mBall->setPosition(msg.ballPos);
+      switch (msg.type) {
+      case SERVER_UPDATE:
+        mBall->setPosition(msg.ballPos);
 
         for (int i = 0; i < MAX_PLAYERS; i++) {
           Player *mPlayer = players[i];
@@ -208,6 +213,12 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         mShutDown = true;
         break;
       }
+    }
+
+    Player *me = players[myId];
+    if (me) {
+      btVector3 pos = (mPlayer->pongMode ? mPlayer->getRacquet()->getPosition() : mPlayer->getNode()->getPosition());
+      mCamera->lookAt(pos[0], pos[1], pos[2]);
     }
   }
 
