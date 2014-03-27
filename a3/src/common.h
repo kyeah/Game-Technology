@@ -9,6 +9,9 @@ extern const int DETAILS_HIGHSCORE;
 extern const int DETAILS_LASTSCORE;
 extern const int DETAILS_SCORE;
 extern const int DETAILS_GRAVITY;
+
+extern const int DETAILS_TEAM1;
+extern const int DETAILS_TEAM2;
                                                                                                        
 extern const int SWING_DELAY;
 extern const int UNSWING_DELAY;

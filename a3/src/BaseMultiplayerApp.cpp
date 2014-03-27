@@ -66,11 +66,16 @@ void BaseMultiplayerApp::createFrameListener(void) {
   items.push_back("Last Score");
   items.push_back("Current Score");
   items.push_back("Gravity");
+  items.push_back("Team 1");
+  items.push_back("Team 2");
+  
 
   mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
   mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, "0");
   mDetailsPanel->setParamValue(DETAILS_LASTSCORE, "0");
   mDetailsPanel->setParamValue(DETAILS_SCORE, "0");
+  mDetailsPanel->setParamValue(DETAILS_TEAM1, std::to_string(team1Score));
+  mDetailsPanel->setParamValue(DETAILS_TEAM2, std::to_string(team2Score));
   mDetailsPanel->setParamValue(DETAILS_GRAVITY, "Downwards");
 }
 
@@ -146,7 +151,7 @@ void BaseMultiplayerApp::addChatMessage(const char* msg) {
   chatBox->ensureItemIsVisible(chatBox->getItemCount());
 }
 
-void BaseMultiplayerApp::createNewScoringPlane(int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
+void BaseMultiplayerApp::createNewScoringPlane(bool nearWall, int points, btVector3 pos, btVector3 speed, btVector3 linearFactor, btVector3 angularFactor) {
   static int wallID;
   std::stringstream ss;
   ss << points << "wall";
@@ -166,7 +171,14 @@ void BaseMultiplayerApp::createNewScoringPlane(int points, btVector3 pos, btVect
   extra->cycleColor();
   extra->getBody()->setLinearFactor(linearFactor);
   extra->getBody()->setAngularFactor(angularFactor);
+  if(nearWall){
+    btVector3 y = btVector3(0, 1, 0);
+    btScalar rot = btScalar(90);
+    extra->rotate(btQuaternion(y, rot));
+  }
+  
 }
+
 
 //-------------------------------------------------------------------------------------
 void BaseMultiplayerApp::createScene(void)
@@ -229,7 +241,7 @@ void BaseMultiplayerApp::createScene(void)
       p->getEntity()->setMaterialName("Court/Wall");
     }
 
-    if (pNames[i] == "farWall") p->points = 1;
+    if (pNames[i] == "farWall" || pNames[i] == "nearWall") p->points = 1;
   }
 
   Ogre::MeshManager::getSingleton().createPlane("2wall",
@@ -310,8 +322,10 @@ void BaseMultiplayerApp::createScene(void)
 
   if (mPlayer->pongMode) mPlayer->getNode()->getEntity()->setVisible(false);
 
-  createNewScoringPlane(2, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5));
-  createNewScoringPlane(4, btVector3( 0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
+  createNewScoringPlane(false, 2, btVector3(0, rand() % 3500 - 2000, 5000/2 - 5));
+  createNewScoringPlane(false, 4, btVector3(0, rand() % 3500 - 2000, 5000/2 - 5), btVector3(30,0,0));
+  createNewScoringPlane(true, 2, btVector3(0 , rand() % 3500 - 2000, -(5000/2) + 5));
+  createNewScoringPlane(true, 4, btVector3(0, rand() % 3500 - 2000, -(5000/2) + 5), btVector3(30, 0, 0));
 
   // Initialize CEGUI
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();

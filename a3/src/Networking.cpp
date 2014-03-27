@@ -12,7 +12,7 @@ extern SDLNet_SocketSet Networking::client_socketset;
 extern SDLNet_SocketSet Networking::server_socketset;
 extern int Networking::client_ids[4];
 extern int Networking::soundState;
-int PORT = 65503;
+int PORT = 65505;
 
 void Networking::initSDLNet() {
   if ( SDLNet_Init() < 0 ) {

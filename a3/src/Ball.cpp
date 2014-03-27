@@ -89,7 +89,7 @@ void Ball::update(float elapsedTime) {
           if (p) {
             btVector3 pos = this->getPosition();
             int whichTeam = 2;
-            if (pos.getZ() >= 600)
+            if (pos.getZ() >= 0)
               whichTeam = 1;
             ScoringPlane *sp = dynamic_cast<ScoringPlane*>(p);
 

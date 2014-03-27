@@ -5,6 +5,9 @@ const int DETAILS_LASTSCORE = 2;
 const int DETAILS_SCORE = 3;
 const int DETAILS_GRAVITY = 4;
 
+const int DETAILS_TEAM1 = 5;
+const int DETAILS_TEAM2 = 6;
+
 const int SWING_DELAY = 5;
 const int UNSWING_DELAY = 10;
 

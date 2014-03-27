@@ -394,6 +394,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
   mDetailsPanel->setParamValue(DETAILS_LASTSCORE, std::to_string(lastscore));
 
   mDetailsPanel->setParamValue(DETAILS_SCORE, std::to_string(score));
+  mDetailsPanel->setParamValue(DETAILS_TEAM1, std::to_string(team1Score));
+  mDetailsPanel->setParamValue(DETAILS_TEAM2, std::to_string(team2Score));
   if (score > highscore) {
     highscore = score;
     mDetailsPanel->setParamValue(DETAILS_HIGHSCORE, std::to_string(highscore));
