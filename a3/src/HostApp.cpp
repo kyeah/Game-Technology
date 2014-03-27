@@ -336,7 +336,8 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     if (!mPlayer) continue;
 
     btVector3 playerDir = (i % 2 == 0 ? btVector3(1,1,1) : btVector3(-1,1,-1));
-    btScalar playerScalar = (i % 2 == 0 ? btScalar(1) : btScalar(-1));
+    int scalar = (i % 2 == 0 ? 1 : -1);
+    btScalar playerScalar = btScalar(scalar);
 
     //store original vectors
     int oldZ = mPlayer->mDirection.getZ();
@@ -344,10 +345,11 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
     int oldY = mPlayer->mDirection.getY();
 
     //boundaries
-    if(mPlayer->getRacquet()->getPosition().getZ() >= 600){
-      mPlayer->mDirection.setZ(-10);
+    
+    if(mPlayer->getRacquet()->getPosition().getZ()*scalar >= 0){
+      mPlayer->mDirection.setZ(-10*scalar);
     }
-    if(mPlayer->getRacquet()->getPosition().getZ() <= -2400){
+    if(mPlayer->getRacquet()->getPosition().getZ()*scalar <= -2400){
       mPlayer->mDirection.setZ(10);
     }
     if(mPlayer->getRacquet()->getPosition().getX() >= 2000){
