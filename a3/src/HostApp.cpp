@@ -280,7 +280,7 @@ bool HostApp::handleMouseReleased( OIS::MouseState arg, OIS::MouseButtonID id, i
     if(id == OIS::MB_Left || id == OIS::MB_Right) {
       mPlayer->swing = SWING_DELAY;
       Sounds::playSound(Sounds::RACQUET_SWOOSH, 100);
-      soundState = Sounds::RACQUET_SWOOSH;
+      Networking::soundState = Sounds::RACQUET_SWOOSH;
 
       Ogre::Vector3 p = mPlayer->getRacquet()->getNode()->getPosition();
       mPlayer->axis = new btVector3(p[1], -p[0], 0);
@@ -540,7 +540,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
   btVector3 ballPos = mBall->getPosition();
   msg.type = SERVER_UPDATE;
   msg.ballPos = ballPos;
-  msg.playSound = soundState;
+  msg.playSound = Networking::soundState;
   msg.team1 = team1Score;
   msg.team2 = team2Score;
 
@@ -559,5 +559,7 @@ bool HostApp::frameStarted(const Ogre::FrameEvent &evt)
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
+
+  Networking::soundState = Sounds::NO_SOUND;
   return result;
 }
