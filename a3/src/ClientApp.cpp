@@ -90,9 +90,11 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
     msg.userID = myId;
     Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
     return true;
+  case OIS::KC_ESCAPE:
+    return BaseApplication::keyPressed(arg);
   }
 
-  return BaseApplication::keyPressed(arg);
+  return false;
 }
 
 bool ClientApp::mouseMoved( const OIS::MouseEvent& arg ) {
@@ -146,9 +148,11 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
     msg.userID = myId;
     Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
     return true;
+  case OIS::KC_ESCAPE:
+    return BaseApplication::keyPressed(arg);    
   }
 
-  return BaseApplication::keyPressed(arg);
+  return false;
 }
 
 bool ClientApp::handleTextSubmitted( const CEGUI::EventArgs &e ) {
