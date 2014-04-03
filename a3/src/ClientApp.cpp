@@ -84,12 +84,14 @@ bool ClientApp::keyReleased(const OIS::KeyEvent &arg){
   case OIS::KC_G:
   case OIS::KC_W:
   case OIS::KC_LSHIFT:
-    ClientPacket msg;
-    msg.type = KEY_RELEASED;
-    msg.keyArg = arg.key;
-    msg.userID = myId;
-    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
-    return true;
+    {
+      ClientPacket msg;
+      msg.type = KEY_RELEASED;
+      msg.keyArg = arg.key;
+      msg.userID = myId;
+      Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+      return true;
+    }
   case OIS::KC_ESCAPE:
     return BaseApplication::keyPressed(arg);
   }
@@ -149,7 +151,7 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
     Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
     return true;
   case OIS::KC_ESCAPE:
-    return BaseApplication::keyPressed(arg);    
+    return BaseApplication::keyPressed(arg);
   }
 
   return false;
@@ -211,7 +213,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         team1Score = msg.team1;
         team2Score = msg.team2;
 
-      
+
         break;
       case SERVER_CLIENT_CONNECT:
         addPlayer(msg.clientId);
@@ -233,7 +235,7 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         break;
       }
       if(msg.playSound != Sounds::NO_SOUND)
-	Sounds::playSound(msg.playSound, 75);
+        Sounds::playSound(msg.playSound, 75);
     }
 
     Player *me = players[myId];
