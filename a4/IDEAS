@@ -1,0 +1,9 @@
+Super Monkey Ball
+=====================
+Level layout scripts 
+Dynamic Levels (moving parts described by positions and interpolation times)
+Randomized Levels (randomized paths between two points, random holes, random path widths)
+Controller Support (GC, Wiimote)
+Multiplayer? (Plane tilt controls = players have different gravities/orientations)
+meshes in ball as characters
+curved planes
