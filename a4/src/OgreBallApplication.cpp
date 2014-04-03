@@ -35,19 +35,16 @@ OgreBallApplication::~OgreBallApplication(void)
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::createScene(void)
 {
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
-	Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "sphere.mesh");
-	Ogre::Entity* Ball = mSceneMgr->createEntity("Ball", "sphere.mesh");
-	
-   	Ogre::SceneNode* headNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("HeadNode");
-	headNode->attachObject(ogreHead);
-	headNode->scale(.1,.1,.1);
-	
-	Ogre::SceneNode* ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("BallNode");
-	ballNode->attachObject(Ball);
-	ballNode->scale(.1,.1,.1);
+  mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
+  new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics);
 
+  Ogre::Light* light = mSceneMgr->createLight("MainLight");
+  light->setPosition(20.0f, 80.0f, 50.0f);
+
+  LevelLoader::loadLevels("media/OgreBall/scripts");
+  new Plane(mSceneMgr, "upPlane", "upPlane", "upPlane", 0, mPhysics, btVector3(0,0,0));
 }
+
 void OgreBallApplication::createCamera(void) {
   BaseApplication::createCamera();
   mCamera->setPosition(0,0,500);
@@ -66,19 +63,6 @@ void OgreBallApplication::createFrameListener(void) {
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
-}
-
-//-------------------------------------------------------------------------------------
-void OgreBallApplication::createScene(void)
-{
-  mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
-  new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics);
-
-  Ogre::Light* light = mSceneMgr->createLight("MainLight");
-  light->setPosition(20.0f, 80.0f, 50.0f);
-
-  LevelLoader::loadLevels("media/OgreBall/scripts");
-  new Plane(mSceneMgr, "upPlane", "upPlane", "upPlane", 0, mPhysics, btVector3(0,0,0));
 }
 
 //-------------------------------------------------------------------------------------
