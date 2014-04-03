@@ -23,6 +23,7 @@
 #include "BaseApplication.h"
 #include "GameObjectDescription.h"
 #include "Physics.h"
+#include "../libs/ConfigLoader.hpp"
 
 class OgreBallApplication : public BaseApplication
 {
@@ -50,6 +51,9 @@ class OgreBallApplication : public BaseApplication
   CEGUI::OgreRenderer* mRenderer;
   CEGUI::WindowManager* Wmgr;
   CEGUI::Window* menu;
+  
+  sh::ConfigLoader *mScriptLoader;
+
 };
 
 #endif // #ifndef __OgreBallApplication_h_

@@ -47,6 +47,9 @@ void OgreBallApplication::createFrameListener(void) {
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();                                                           
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");                                             
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  
+  mScriptLoader = new sh::ConfigLoader(".ogreball");
+  sh::ConfigLoader::loadAllFiles(mScriptLoader, "media/OgreBall");
 }
 
 //-------------------------------------------------------------------------------------
