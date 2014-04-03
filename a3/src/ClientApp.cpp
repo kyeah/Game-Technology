@@ -136,11 +136,8 @@ bool ClientApp::keyPressed( const OIS::KeyEvent &arg ) {
     msg.userID = myId;
     Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
     return true;
-<<<<<<< HEAD
-=======
   case OIS::KC_ESCAPE:
     return BaseApplication::keyPressed(arg);
->>>>>>> 49b017c55cfc9e14a88eb90d554ea9b5a9bdfd4d
   }
 
   return BaseApplication::keyPressed(arg);
@@ -199,14 +196,9 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
             mPlayer->getNode()->setOrientation(msg.players[i].nodeOrientation);
           }
         }
-<<<<<<< HEAD
-      
-=======
         team1Score = msg.team1;
         team2Score = msg.team2;
 
-
->>>>>>> 49b017c55cfc9e14a88eb90d554ea9b5a9bdfd4d
         break;
       case SERVER_CLIENT_CONNECT:
         addPlayer(msg.clientId);
@@ -227,8 +219,6 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
         mShutDown = true;
         break;
       }
-<<<<<<< HEAD
-=======
       if(msg.playSound != Sounds::NO_SOUND)
         Sounds::playSound(msg.playSound, 75);
     }
@@ -237,7 +227,6 @@ bool ClientApp::frameStarted(const Ogre::FrameEvent &evt) {
     if (me) {
       btVector3 pos = me->getNode()->getPosition();
       mCamera->lookAt(pos[0], pos[1], pos[2]);
->>>>>>> 49b017c55cfc9e14a88eb90d554ea9b5a9bdfd4d
     }
   }
 
