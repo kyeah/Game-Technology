@@ -19,5 +19,13 @@ PKG_CHECK_MODULES(bullet, [bullet >= 2.79])
 AC_SUBST(BULLET_CFLAGS)
 AC_SUBST(BULLET_LIBS)
 
+PKG_CHECK_MODULES(CEGUI, [CEGUI >= 0.7])                                                                         
+AC_SUBST(CEGUI_CFLAGS)                                                                                           
+AC_SUBST(CEGUI_LIBS)                                                                                             
+                                                                                                                 
+PKG_CHECK_MODULES(CEGUI_OGRE, [CEGUI-OGRE >= 0.7])                                                               
+AC_SUBST(CEGUI_OGRE_CFLAGS)                                                                                      
+AC_SUBST(CEGUI_OGRE_LIBS) 
+
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT
