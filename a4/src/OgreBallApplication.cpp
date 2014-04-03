@@ -1,20 +1,24 @@
 /*
------------------------------------------------------------------------------
-Filename:    OgreBallApplication.cpp
------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  Filename:    OgreBallApplication.cpp
+  -----------------------------------------------------------------------------
 
-This source file is part of the
-   ___                 __    __ _ _    _ 
+  This source file is part of the
+  ___                 __    __ _ _    _
   /___\__ _ _ __ ___  / / /\ \ (_) | _(_)
- //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
-/ \_// (_| | | |  __/  \  /\  /| |   <| |
-\___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
-      |___/                              
-      Tutorial Framework
-      http://www.ogre3d.org/tikiwiki/
------------------------------------------------------------------------------
+  //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
+  / \_// (_| | | |  __/  \  /\  /| |   <| |
+  \___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
+  |___/
+  Tutorial Framework
+  http://www.ogre3d.org/tikiwiki/
+  -----------------------------------------------------------------------------
 */
 #include "OgreBallApplication.h"
+#include "LevelLoader.h"
+
+using namespace std;
+using namespace sh;
 
 OgreBallApplication::OgreBallApplication(void)
 {
@@ -36,30 +40,30 @@ void OgreBallApplication::createCamera(void) {
 
 void OgreBallApplication::createFrameListener(void) {
   BaseApplication::createFrameListener();
-  
+
   // Initialize CEGUI
-  CEGUI::Imageset::setDefaultResourceGroup("Imagesets");                                                         
-  CEGUI::Font::setDefaultResourceGroup("Fonts");                                                                 
-  CEGUI::Scheme::setDefaultResourceGroup("Schemes");                                                             
-  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");                                                
-  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");                                                      
-                                                                                                                 
-  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();                                                           
-  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");                                             
+  CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
+  CEGUI::Font::setDefaultResourceGroup("Fonts");
+  CEGUI::Scheme::setDefaultResourceGroup("Schemes");
+  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
+  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+
+  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
-  
-  mScriptLoader = new sh::ConfigLoader(".ogreball");
-  sh::ConfigLoader::loadAllFiles(mScriptLoader, "media/OgreBall");
 }
 
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::createScene(void)
 {
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
-        new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics);
+  mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
+  new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics);
 
-	Ogre::Light* light = mSceneMgr->createLight("MainLight");
-	light->setPosition(20.0f, 80.0f, 50.0f);
+  Ogre::Light* light = mSceneMgr->createLight("MainLight");
+  light->setPosition(20.0f, 80.0f, 50.0f);
+
+  LevelLoader::loadLevels("media/OgreBall/scripts");
+  new Plane(mSceneMgr, "upPlane", "upPlane", "upPlane", 0, mPhysics, btVector3(0,0,0));
 }
 
 //-------------------------------------------------------------------------------------
@@ -94,27 +98,27 @@ extern "C" {
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+  INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
     int main(int argc, char *argv[])
 #endif
-    {
-        // Create application object
-        OgreBallApplication app;
+  {
+    // Create application object
+    OgreBallApplication app;
 
-        try {
-            app.go();
-        } catch( Ogre::Exception& e ) {
+    try {
+      app.go();
+    } catch( Ogre::Exception& e ) {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+      MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 #else
-            std::cerr << "An exception has occured: " <<
-                e.getFullDescription().c_str() << std::endl;
+      std::cerr << "An exception has occured: " <<
+        e.getFullDescription().c_str() << std::endl;
 #endif
-        }
-
-        return 0;
     }
+
+    return 0;
+  }
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,7 @@
+planemesh upPlane {
+     dir 0 1 0 0
+     size 1000 1000
+     up 0 0 1
+     segments 20 20
+     texRepeat 1 5
+}

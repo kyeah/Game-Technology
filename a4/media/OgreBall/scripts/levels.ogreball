@@ -1,0 +1,7 @@
+level baseLevel {
+      plane {            
+            meshname upPlane
+            pos 0 0 0
+            rot 0 0 0 0 
+      }
+}

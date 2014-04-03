@@ -52,8 +52,6 @@ class OgreBallApplication : public BaseApplication
   CEGUI::WindowManager* Wmgr;
   CEGUI::Window* menu;
   
-  sh::ConfigLoader *mScriptLoader;
-
 };
 
 #endif // #ifndef __OgreBallApplication_h_

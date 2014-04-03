@@ -1,5 +1,7 @@
 #ifndef SH_CONFIG_LOADER_H__
 #define SH_CONFIG_LOADER_H__
+
+#include <btBulletDynamicsCommon.h>
  
 #include <map>
 #include <vector>
@@ -96,7 +98,73 @@ namespace sh
       assert(index < m_values.size());
       return m_values[index];
     }
+
+    inline float getValueF(unsigned int index = 0)
+    {
+      assert(index < m_values.size());
+      return (float)::atof(m_values[index].c_str());
+    }
  
+    inline double getValueD(unsigned int index = 0)
+    {
+      assert(index < m_values.size());
+      return ::atof(m_values[index].c_str());
+    }
+ 
+    inline int getValueI(unsigned int index = 0)
+    {
+      assert(index < m_values.size());
+      return ::atoi(m_values[index].c_str());
+    }
+ 
+    inline btVector3 getValueV3(unsigned int index = 0)
+    {
+      assert(index < m_values.size() - 3);
+      return btVector3(parseBtScalar(m_values[index]), parseBtScalar(m_values[index + 1]), parseBtScalar(m_values[index + 2]));
+    }
+ 
+    inline btQuaternion getValueYPR(unsigned int index = 0)
+    {
+      assert(index < m_values.size() - 3);
+      return btQuaternion(parseBtDegrees(m_values[index]), parseBtDegrees(m_values[index + 1]), parseBtDegrees(m_values[index + 2]));
+    }
+ 
+    inline double parseDouble(std::string s)
+    {
+      double d;
+      int rc = sscanf(s.c_str(), "%lf", &d);
+      if(rc == 1)
+        {
+          return d;
+        }
+      assert(false);
+      return 1.0;
+    }
+ 
+    inline btScalar parseBtScalar(std::string s)
+    {
+      double d;
+      int rc = sscanf(s.c_str(), "%lf", &d);
+      if(rc == 1)
+        {
+          return btScalar(d);
+        }
+      assert(false);
+      return btScalar(1.0);
+    }
+ 
+    // s is like 90.0 degrees. returns btScalar radians.
+    inline btScalar parseBtDegrees(std::string s)
+    {
+      return btRadians(parseBtScalar(s));
+    }
+ 
+    // s is like 1.7 radians. returns btScalar radians.
+    inline btScalar parseBtRadians(std::string s)
+    {
+      return parseBtScalar(s);
+    }
+
     ConfigNode *addChild(const std::string &name = "untitled", bool replaceExisting = false);
     ConfigNode *findChild(const std::string &name, bool recursive = false);
  
