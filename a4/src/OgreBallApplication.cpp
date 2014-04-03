@@ -16,10 +16,13 @@ This source file is part of the
 */
 #include "OgreBallApplication.h"
 
-//-------------------------------------------------------------------------------------
 OgreBallApplication::OgreBallApplication(void)
 {
+  mPhysics = new Physics(btVector3(0, 0, 0));
+  mTimer = OGRE_NEW Ogre::Timer();
+  mTimer->reset();
 }
+
 //-------------------------------------------------------------------------------------
 OgreBallApplication::~OgreBallApplication(void)
 {
@@ -40,10 +43,50 @@ void OgreBallApplication::createScene(void)
 	ballNode->attachObject(Ball);
 	ballNode->scale(.1,.1,.1);
 
-	Ogre::Light* light = mSceneMgr->createLight("MainLight");
-	light->setPosition(20.0f, 80.0f, 50.0f);
+}
+void OgreBallApplication::createCamera(void) {
+  BaseApplication::createCamera();
+  mCamera->setPosition(0,0,500);
 }
 
+void OgreBallApplication::createFrameListener(void) {
+  BaseApplication::createFrameListener();
+  
+  // Initialize CEGUI
+  CEGUI::Imageset::setDefaultResourceGroup("Imagesets");                                                         
+  CEGUI::Font::setDefaultResourceGroup("Fonts");                                                                 
+  CEGUI::Scheme::setDefaultResourceGroup("Schemes");                                                             
+  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");                                                
+  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");                                                      
+                                                                                                                 
+  mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();                                                           
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");                                             
+  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  
+  mScriptLoader = new sh::ConfigLoader(".ogreball");
+  sh::ConfigLoader::loadAllFiles(mScriptLoader, "media/OgreBall");
+}
+
+//-------------------------------------------------------------------------------------
+bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
+  return BaseApplication::frameStarted(evt);
+}
+
+//-------------------------------------------------------------------------------------
+bool OgreBallApplication::keyPressed( const OIS::KeyEvent &arg ) {
+  return BaseApplication::keyPressed(arg);
+}
+
+bool OgreBallApplication::keyReleased( const OIS::KeyEvent &arg ) {
+  return BaseApplication::keyReleased(arg);
+}
+
+bool OgreBallApplication::mouseMoved( const OIS::MouseEvent &arg ) {
+  return BaseApplication::mouseMoved(arg);
+}
+bool OgreBallApplication::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+  return BaseApplication::mouseReleased(arg, id);
+}
 
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

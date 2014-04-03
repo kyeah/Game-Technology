@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "GameObjectDescription.h"
 
-OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
+OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::String _meshName, Ogre::SceneNode* parentNode,
            Physics* _physics,
            btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest,
            btVector3 _localInertia, btQuaternion *rotation)
@@ -12,7 +12,15 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   entity = mgr->createEntity(_entName, "sphere.mesh");
   entity->setCastShadows(true);
 
+  entity->setMaterialName("OgreBall/Transparent");
+
   node->attachObject(entity);
+
+  Ogre::Entity* charHead = mgr->createEntity(_entName + "head", _meshName);
+  Ogre::SceneNode* headNode = node->createChildSceneNode(_nodeName + "head");
+  headNode->attachObject(charHead);
+  headNode->scale(2,2,2);
+
 /*
   Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
   collisionShape = new btSphereShape(0.01);

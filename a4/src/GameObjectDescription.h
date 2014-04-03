@@ -4,7 +4,7 @@
 
 class OgreBall : public GameObject{
  public:
-  OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String nodeName,
+  OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String nodeName, Ogre::String meshName,
        Ogre::SceneNode* parentNode, Physics* physics,
        btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0),
        btScalar mass=0.1f, btScalar rest=1.0f,
