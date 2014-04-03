@@ -11,6 +11,7 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
 
   entity = mgr->createEntity(_entName, "sphere.mesh");
   entity->setCastShadows(true);
+
   entity->setMaterialName("OgreBall/Transparent");
 
   node->attachObject(entity);

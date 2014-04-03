@@ -33,6 +33,21 @@ OgreBallApplication::~OgreBallApplication(void)
 }
 
 //-------------------------------------------------------------------------------------
+void OgreBallApplication::createScene(void)
+{
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
+	Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "sphere.mesh");
+	Ogre::Entity* Ball = mSceneMgr->createEntity("Ball", "sphere.mesh");
+	
+   	Ogre::SceneNode* headNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("HeadNode");
+	headNode->attachObject(ogreHead);
+	headNode->scale(.1,.1,.1);
+	
+	Ogre::SceneNode* ballNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("BallNode");
+	ballNode->attachObject(Ball);
+	ballNode->scale(.1,.1,.1);
+
+}
 void OgreBallApplication::createCamera(void) {
   BaseApplication::createCamera();
   mCamera->setPosition(0,0,500);
