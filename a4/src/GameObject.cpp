@@ -21,7 +21,50 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
     node->rotate(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
 
   transform.setIdentity();
+
+  currentInterpPosTime = 0;
+  currentInterpRotTime = 0;
   // Extend this class dude
+}
+
+void GameObject::setKinematic(bool kinematic) {
+  if (kinematic && body) {
+    body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+    body->setActivationState(DISABLE_DEACTIVATION);
+  } else if (body) {
+    body->setCollisionFlags(body->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
+    //    body->setActivationState(ENABLE_DEACTIVATION);
+  }
+}
+
+void GameObject::setInterpTimes(std::vector<float>& times) {
+  totalInterpTime = 0;
+  for (int i = 0; i< times.size(); i++) {
+    float t = times[i];
+    times[i] += totalInterpTime;
+    totalInterpTime += t;
+  }
+
+  posInterpTimes = times;
+}
+
+void GameObject::setInterpPos(std::vector<btVector3>& positions) {
+  posKnobs = positions;
+}
+
+void GameObject::setInterpRotTimes(std::vector<float>& times) {
+  totalInterpRotTime = 0;
+  for (int i = 0; i< times.size(); i++) {
+    float t = times[i];
+    times[i] += totalInterpRotTime;
+    totalInterpRotTime += t;
+  }
+
+  rotInterpTimes = times;
+}
+
+void GameObject::setInterpRot(std::vector<btQuaternion>& rotations) {
+  rotKnobs = rotations;
 }
 
 void GameObject::setColor(float ar, float ag, float ab,
@@ -125,5 +168,42 @@ void GameObject::setVelocity(btVector3 vel) {
   initVel = vel;
   body->setLinearVelocity(initVel);
 }
-                                                                                   
 
+void GameObject::update(float elapsedTime) {
+  if (posKnobs.size() > 0) {
+    currentInterpPosTime = fmod((currentInterpPosTime + elapsedTime), totalInterpTime);
+
+    for (int i = 1; i < posInterpTimes.size(); i++) {
+      if (currentInterpPosTime < posInterpTimes[i]) {
+        // Interp time is between position (i-1) and position i
+        btVector3 first = posKnobs[i-1];
+        btVector3 second = posKnobs[i];
+
+        float dt = currentInterpPosTime - posInterpTimes[i-1];
+        float proportion = dt/(posInterpTimes[i]-posInterpTimes[i-1]);
+
+        btVector3 pos = first.lerp(second, proportion);
+        setPosition(pos);
+        break;
+      }
+    }
+  }
+
+  if (rotKnobs.size() > 0) {
+    currentInterpRotTime = fmod((currentInterpRotTime + elapsedTime), totalInterpRotTime);
+
+    for (int i = 1; i < rotInterpTimes.size(); i++) {
+      if (currentInterpRotTime < rotInterpTimes[i]) {
+        btQuaternion first = rotKnobs[i-1];
+        btQuaternion second = rotKnobs[i];
+
+        float dt = currentInterpRotTime - rotInterpTimes[i-1];
+        float proportion = dt/(rotInterpTimes[i] - rotInterpTimes[i-1]);
+        
+        btQuaternion rot = first.slerp(second, proportion);
+        setOrientation(rot);
+        break;
+      }
+    }
+  }
+}

@@ -40,6 +40,7 @@ This source file is part of the
 
 #include "BaseApplication.h"
 #include "GameObjectDescription.h"
+#include "LevelLoader.h"
 #include "Physics.h"
 #include "../libs/ConfigLoader.hpp"
 
@@ -64,6 +65,7 @@ class OgreBallApplication : public BaseApplication
 
   Ogre::Timer *mTimer;
   Physics *mPhysics;
+  LevelLoader *levelLoader;
 
   // CEGUI
   CEGUI::OgreRenderer* mRenderer;

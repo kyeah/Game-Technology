@@ -19,10 +19,11 @@ class GameObject {
 
   void init();
 
-  virtual void update(float elapsedTime) {}
+  virtual void update(float elapsedTime);
   void updateTransform();
   void addToSimulator();
-
+  
+  void setKinematic(bool kinematic);
   void setColor(float ar, float ag, float ab,
                 float dr, float dg, float db, float da,
                 float sr, float sg, float sb, float sa);
@@ -36,6 +37,11 @@ class GameObject {
   void setOrientation(btQuaternion quaternion);
   void rotate(btQuaternion q);
   void setVelocity(btVector3 velocity);
+
+  void setInterpTimes(std::vector<float>& times);
+  void setInterpPos(std::vector<btVector3>& positions);
+  void setInterpRotTimes(std::vector<float>& times);
+  void setInterpRot(std::vector<btQuaternion>& rotations);
 
   btVector3 getPosition();
   btQuaternion getOrientation();
@@ -70,6 +76,17 @@ class GameObject {
   btVector3 inertia;
   btVector3 initVel;
 
+  std::vector<btVector3> posKnobs;
+  std::vector<float> posInterpTimes;
+  float totalInterpTime;
+
+  std::vector<btQuaternion> rotKnobs;
+  std::vector<float> rotInterpTimes;
+  float totalInterpRotTime;
+
+  float currentInterpPosTime;
+  float currentInterpRotTime;
+  
   bool needsUpdates;
   std::vector<CollisionContext *> contexts;
   BulletContactCallback* cCallback;

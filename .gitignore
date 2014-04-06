@@ -23,6 +23,9 @@
 */Ogre.log
 */stamp-h1
 */configure
+*/ogre.cfg
 */BallApp
 */MenuApp
 */RacquetApp
+*/OgreBall
+*/config.h

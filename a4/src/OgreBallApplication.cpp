@@ -15,14 +15,13 @@
   -----------------------------------------------------------------------------
 */
 #include "OgreBallApplication.h"
-#include "LevelLoader.h"
 
 using namespace std;
 using namespace sh;
 
 OgreBallApplication::OgreBallApplication(void)
 {
-  mPhysics = new Physics(btVector3(0, 0, 0));
+  mPhysics = new Physics(btVector3(0, -490, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
 }
@@ -36,18 +35,20 @@ OgreBallApplication::~OgreBallApplication(void)
 void OgreBallApplication::createScene(void)
 {
   mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
-  new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics);
+  new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics, btVector3(0, 500, 0));
 
   Ogre::Light* light = mSceneMgr->createLight("MainLight");
   light->setPosition(20.0f, 80.0f, 50.0f);
 
-  LevelLoader::loadLevels("media/OgreBall/scripts");
-  new Plane(mSceneMgr, "upPlane", "upPlane", "upPlane", 0, mPhysics, btVector3(0,0,0));
+  levelLoader = new LevelLoader(mSceneMgr, mPhysics);
+  levelLoader->loadResources("media/OgreBall/scripts");
+  levelLoader->loadLevel("baseLevel");
 }
 
 void OgreBallApplication::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(0,0,500);
+  mCamera->setPosition(0,500,2000);
+  mCamera->lookAt(0,0,0);
 }
 
 void OgreBallApplication::createFrameListener(void) {
@@ -67,7 +68,14 @@ void OgreBallApplication::createFrameListener(void) {
 
 //-------------------------------------------------------------------------------------
 bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
-  return BaseApplication::frameStarted(evt);
+  bool result =  BaseApplication::frameStarted(evt);
+  static Ogre::Real time = mTimer->getMilliseconds();
+
+  Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
+  time = mTimer->getMilliseconds();
+
+  if (mPhysics) mPhysics->stepSimulation(elapsedTime);
+  return result;
 }
 
 //-------------------------------------------------------------------------------------

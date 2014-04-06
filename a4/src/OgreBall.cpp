@@ -21,19 +21,17 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   headNode->attachObject(charHead);
   headNode->scale(2,2,2);
 
-/*
   Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
-  collisionShape = new btSphereShape(0.01);
+  collisionShape = new btSphereShape(s[0]);
   addToSimulator();
 
   body->setCcdMotionThreshold(1);
   body->setCcdSweptSphereRadius(0.4);
 
-  body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-  body->setActivationState(DISABLE_DEACTIVATION);
+  //  body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+  //  body->setActivationState(DISABLE_DEACTIVATION);
   setAmbient(0.5,0.5,0.9);
   setSpecular(0.1,0,0,0.4);
-*/
 }
 
 void OgreBall::update(float elapsedTime) {

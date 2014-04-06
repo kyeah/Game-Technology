@@ -1,7 +1,17 @@
 level baseLevel {
       plane {            
             meshname upPlane
-            pos 0 0 0
-            rot 0 0 0 0 
+            pos {
+                start 0 0 0
+                interp 3000 0 100 0
+                interp 3000 0 0 0
+            }
+            rot {
+                start 0 0 0
+                rotate 1000 90 0 0
+                rotate 1000 180 0 0
+                rotate 1000 270 0 0
+                rotate 1000 360 0 0
+            }
       }
 }

@@ -119,13 +119,18 @@ namespace sh
  
     inline btVector3 getValueV3(unsigned int index = 0)
     {
-      assert(index < m_values.size() - 3);
+      assert(index < m_values.size() - 2);
       return btVector3(parseBtScalar(m_values[index]), parseBtScalar(m_values[index + 1]), parseBtScalar(m_values[index + 2]));
+    }
+
+    inline btQuaternion getValueQ4Rot(unsigned int index = 0) {
+      assert(index < m_values.size() - 3);
+      return btQuaternion(getValueV3(index+1), parseBtScalar(m_values[index]));
     }
  
     inline btQuaternion getValueYPR(unsigned int index = 0)
     {
-      assert(index < m_values.size() - 3);
+      assert(index < m_values.size() - 2);
       return btQuaternion(parseBtDegrees(m_values[index]), parseBtDegrees(m_values[index + 1]), parseBtDegrees(m_values[index + 2]));
     }
  
