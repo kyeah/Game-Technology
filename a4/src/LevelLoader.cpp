@@ -151,7 +151,6 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
 void LevelLoader::parseCatmullSpline(ConfigNode *path, Procedural::Path& p) {
   Procedural::CatmullRomSpline3 *spline = new Procedural::CatmullRomSpline3();
   int segments = 8;
-  bool close = true;
 
   ConfigNode *segNode = path->findChild("segments");
   if (segNode) segments = segNode->getValueI();
@@ -166,7 +165,10 @@ void LevelLoader::parseCatmullSpline(ConfigNode *path, Procedural::Path& p) {
     }
   }
 
-  if (close) spline->close();
+  ConfigNode *closeNode = path->findChild("close");
+  if (closeNode && closeNode->getValue().compare("true") == 0)
+    spline->close();
+
   p = spline->realizePath();
 }
 
