@@ -21,7 +21,7 @@ vector<string> LevelLoader::split(const string &s, char delim) {
   return elems;
 }
 
-LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Physics *phys) : mSceneMgr(mgr), mPhysics(phys) { }
+LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam) { }
 
 void LevelLoader::loadResources(const string& path) {
   ConfigLoader *mScriptLoader = new ConfigLoader(".ogreball");
@@ -57,17 +57,87 @@ void LevelLoader::loadResources(const string& path) {
 }
 
 void LevelLoader::loadLevel(char* levelName) {
-  int i;
-  for (i = 0; i < levelNames.size(); i++) {
-    if (levelNames[i].compare(levelName) == 0)
+  for (int i = 0; i < levelNames.size(); i++) {
+    if (levelNames[i].compare(levelName) == 0) {
+      ConfigNode *level = levels[i];
+      vector<ConfigNode*> objs = level->getChildren();
+
+      for (int j = 0; j < objs.size(); j++) {
+        if (objs[j]->getName().compare("start") == 0) {
+          loadStartParameters(objs[j]);
+        } else if (objs[j]->getName().compare("lights") == 0) {
+          loadLights(objs[j]);
+        } else {
+          loadObject(objs[j]);
+        }
+      }
+
       break;
+    }
+  }
+}
+
+void LevelLoader::loadStartParameters(ConfigNode *root) {
+  ConfigNode *camNode = root->findChild("camera");
+  if (camNode) {
+    btVector3 camPos = camNode->getValueV3();
+    mCamera->setPosition(camPos[0], camPos[1], camPos[2]);
   }
 
-  ConfigNode *level = levels[i];
-  vector<ConfigNode*> objs = level->getChildren();
+  string ids[] = { "player1", "player2", "player3", "player4" };
 
-  for (int j = 0; j < objs.size(); j++) {
-    loadObject(objs[j]);
+  for (int i = 0; i < 4; i++) {
+    ConfigNode *pNode = root->findChild(ids[i]);
+    if (pNode) playerStartPositions[i] = pNode->getValueV3();
+  }
+}
+
+void LevelLoader::loadLights(ConfigNode *root) {
+  vector<ConfigNode*> lightNodes = root->getChildren();
+  for (int i = 0; i < lightNodes.size(); i++) {
+    if (lightNodes[i]->getName().compare("ambient") == 0) {
+      mSceneMgr->setAmbientLight(Ogre::ColourValue(lightNodes[i]->getValueF(0),
+                                                   lightNodes[i]->getValueF(1),
+                                                   lightNodes[i]->getValueF(2)));
+
+    } else if (lightNodes[i]->getName().compare("shadow") == 0) {
+
+    } else {
+      Ogre::Light* light = mSceneMgr->createLight(lightNodes[i]->getName());
+
+      vector<ConfigNode*> attrs = lightNodes[i]->getChildren();
+      for (int i = 0; i < attrs.size(); i++) {
+        string name = attrs[i]->getName();
+        if (name.compare("pos") == 0) {
+          btVector3 pos = attrs[i]->getValueV3();
+          light->setPosition(pos[0], pos[1], pos[2]);
+
+        } else if (name.compare("type") == 0) {
+          if (attrs[i]->getValue().compare("directional") == 0) {
+            light->setType(Ogre::Light::LT_DIRECTIONAL);
+          } else if (attrs[i]->getValue().compare("spotlight") == 0) {
+            light->setType(Ogre::Light::LT_SPOTLIGHT);
+          }
+
+        } else if (name.compare("diffuse") == 0) {
+          light->setDiffuseColour(Ogre::ColourValue(attrs[i]->getValueF(0),
+                                                    attrs[i]->getValueF(1),
+                                                    attrs[i]->getValueF(2)));
+        } else if (name.compare("specular") == 0) {
+          light->setSpecularColour(Ogre::ColourValue(attrs[i]->getValueF(0),
+                                                     attrs[i]->getValueF(1),
+                                                     attrs[i]->getValueF(2)));          
+          
+        } else if (name.compare("direction") == 0) {
+          btVector3 dir = attrs[i]->getValueV3();
+          light->setDirection(Ogre::Vector3(dir[0], dir[1], dir[2]));
+
+        } else if (name.compare("range") == 0) {
+          light->setSpotlightRange(Ogre::Degree(attrs[i]->getValueF(0)), Ogre::Degree(attrs[i]->getValueF(1)));
+
+        }
+      }
+    }
   }
 }
 
@@ -191,11 +261,11 @@ void LevelLoader::parseBezierCurve(ConfigNode *path, Procedural::Path& p) {
 Procedural::Shape* LevelLoader::parseShape(ConfigNode *path) {
   if (!path) return NULL;
   Procedural::Shape *shape = new Procedural::Shape();
-  
+
   ConfigNode *outsideNode = path->findChild("outside");
   if (outsideNode && outsideNode->getValue().compare("left") == 0)
     shape->setOutSide(Procedural::SIDE_LEFT);
-  
+
   ConfigNode *pointsNode = path->findChild("points");
   if (pointsNode) {
     vector<ConfigNode*> points = pointsNode->getChildren();
@@ -203,7 +273,7 @@ Procedural::Shape* LevelLoader::parseShape(ConfigNode *path) {
       shape->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
     }
   }
-  
+
   return shape;
 }
 
@@ -268,7 +338,7 @@ void LevelLoader::loadObject(ConfigNode *obj) {
 
     } else if (name.compare("mass") == 0) {
       mass = attrs[i]->getValueF();
-    
+
     } else if (name.compare("rest") == 0) {
       rest = attrs[i]->getValueF();
 
@@ -337,7 +407,7 @@ void LevelLoader::loadObject(ConfigNode *obj) {
     go = new ExtrudedObject(mSceneMgr, name, meshName, name, 0, mPhysics, startPos, scale,
                             btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   }
-    
+
   if (materialName.length() > 0)
     go->getEntity()->setMaterialName(materialName);
 

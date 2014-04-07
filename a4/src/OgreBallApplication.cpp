@@ -35,20 +35,16 @@ OgreBallApplication::~OgreBallApplication(void)
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::createScene(void)
 {
-  mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f,.5f,.5f));
-  new OgreBall(mSceneMgr, "ball", "ball", "penguin.mesh", 0, mPhysics, btVector3(0, 500, 0));
-
-  Ogre::Light* light = mSceneMgr->createLight("MainLight");
-  light->setPosition(20.0f, 80.0f, 50.0f);
-
-  levelLoader = new LevelLoader(mSceneMgr, mPhysics);
+  levelLoader = new LevelLoader(mSceneMgr, mCamera, mPhysics);
   levelLoader->loadResources("media/OgreBall/scripts");
   levelLoader->loadLevel("baseLevel");
+
+  new OgreBall(mSceneMgr, "player1", "player1", "penguin.mesh", 0, mPhysics, 
+               levelLoader->playerStartPositions[0]);
 }
 
 void OgreBallApplication::createCamera(void) {
   BaseApplication::createCamera();
-  mCamera->setPosition(0,500,2000);
   mCamera->lookAt(0,0,0);
 }
 

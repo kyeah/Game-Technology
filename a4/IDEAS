@@ -7,3 +7,5 @@ Controller Support (GC, Wiimote)
 Multiplayer? (Plane tilt controls = players have different gravities/orientations)
 meshes in ball as characters
 curved planes
+menu -> mp -> serverlist (read list from file) -> waiting room with chatlog and level selector for host, start button for host
+Show small plane under each opposing character in multiplayer to show what their local orientation is
