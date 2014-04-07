@@ -3,10 +3,11 @@
 #include "GameObjectDescription.h"
 
 OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::String _meshName, Ogre::SceneNode* parentNode,
-           Physics* _physics,
-           btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest,
-           btVector3 _localInertia, btQuaternion *rotation)
-  : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, velocity, _mass, _rest, _localInertia, rotation)
+                   Physics* _physics, 
+                   btVector3 origin, btVector3 scale,
+                   btVector3 velocity, btScalar _mass, btScalar _rest,
+                   btVector3 _localInertia, btQuaternion *rotation)
+  : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, scale, velocity, _mass, _rest, _localInertia, rotation)
 {
 
   entity = mgr->createEntity(_entName, "sphere.mesh");
@@ -25,8 +26,8 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   collisionShape = new btSphereShape(s[0]);
   addToSimulator();
 
-  body->setCcdMotionThreshold(1);
-  body->setCcdSweptSphereRadius(0.4);
+  // body->setCcdMotionThreshold(1);
+  // body->setCcdSweptSphereRadius(0.4);
 
   //  body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
   //  body->setActivationState(DISABLE_DEACTIVATION);

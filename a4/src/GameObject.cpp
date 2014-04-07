@@ -5,7 +5,8 @@
 
 GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
                        Physics* _physics,
-                       btVector3 origin, btVector3 velocity, btScalar _mass, btScalar _rest,
+                       btVector3 origin, btVector3 scale,
+                       btVector3 velocity, btScalar _mass, btScalar _rest,
                        btVector3 _localInertia, btQuaternion *rotation)
   : entName(_entName), nodeName(_nodeName),
     physics(_physics), mass(_mass), rest(_rest), inertia(_localInertia), initVel(velocity) {
@@ -20,6 +21,7 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   if (rotation)
     node->rotate(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
 
+  node->scale(scale[0], scale[1], scale[2]);
   transform.setIdentity();
 
   currentInterpPosTime = 0;
@@ -31,9 +33,10 @@ void GameObject::setKinematic(bool kinematic) {
   if (kinematic && body) {
     body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
     body->setActivationState(DISABLE_DEACTIVATION);
+    body->setMassProps(0, btVector3(0,0,0));
   } else if (body) {
     body->setCollisionFlags(body->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
-    //    body->setActivationState(ENABLE_DEACTIVATION);
+    body->activate(true);
   }
 }
 

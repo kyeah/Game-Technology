@@ -14,7 +14,8 @@ class GameObject {
 
   GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName,
              Ogre::SceneNode* parentNode, Physics* _physics,
-             btVector3 origin=btVector3(0,0,0), btVector3 velocity=btVector3(0,0,0), btScalar _mass=0.0f,
+             btVector3 origin=btVector3(0,0,0),  btVector3 scale=btVector3(1,1,1), 
+             btVector3 velocity=btVector3(0,0,0), btScalar _mass=0.0f,
              btScalar _rest=0.0f, btVector3 _localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   void init();

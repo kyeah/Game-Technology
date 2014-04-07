@@ -3,7 +3,7 @@ noinst_HEADERS= libs/ConfigLoader.hpp src/LevelLoader.h src/BaseApplication.h sr
 
 bin_PROGRAMS= OgreBall 
 OgreBall_CPPFLAGS= -I$(top_srcdir) -Ilibs/OgreProcedural/include -std=c++0x
-OgreBall_SOURCES= libs/ConfigScript.cpp src/BaseApplication.cpp src/OgreBallApplication.cpp src/Physics.cpp src/OgreMotionState.cpp src/GameObject.cpp src/OgreBall.cpp src/Plane.cpp src/LevelLoader.cpp
+OgreBall_SOURCES= libs/ConfigScript.cpp src/BaseApplication.cpp src/OgreBallApplication.cpp src/Physics.cpp src/OgreMotionState.cpp src/GameObject.cpp src/OgreBall.cpp src/Plane.cpp src/LevelLoader.cpp src/ExtrudedObject.cpp
 OgreBall_CXXFLAGS= $(OGRE_CFLAGS) $(OIS_CFLAGS) $(bullet_CFLAGS) $(CEGUI_CFLAGS) $(CEGUI_OGRE_CFLAGS) -lboost_system -lboost_filesystem -Llibs/OgreProcedural/lib -lOgreProcedural -Wl,-rpath=libs/OgreProcedural/lib
 OgreBall_LDADD= $(OGRE_LIBS) $(OIS_LIBS) $(bullet_LIBS) $(CEGUI_LIBS) $(CEGUI_OGRE_LIBS)
 

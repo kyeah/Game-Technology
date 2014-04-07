@@ -29,20 +29,31 @@ void LevelLoader::loadResources(const string& path) {
 
   map<string, ConfigNode*> scripts = mScriptLoader->getAllConfigScripts();
   vector<ConfigNode*> planeMeshes;
+  vector<ConfigNode*> extrudedMeshes;
+
   vector<string> planeMeshNames;
+  vector<string> extrudedMeshNames;
 
   for(map<string, ConfigNode*>::iterator it = scripts.begin(); it != scripts.end(); ++it) {
+    cout << it->first << endl;
     vector<string> name = split(it->first, ' ');
+    cout << name[0] << " " << name[1] << endl;
     if (name[0].compare("planemesh") == 0) {
       planeMeshes.push_back(it->second);
       planeMeshNames.push_back(name[1]);
+    } else if (name[0].compare("extrudedMesh") == 0) {
+      extrudedMeshes.push_back(it->second);
+      extrudedMeshNames.push_back(name[1]);
     } else if (name[0].compare("level") == 0) {
       levels.push_back(it->second);
       levelNames.push_back(name[1]);
     }
   }
 
+  cout << "loading planes" << endl;
   loadPlaneMeshes(planeMeshes, planeMeshNames);
+  cout << "loaded planes" << endl;
+  loadExtrudedMeshes(extrudedMeshes, extrudedMeshNames);
 }
 
 void LevelLoader::loadLevel(char* levelName) {
@@ -56,14 +67,11 @@ void LevelLoader::loadLevel(char* levelName) {
   vector<ConfigNode*> objs = level->getChildren();
 
   for (int j = 0; j < objs.size(); j++) {
-    string name = objs[j]->getName();
-    if (name.compare("plane") == 0) {
-      loadPlane(objs[j]);
-    }
+    loadObject(objs[j]);
   }
 }
 
-void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<std::string>& meshNames) {
+void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<string>& meshNames) {
   for (int i = 0; i < meshes.size(); i++) {
     ConfigNode *root;
     ConfigNode *info[5];
@@ -87,8 +95,141 @@ void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<std::strin
   }
 }
 
-void LevelLoader::loadPlane(ConfigNode *plane) {
+void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>& meshNames) {
+  for (int i = 0; i < meshes.size(); i++) {
+    ConfigNode *root;
+    ConfigNode *info[3];
+    string ids[] = { "path", "shape", "track" };
+    root = meshes[i];
+
+    for (int i = 0; i < 3; i++) {
+      info[i] = root->findChild(ids[i]);
+    }
+
+    if (!info[0] || !info[1]) continue;
+
+    float utiles, vtiles;
+    utiles = vtiles = 1.0;
+
+    cout << "test" << endl;
+
+    Procedural::Path p;
+    parsePath(info[0], p);
+    cout << "finished path" << endl;
+    Procedural::Shape *s = parseShape(info[1]);
+    cout << "finished shape" << endl;
+    Procedural::Track *t = parseTrack(info[2]);
+    cout << "finished track" << endl;
+    Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    cout << "finished mesh" << endl;
+  }
+}
+
+void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
+  ConfigNode *typeNode = path->findChild("type");
+  if (typeNode) {
+    string type = typeNode->getValue();
+
+    if (type.compare("catmullSpline") == 0) {
+      return parseCatmullSpline(path, p);
+    } else if (type.compare("cubicHermiteSpline") == 0) {
+      return parseCubicHermiteSpline(path, p);
+    } else if (type.compare("kbSpline") == 0) {
+      return parseKbSpline(path, p);
+    } else if (type.compare("roundedCornerSpline") == 0) {
+      return parseRoundedCornerSpline(path, p);
+    } else if (type.compare("bezierCurve") == 0) {
+      return parseBezierCurve(path, p);
+    }
+  }
+}
+
+void LevelLoader::parseCatmullSpline(ConfigNode *path, Procedural::Path& p) {
+  Procedural::CatmullRomSpline3 *spline = new Procedural::CatmullRomSpline3();
+  int segments = 8;
+  bool close = true;
+
+  ConfigNode *segNode = path->findChild("segments");
+  if (segNode) segments = segNode->getValueI();
+  spline->setNumSeg(segments);
+
+  ConfigNode *pointsNode = path->findChild("points");
+  if (pointsNode) {
+    vector<ConfigNode*> points = pointsNode->getChildren();
+    for (int i = 0; i < points.size(); i++) {
+      btVector3 point = points[i]->getValueV3();
+      spline->addPoint(point[0], point[1], point[2]);
+    }
+  }
+
+  if (close) spline->close();
+  p = spline->realizePath();
+}
+
+void LevelLoader::parseCubicHermiteSpline(ConfigNode *path, Procedural::Path& p) {
+
+}
+
+void LevelLoader::parseKbSpline(ConfigNode *path, Procedural::Path& p) {
+
+}
+
+void LevelLoader::parseRoundedCornerSpline(ConfigNode *path, Procedural::Path& p) {
+
+}
+
+void LevelLoader::parseBezierCurve(ConfigNode *path, Procedural::Path& p) {
+
+}
+
+Procedural::Shape* LevelLoader::parseShape(ConfigNode *path) {
+  if (!path) return NULL;
+  Procedural::Shape *shape = new Procedural::Shape();
+  
+  ConfigNode *outsideNode = path->findChild("outside");
+  if (outsideNode && outsideNode->getValue().compare("left") == 0)
+    shape->setOutSide(Procedural::SIDE_LEFT);
+  
+  ConfigNode *pointsNode = path->findChild("points");
+  if (pointsNode) {
+    vector<ConfigNode*> points = pointsNode->getChildren();
+    for (int i = 0; i < points.size(); i++) {
+      shape->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+    }
+  }
+  
+  return shape;
+}
+
+Procedural::Track* LevelLoader::parseTrack(ConfigNode *path) {
+  if (!path) return NULL;
+
+  ConfigNode *amNode = path->findChild("addressingMode");
+  Procedural::Track::AddressingMode am = Procedural::Track::AM_ABSOLUTE_LINEIC;
+  if (amNode) {
+    string am = amNode->getValue();
+    if (am.compare("relative") == 0) {
+      am = Procedural::Track::AM_RELATIVE_LINEIC;
+    } else if (am.compare("point") == 0) {
+      am = Procedural::Track::AM_POINT;
+    }
+  }
+
+  Procedural::Track *track = new Procedural::Track(am);
+  ConfigNode *keyNode = path->findChild("keyframes");
+  if (keyNode) {
+    vector<ConfigNode*> keys = keyNode->getChildren();
+    for (int i = 0; i < keys.size(); i++) {
+      track->addKeyFrame(keys[i]->getValueF(0), keys[i]->getValueF(1));
+    }
+  }
+
+  return track;
+}
+
+void LevelLoader::loadObject(ConfigNode *obj) {
   string meshName, materialName;
+  btVector3 scale(1,1,1);
   btVector3 startPos;
   btQuaternion startRot;
 
@@ -98,7 +239,13 @@ void LevelLoader::loadPlane(ConfigNode *plane) {
   vector<float> interpRotTimes;
   vector<btQuaternion> interpRot;
 
-  vector<ConfigNode*> attrs = plane->getChildren();
+  bool ambient, diffuse, specular;
+  ambient = diffuse = specular = false;
+  float ar, ag, ab,
+    dr, dg, db, da,
+    sr, sg, sb, sa;
+
+  vector<ConfigNode*> attrs = obj->getChildren();
   for (int i = 0; i < attrs.size(); i++) {
     string name = attrs[i]->getName();
     if (name.compare("meshname") == 0) {
@@ -106,6 +253,29 @@ void LevelLoader::loadPlane(ConfigNode *plane) {
 
     } else if (name.compare("material") == 0) {
       materialName = attrs[i]->getValue();
+
+    } else if (name.compare("scale") == 0) {
+      scale = attrs[i]->getValueV3();
+
+    } else if (name.compare("ambient") == 0) {
+      ambient = true;
+      ar = attrs[i]->getValueF(0);
+      ag = attrs[i]->getValueF(1);
+      ab = attrs[i]->getValueF(2);
+
+    } else if (name.compare("diffuse") == 0) {
+      diffuse = true;
+      dr = attrs[i]->getValueF(0);
+      dg = attrs[i]->getValueF(1);
+      db = attrs[i]->getValueF(2);
+      da = attrs[i]->getValueF(3);
+
+    } else if (name.compare("specular") == 0) {
+      specular = true;
+      sr = attrs[i]->getValueF(0);
+      sg = attrs[i]->getValueF(1);
+      sb = attrs[i]->getValueF(2);
+      sa = attrs[i]->getValueF(3);
 
     } else if (name.compare("pos") == 0) {
       vector<ConfigNode*> pos = attrs[i]->getChildren();
@@ -139,18 +309,30 @@ void LevelLoader::loadPlane(ConfigNode *plane) {
 
   static int id = 0;
   stringstream ss;
-  ss << "plane" << id;
+  ss << "object" << id;
   string name = ss.str();
+  id++;
 
-  Plane *p = new Plane(mSceneMgr, name, meshName, name, 0, mPhysics, startPos,
-                       btVector3(0,0,0), btScalar(1), btScalar(0.9), btVector3(0,0,0), &startRot);
-
+  string type = obj->getName();
+  GameObject *go;
+  if (type.compare("plane") == 0) {
+    go = new Plane(mSceneMgr, name, meshName, name, 0, mPhysics, startPos, scale,
+                   btVector3(0,0,0), btScalar(0), btScalar(0.9), btVector3(0,0,0), &startRot);
+  } else if (type.compare("extrudedObject") == 0) {
+    go = new ExtrudedObject(mSceneMgr, name, meshName, name, 0, mPhysics, startPos, scale,
+                            btVector3(0,0,0), btScalar(0), btScalar(0.9), btVector3(0,0,0), &startRot);
+  }
+    
   if (materialName.length() > 0)
-    p->getEntity()->setMaterialName(materialName);
+    go->getEntity()->setMaterialName(materialName);
 
-  p->setKinematic(true);
-  p->setInterpTimes(interpTimes);
-  p->setInterpPos(interpPos);
-  p->setInterpRotTimes(interpRotTimes);
-  p->setInterpRot(interpRot);
+  go->setKinematic(true);
+  go->setInterpTimes(interpTimes);
+  go->setInterpPos(interpPos);
+  go->setInterpRotTimes(interpRotTimes);
+  go->setInterpRot(interpRot);
+
+  if (ambient)  go->setAmbient(ar, ag, ab);
+  if (diffuse)  go->setDiffuse(dr, dg, db, da);
+  if (specular) go->setSpecular(sr, sg, sb, sa);
 }

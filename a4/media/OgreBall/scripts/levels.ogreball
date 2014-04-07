@@ -14,4 +14,12 @@ level baseLevel {
                 rotate 1000 360 0 0
             }
       }
+      extrudedObject {
+            meshname teardropMesh
+            scale 500 500 500
+            material OgreBall/Transparent
+            rot {
+                start 0 180 0
+            }
+      }
 }
