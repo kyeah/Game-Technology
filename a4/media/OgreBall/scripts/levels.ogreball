@@ -1,6 +1,7 @@
 level baseLevel {
       plane {            
             meshname upPlane
+            rest 0.8
             pos {
                 start 0 0 0
                 interp 3000 0 100 0
@@ -16,8 +17,8 @@ level baseLevel {
       }
       extrudedObject {
             meshname teardropMesh
-            scale 500 500 500
             material OgreBall/Transparent
+            rest 0.4
             rot {
                 start 0 180 0
             }

@@ -1,4 +1,5 @@
 extrudedMesh teardropMesh {
+  scale 500 500 500
   path {
      type catmullSpline
      segments 16

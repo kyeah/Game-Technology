@@ -115,13 +115,17 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
 
     Procedural::Path p;
     parsePath(info[0], p);
-    cout << "finished path" << endl;
     Procedural::Shape *s = parseShape(info[1]);
-    cout << "finished shape" << endl;
     Procedural::Track *t = parseTrack(info[2]);
-    cout << "finished track" << endl;
-    Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
-    cout << "finished mesh" << endl;
+
+    Ogre::Vector3 scale(1,1,1);
+
+    ConfigNode *sNode = root->findChild("scale");
+    if (sNode) {
+      scale = Ogre::Vector3(sNode->getValueF(0), sNode->getValueF(1), sNode->getValueF(2));
+    }
+
+    Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).setScale(scale).realizeMesh(meshNames[i]);
   }
 }
 
@@ -239,6 +243,9 @@ void LevelLoader::loadObject(ConfigNode *obj) {
   vector<float> interpRotTimes;
   vector<btQuaternion> interpRot;
 
+  float mass = 0.0f;
+  float rest = 0.9f;
+
   bool ambient, diffuse, specular;
   ambient = diffuse = specular = false;
   float ar, ag, ab,
@@ -256,6 +263,12 @@ void LevelLoader::loadObject(ConfigNode *obj) {
 
     } else if (name.compare("scale") == 0) {
       scale = attrs[i]->getValueV3();
+
+    } else if (name.compare("mass") == 0) {
+      mass = attrs[i]->getValueF();
+    
+    } else if (name.compare("rest") == 0) {
+      rest = attrs[i]->getValueF();
 
     } else if (name.compare("ambient") == 0) {
       ambient = true;
@@ -317,10 +330,10 @@ void LevelLoader::loadObject(ConfigNode *obj) {
   GameObject *go;
   if (type.compare("plane") == 0) {
     go = new Plane(mSceneMgr, name, meshName, name, 0, mPhysics, startPos, scale,
-                   btVector3(0,0,0), btScalar(0), btScalar(0.9), btVector3(0,0,0), &startRot);
+                   btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("extrudedObject") == 0) {
     go = new ExtrudedObject(mSceneMgr, name, meshName, name, 0, mPhysics, startPos, scale,
-                            btVector3(0,0,0), btScalar(0), btScalar(0.9), btVector3(0,0,0), &startRot);
+                            btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   }
     
   if (materialName.length() > 0)
