@@ -77,6 +77,26 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
 
 //-------------------------------------------------------------------------------------
 bool OgreBallApplication::keyPressed( const OIS::KeyEvent &arg ) {
+  btVector3 axis;
+  switch(arg.key){
+    
+    case OIS::KC_D:
+      axis = btVector3(0, 0, 1);
+      levelLoader->rotateLevel(&axis, btScalar(.01));
+      break;
+    case OIS::KC_A:
+      axis = btVector3(0, 0, 1);
+      levelLoader->rotateLevel(&axis, btScalar(-.01));
+      break;
+    case OIS::KC_W:
+      axis = btVector3(1, 0, 0);
+      levelLoader->rotateLevel(&axis, btScalar(.01));
+      break;
+    case OIS::KC_S:
+      axis = btVector3(1, 0, 0);
+      levelLoader->rotateLevel(&axis, btScalar(-.01));
+      break;
+  }
   return BaseApplication::keyPressed(arg);
 }
 
