@@ -24,16 +24,10 @@ class LevelLoader {
   void loadExtrudedMeshes(std::vector<sh::ConfigNode*>& meshes, std::vector<std::string>& meshNames);
   
   void parsePath(sh::ConfigNode *path, Procedural::Path& p);
-  void parseCatmullSpline(sh::ConfigNode *path, Procedural::Path& p);
-  void parseCubicHermiteSpline(sh::ConfigNode *path, Procedural::Path& p);
-  void parseKbSpline(sh::ConfigNode *path, Procedural::Path& p);
-  void parseRoundedCornerSpline(sh::ConfigNode *path, Procedural::Path& p);
-  void parseBezierCurve(sh::ConfigNode *path, Procedural::Path& p);
-  
   Procedural::Shape* parseShape(sh::ConfigNode *shape);
   Procedural::Track* parseTrack(sh::ConfigNode *track);
 
-  void loadObject(sh::ConfigNode *plane);
+  void loadObject(sh::ConfigNode *plane, Ogre::SceneNode *parentNode = NULL);
 
   Ogre::SceneManager *mSceneMgr;
   Ogre::Camera *mCamera;
@@ -41,5 +35,11 @@ class LevelLoader {
 
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
-  btVector3 playerStartPositions[4];  // Positions for the most recently loaded level
+
+  // Start Parameters for most recently loaded level
+  btVector3 playerStartPositions[4];
+  btQuaternion playerStartRotations[4];
+
+  btVector3 goalPosition;
+  btQuaternion goalRotation;
 };

@@ -1,7 +1,16 @@
 level baseLevel {
       start {
             camera 0 500 2000
-            player1 0 500 0
+            player1 {
+                    pos 0 500 0
+                    rot 0 0 0
+            }
+            goal {
+                 pos 1000 0 0
+                 rot 0 0 0
+            }
+            waypoints {
+            }
       }
       lights {
              ambient .5 .5 .5
@@ -23,6 +32,16 @@ level baseLevel {
                 rotate 1000 180 0 0
                 rotate 1000 270 0 0
                 rotate 1000 360 0 0
+            }
+            plane {
+                  meshname upPlane
+                  rest 0.8
+                  pos {
+                      start 0 500 0
+                  }
+                  rot {
+                      start 0 180 0
+                  }
             }
       }
       extrudedObject {
