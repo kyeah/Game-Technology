@@ -38,11 +38,14 @@ This source file is part of the
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 
+#include "Activity.h"
 #include "BaseApplication.h"
 #include "GameObjectDescription.h"
 #include "LevelLoader.h"
 #include "Physics.h"
 #include "../libs/ConfigLoader.hpp"
+
+class Activity;
 
 class OgreBallApplication : public BaseApplication
 {
@@ -50,7 +53,8 @@ class OgreBallApplication : public BaseApplication
   OgreBallApplication(void);
   virtual ~OgreBallApplication(void);
 
-  bool frameStarted(const Ogre::FrameEvent &evt);
+  bool frameStarted( const Ogre::FrameEvent &evt );
+  bool frameRenderingQueued( const Ogre::FrameEvent& evt );
 
  protected:
   virtual void createScene(void);
@@ -63,15 +67,17 @@ class OgreBallApplication : public BaseApplication
   bool mouseMoved( const OIS::MouseEvent &arg );
   bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
+ public:
+  Activity *activity;  // Our application will dispatch events to activities to deal with different game states.
+
   Ogre::Timer *mTimer;
   Physics *mPhysics;
   LevelLoader *levelLoader;
+  Ogre::SceneNode *levelRoot;
 
   // CEGUI
   CEGUI::OgreRenderer* mRenderer;
   CEGUI::WindowManager* Wmgr;
-  CEGUI::Window* menu;
-  
 };
 
 #endif // #ifndef __OgreBallApplication_h_

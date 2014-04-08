@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include "Physics.h"
 #include "ProceduralStableHeaders.h"
@@ -9,7 +10,7 @@
 
 class LevelLoader {
  public:
-  LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys);
+  LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *levelRoot);
 
   static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
   static std::vector<std::string> split(const std::string &s, char delim);
@@ -30,6 +31,7 @@ class LevelLoader {
   void loadObject(sh::ConfigNode *plane, Ogre::SceneNode *parentNode = NULL);
 
   Ogre::SceneManager *mSceneMgr;
+  Ogre::SceneNode *levelRoot;
   Ogre::Camera *mCamera;
   Physics *mPhysics;
 

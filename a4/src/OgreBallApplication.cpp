@@ -15,6 +15,8 @@
   -----------------------------------------------------------------------------
 */
 #include "OgreBallApplication.h"
+#include "MenuActivity.h"
+#include "SinglePlayerActivity.h"
 
 using namespace Ogre;
 using namespace std;
@@ -35,12 +37,14 @@ OgreBallApplication::~OgreBallApplication(void)
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::createScene(void)
 {
-  levelLoader = new LevelLoader(mSceneMgr, mCamera, mPhysics);
+  levelRoot = mSceneMgr->getRootSceneNode()->createChildSceneNode("root");
+  levelLoader = new LevelLoader(mSceneMgr, mCamera, mPhysics, levelRoot);
   levelLoader->loadResources("media/OgreBall/scripts");
-  levelLoader->loadLevel("baseLevel");
+  //  levelLoader->loadLevel("baseLevel");
 
-  new OgreBall(mSceneMgr, "player1", "player1", "penguin.mesh", 0, mPhysics, 
-               levelLoader->playerStartPositions[0]);
+  //  new OgreBall(mSceneMgr, "player1", "player1", "penguin.mesh", 0, mPhysics,
+  //               levelLoader->playerStartPositions[0]);
+  activity->start();
 }
 
 void OgreBallApplication::createCamera(void) {
@@ -59,8 +63,17 @@ void OgreBallApplication::createFrameListener(void) {
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
 
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-  //  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-  //  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
+  CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
+
+  Wmgr = &CEGUI::WindowManager::getSingleton();
+  Wmgr->loadWindowLayout("Menu.layout");
+  Wmgr->loadWindowLayout("MultiSubMenu.layout");
+  Wmgr->loadWindowLayout("Chatbox.layout");
+  // sheet = wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
+  // CEGUI::System::getSingleton().setGUISheet(sheet);
 }
 
 //-------------------------------------------------------------------------------------
@@ -72,7 +85,30 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   time = mTimer->getMilliseconds();
 
   if (mPhysics) mPhysics->stepSimulation(elapsedTime);
+
+  // activity->frameStarted(elapsedTime);
   return result;
+}
+
+bool OgreBallApplication::frameRenderingQueued( const Ogre::FrameEvent &evt ) {
+  if(mWindow->isClosed())
+    return false;
+
+  if(mShutDown)
+    return false;
+
+  //Need to capture/update each device
+  mKeyboard->capture();
+  mMouse->capture();
+
+  mTrayMgr->frameRenderingQueued(evt);
+  if (!mTrayMgr->isDialogVisible()) {
+    mCameraMan->frameRenderingQueued(evt);
+  }
+
+  // activity->frameRenderingQueued(evt);
+  
+  return true;
 }
 
 //-------------------------------------------------------------------------------------
@@ -109,6 +145,8 @@ extern "C" {
   {
     // Create application object
     OgreBallApplication app;
+    // app.activity = new MenuActivity(&app);
+    app.activity = new SinglePlayerActivity(&app);
 
     try {
       app.go();

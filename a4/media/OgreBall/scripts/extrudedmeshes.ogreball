@@ -32,3 +32,36 @@ extrudedMesh teardropMesh {
      }
   }  
 }
+
+extrudedMesh mountainTeardropMesh {
+  scale 500 500 500
+  path {
+     type catmullSpline
+     segments 16
+     points {
+       p 0 0 0
+       p 0 0 10
+       p 10 0 10
+       p 20 0 0
+     }
+     close true
+  }
+  shape {
+     outside left
+     points {
+       p 0 0
+       p 1 0
+       p 1 100
+       p 0 100
+     }
+  }
+  track {
+     addressingMode point
+     keyframes {
+       k 0 0
+       k 2 .2
+       k 3 .8
+       k 5 1
+     }
+  }  
+}

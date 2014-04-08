@@ -21,7 +21,7 @@ vector<string> LevelLoader::split(const string &s, char delim) {
   return elems;
 }
 
-LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam) { }
+LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) { }
 
 void LevelLoader::loadResources(const string& path) {
   ConfigLoader *mScriptLoader = new ConfigLoader(".ogreball");
@@ -453,6 +453,10 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   ss << "object" << id;
   string name = ss.str();
   id++;
+
+  if (!parentNode && kinematic) {
+    parentNode = levelRoot;
+  }
 
   string type = obj->getName();
   GameObject *go;
