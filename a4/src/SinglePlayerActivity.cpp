@@ -5,7 +5,8 @@ SinglePlayerActivity::~SinglePlayerActivity(void) {
 
 void SinglePlayerActivity::start(void) {
   CEGUI::System::getSingleton().setGUISheet(app->sheet);
-  loadLevel("baseLevel");
+  //  loadLevel("baseLevel");
+  loadLevel("clearPath");
 }
 
 void SinglePlayerActivity::loadLevel(char* name) {
@@ -13,7 +14,8 @@ void SinglePlayerActivity::loadLevel(char* name) {
   app->levelLoader->loadLevel(name);
 
   new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
-               app->levelLoader->playerStartPositions[0]);
+               app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
+               8.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 }
 
 // The world is your oyster...

@@ -18,9 +18,6 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   node = parentNode->createChildSceneNode(_nodeName);
 
   node->translate(Ogre::Vector3(origin[0], origin[1], origin[2]));
-  if (rotation)
-    node->rotate(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
-
   node->scale(scale[0], scale[1], scale[2]);
   transform.setIdentity();
 
@@ -202,7 +199,7 @@ void GameObject::update(float elapsedTime) {
 
         float dt = currentInterpRotTime - rotInterpTimes[i-1];
         float proportion = dt/(rotInterpTimes[i] - rotInterpTimes[i-1]);
-        
+
         btQuaternion rot = first.slerp(second, proportion);
         setOrientation(rot);
         break;

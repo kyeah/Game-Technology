@@ -18,6 +18,7 @@ ExtrudedObject::ExtrudedObject(Ogre::SceneManager *mgr, Ogre::String _entName, O
   MeshStrider *strider = new MeshStrider(meshptr.get());
   collisionShape = new btBvhTriangleMeshShape(strider,true,true);
   addToSimulator();
+  if (rotation) rotate(*rotation);
 }
 
 void ExtrudedObject::update(float elapsedTime) { 
