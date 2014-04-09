@@ -9,7 +9,7 @@ class MenuActivity : public Activity {
  MenuActivity(OgreBallApplication *app) : Activity(app) {}
   
   virtual void start(void);
-  virtual bool frameStarted( const Ogre::FrameEvent &evt );
+  virtual bool frameStarted( Ogre::Real elapsedTime );
   virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
   
   virtual bool keyPressed( const OIS::KeyEvent &arg );
@@ -19,6 +19,11 @@ class MenuActivity : public Activity {
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
-  bool SwitchToMainMenu(const CEGUI::EventArgs& e);                                                              
-  bool SwitchToMultiMenu(const CEGUI::EventArgs& e); 
+  bool SwitchToMainMenu(const CEGUI::EventArgs& e);
+  bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
+  bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+
+  bool StartSinglePlayer(const CEGUI::EventArgs& e);
+
+  bool quit(const CEGUI::EventArgs& e);
 };

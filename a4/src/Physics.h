@@ -42,4 +42,5 @@ class Physics {
   void stepSimulation(const Ogre::Real elapsedTime, int maxSubsteps = 1,
                       const Ogre::Real fixedTimestep = 1.0f/60.0f);
 
+  void removeAllObjects();
 };

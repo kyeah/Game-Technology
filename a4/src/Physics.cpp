@@ -91,6 +91,13 @@ int Physics::addObject(GameObject *obj) {
   return simID++;
 }
 
+void Physics::removeAllObjects() {
+  for (int i = 0; i < objList.size(); i++) {
+    getDynamicsWorld()->removeRigidBody(objList[i]->getBody());
+  }
+  objList.clear();
+}
+
 void Physics::removeObject(GameObject *obj) {
   objList.erase(std::remove(objList.begin(), objList.end(), obj), objList.end());
   getDynamicsWorld()->removeRigidBody(obj->getBody());

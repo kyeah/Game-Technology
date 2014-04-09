@@ -135,7 +135,7 @@ void BaseApplication::createFrameListener(void)
     mDetailsPanel->setParamValue(9, "Bilinear");
     mDetailsPanel->setParamValue(10, "Solid");
     mDetailsPanel->hide();
-
+    
     mRoot->addFrameListener(this);
 }
 //-------------------------------------------------------------------------------------

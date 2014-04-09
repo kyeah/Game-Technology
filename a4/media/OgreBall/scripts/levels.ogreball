@@ -1,6 +1,9 @@
 level menuBG {
       start {
-            camera 0 500 2000
+            camera {
+                   pos -3500 800 1000
+                   lookAt 0 800 1800
+            }
             player1 {
                     pos 250 500 0
                     rot 0 0 0
@@ -46,7 +49,10 @@ level menuBG {
 
 level baseLevel {
       start {
-            camera 0 500 2000
+            camera {
+                   pos -3500 800 1000
+                   lookAt 0 800 1800
+            }
             player1 {
                     pos 0 500 0
                     rot 0 0 0

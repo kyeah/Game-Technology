@@ -53,18 +53,22 @@ class OgreBallApplication : public BaseApplication
   OgreBallApplication(void);
   virtual ~OgreBallApplication(void);
 
+  void destroyAllEntitiesAndNodes(void);
+  void switchActivity(Activity *activity);
+
   bool frameStarted( const Ogre::FrameEvent &evt );
   bool frameRenderingQueued( const Ogre::FrameEvent& evt );
 
  protected:
   virtual void createScene(void);
   void createCamera(void);
-  void createFrameListener(void);  // GUI Setup
+  void loadResources(void);  // GUI Setup
 
   bool keyPressed( const OIS::KeyEvent &arg );
   bool keyReleased( const OIS::KeyEvent &arg );
 
   bool mouseMoved( const OIS::MouseEvent &arg );
+  bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
  public:
@@ -78,6 +82,8 @@ class OgreBallApplication : public BaseApplication
   // CEGUI
   CEGUI::OgreRenderer* mRenderer;
   CEGUI::WindowManager* Wmgr;
+  CEGUI::Window *sheet;
+
 };
 
 #endif // #ifndef __OgreBallApplication_h_

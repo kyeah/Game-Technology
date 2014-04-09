@@ -10,7 +10,7 @@ class SinglePlayerActivity : public Activity {
   virtual ~SinglePlayerActivity(void);
   
   virtual void start(void);
-  virtual bool frameStarted( const Ogre::FrameEvent &evt );
+  virtual bool frameStarted( Ogre::Real elapsedTime );
   virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
   
   virtual bool keyPressed( const OIS::KeyEvent &arg );

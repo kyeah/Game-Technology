@@ -1,6 +1,12 @@
 #include "MenuActivity.h"
+#include "SinglePlayerActivity.h"
 
 void MenuActivity::start(void) {
+  app->levelLoader->loadLevel("menuBG");
+
+  new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
+               app->levelLoader->playerStartPositions[0]);
+
   const CEGUI::EventArgs* args;
   SwitchToMainMenu(*args);
 }
@@ -10,40 +16,56 @@ bool MenuActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
   return true;
 }
 
-bool MenuActivity::frameStarted( const Ogre::FrameEvent& evt ) {
-  
+bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
+  // Do cool camera panning stuff here
+  return true;
 }
 
 bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
-  /*    menu = Wmgr->getWindow("Menu/Background");
-    CEGUI::System::getSingleton().setGUISheet(menu);
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/Background"));
 
-    CEGUI::PushButton* singlePlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/SinglePlayer");
-    CEGUI::PushButton* multiPlayerButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/MultiPlayer");
-    CEGUI::PushButton* quitButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/QuitGame");
+  CEGUI::Window* singlePlayerButton = app->Wmgr->getWindow("Menu/SinglePlayer");
+  CEGUI::Window* multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
+  CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
+  
+  singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                     CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
 
-    singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
-    multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
-    quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&MenuActivity::quit,this));*/
+  multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                    CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
+  
+  quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&MenuActivity::quit,this));
+}
+
+bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
+  CEGUI::MouseCursor::getSingleton().hide();
+  app->switchActivity(new SinglePlayerActivity(app));
+  return true;
+}
+
+bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
+
 }
 
 bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
-  /*  menu = Wmgr->getWindow("Menu/MultiBackground");
-  CEGUI::System::getSingleton().setGUISheet(menu);
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/MultiBackground"));
   
-  CEGUI::PushButton* hostButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Host");
-  CEGUI::PushButton* clientButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Client");
-  CEGUI::PushButton* returnButton = (CEGUI::PushButton*)Wmgr->getWindow("Menu/Return");
+  CEGUI::Window* hostButton = app->Wmgr->getWindow("Menu/Host");
+  CEGUI::Window* clientButton = app->Wmgr->getWindow("Menu/Client");
+  CEGUI::Window* returnButton = app->Wmgr->getWindow("Menu/Return");
   
+  /*
   hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
   clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                               CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));
+  CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));*/
   returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-  CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));*/
+                               CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
+}
+
+bool MenuActivity::quit( const CEGUI::EventArgs& e ) {
+  app->mShutDown = true;
 }
 
 //-------------------------------------------------------------------------------------
