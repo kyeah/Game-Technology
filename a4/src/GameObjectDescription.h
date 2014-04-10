@@ -28,7 +28,7 @@ class Plane : public GameObject {
 
 class Collectible : public GameObject {
   public:
-    Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::String _meshName, Ogre::SceneNode* parentNode,
+    Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
                    Physics* physics, 
                    btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
                    btVector3 velocity=btVector3(0,0,0), btScalar mass=0.0f, btScalar rest=.9f,
@@ -37,15 +37,6 @@ class Collectible : public GameObject {
     virtual void update(float elapsedTime);
 };
 
-class ExtrudedObject : public GameObject {
- public:                                                                                                   
-  ExtrudedObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String nodeName,
-        Ogre::SceneNode* parentNode, Physics* physics,                                                     
-        btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1), 
-        btVector3 velocity=btVector3(0,0,0),  
-        btScalar mass=0.0f, btScalar rest=0.7f,                                                            
-        btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
-};
 class MeshObject : public GameObject {
  public:
   MeshObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String nodeName,

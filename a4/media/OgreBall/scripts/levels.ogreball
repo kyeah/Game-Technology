@@ -101,7 +101,7 @@ level baseLevel {
             }
       }
       collectible {
-            meshname upPlane
+            meshname sphere.mesh
             rest 0.8
             pos {
                 start 0 100 0
@@ -152,6 +152,13 @@ level clearPath {
             }
             rot {
                 start 0 0 0
+            }
+      }
+      collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 0 5 -7000
             }
       }
 }

@@ -509,11 +509,5 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
 
   void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){
     btQuaternion q = btQuaternion(*axis, degree);
-    //    for(int i = 0; i < levelPieces.size(); i++){
-    //      GameObject *go = levelPieces[i];
-    //      go->rotate(q);
-    //    }
-    
-    std::cout << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << std::endl;
     levelRoot->rotate(Ogre::Quaternion(q.w(), q.x(), q.y(), q.z()));
 }
