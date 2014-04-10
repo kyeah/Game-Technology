@@ -2,7 +2,7 @@
 #include "GameObjectDescription.h"
 #include "../libs/MeshStrider.h"
 
-ExtrudedObject::ExtrudedObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String _nodeName,
+MeshObject::MeshObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String _nodeName,
              Ogre::SceneNode* parentNode, Physics* _physics,
              btVector3 origin, btVector3 scale, btVector3 velocity, btScalar _mass, btScalar _rest,
              btVector3 _localInertia, btQuaternion *rotation)
@@ -21,6 +21,6 @@ ExtrudedObject::ExtrudedObject(Ogre::SceneManager *mgr, Ogre::String _entName, O
   if (rotation) rotate(*rotation);
 }
 
-void ExtrudedObject::update(float elapsedTime) { 
+void MeshObject::update(float elapsedTime) { 
   GameObject::update(elapsedTime);
 }

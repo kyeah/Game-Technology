@@ -1,7 +1,23 @@
 #pragma once
 #include <btBulletDynamicsCommon.h>
+#include <vector>
 
 class GameObject;
+
+#define BIT(x) (1<<(x))
+
+class Collisions {
+ public:
+  enum CollisionTypes {
+    COL_NOTHING = 0,
+    COL_LEVEL = BIT(0),
+    COL_PLAYER = BIT(1),
+    COL_COLLECTIBLE = BIT(2),
+    COL_GOAL = BIT(3)
+  };
+  
+  static int levelColliders, playerColliders, collectibleColliders, goalColliders;
+};
 
 class CollisionContext {
  public:

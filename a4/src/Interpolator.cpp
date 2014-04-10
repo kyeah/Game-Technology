@@ -1,20 +1,26 @@
 #include "Interpolator.h"
 
-btVector3 Interpolator::interpV3(float& currTime, float elapsedTime, float totalTime
+btVector3 Interpolator::interpV3(float& currTime, float elapsedTime, float totalTime,
                                  btVector3 first, btVector3 second) {
   currTime += elapsedTime;
-  if (currTime >= totalTime) currTime = totalTime;
+  if (currTime >= totalTime) {
+    currTime = totalTime;
+    return second;
+  }
 
-  float proportion = currTime/elapsedTime;
+  float proportion = currTime/totalTime;
   return first.lerp(second, proportion);
 }
 
 btQuaternion Interpolator::interpQuat(float& currTime, float elapsedTime, float totalTime,
                                       btQuaternion first, btQuaternion second) {
   currTime += elapsedTime;
-  if (currTime >= totalTime) currTime = totalTime;
+  if (currTime >= totalTime) {
+    currTime = totalTime;
+    return second;
+  }
 
-  float proportion = currTime/elapsedTime;
+  float proportion = currTime/totalTime;
   return first.slerp(second, proportion);
 }
 

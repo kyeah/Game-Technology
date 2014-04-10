@@ -26,9 +26,9 @@ class Plane : public GameObject {
   virtual void update(float elapsedTime);                                                                  
 };
 
-class ExtrudedObject : public GameObject {
+class MeshObject : public GameObject {
  public:                                                                                                   
-  ExtrudedObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String nodeName,
+  MeshObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String nodeName,
         Ogre::SceneNode* parentNode, Physics* physics,                                                     
         btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1), 
         btVector3 velocity=btVector3(0,0,0),  
