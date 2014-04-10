@@ -20,11 +20,19 @@ using namespace Ogre;
 using namespace std;
 using namespace sh;
 
+
+
 OgreBallApplication::OgreBallApplication(void)
 {
   mPhysics = new Physics(btVector3(0, -490, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
+  xTilt = 0;
+  zTilt = 0;
+  totalXTilt = 0;
+  totalZTilt = 0;
+  ROTATION_FACTOR = 0.0001; //Increasing this increases the speed at which the level rotates on key press
+  MAX_TILT = .1; //Increasing this increases the maximum degree to which the level can rotate
 }
 
 //-------------------------------------------------------------------------------------
@@ -72,35 +80,64 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   time = mTimer->getMilliseconds();
 
   if (mPhysics) mPhysics->stepSimulation(elapsedTime);
+  if(zTilt != 0){
+    btVector3 axis = btVector3(0, 0, 1);
+    if (zTilt > 0 && totalZTilt >= MAX_TILT){}
+    else if(zTilt < 0 && totalZTilt <= -1 * MAX_TILT){}
+    else{
+      levelLoader->rotateLevel(&axis, zTilt);
+      totalZTilt += zTilt;
+    }
+  }
+  if(xTilt != 0){
+    btVector3 axis = btVector3(1, 0, 0);
+    if (xTilt > 0 && totalXTilt >= MAX_TILT){}
+    else if(xTilt < 0 && totalXTilt <= -1 * MAX_TILT){}
+    else{
+      levelLoader->rotateLevel(&axis, xTilt);
+      totalXTilt += xTilt;
+    }
+  }
   return result;
 }
 
 //-------------------------------------------------------------------------------------
 bool OgreBallApplication::keyPressed( const OIS::KeyEvent &arg ) {
-  btVector3 axis;
+
   switch(arg.key){
     
     case OIS::KC_D:
-      axis = btVector3(0, 0, 1);
-      levelLoader->rotateLevel(&axis, btScalar(.01));
+      zTilt += ROTATION_FACTOR;
       break;
     case OIS::KC_A:
-      axis = btVector3(0, 0, 1);
-      levelLoader->rotateLevel(&axis, btScalar(-.01));
+      zTilt += -1.0 * ROTATION_FACTOR;
       break;
     case OIS::KC_W:
-      axis = btVector3(1, 0, 0);
-      levelLoader->rotateLevel(&axis, btScalar(.01));
+      xTilt += -1.0 * ROTATION_FACTOR;
       break;
     case OIS::KC_S:
-      axis = btVector3(1, 0, 0);
-      levelLoader->rotateLevel(&axis, btScalar(-.01));
+      xTilt += ROTATION_FACTOR;
       break;
   }
   return BaseApplication::keyPressed(arg);
 }
 
 bool OgreBallApplication::keyReleased( const OIS::KeyEvent &arg ) {
+  switch(arg.key){
+    
+    case OIS::KC_D:
+      zTilt -= ROTATION_FACTOR;
+      break;
+    case OIS::KC_A:
+      zTilt -= -1.0 * ROTATION_FACTOR;
+      break;
+    case OIS::KC_W:
+      xTilt -= -1.0 * ROTATION_FACTOR;
+      break;
+    case OIS::KC_S:
+      xTilt -= ROTATION_FACTOR;
+      break;
+  }
   return BaseApplication::keyReleased(arg);
 }
 

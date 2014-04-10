@@ -63,9 +63,16 @@ class OgreBallApplication : public BaseApplication
   bool mouseMoved( const OIS::MouseEvent &arg );
   bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
+  btScalar ROTATION_FACTOR;
+  btScalar MAX_TILT;
+
   Ogre::Timer *mTimer;
   Physics *mPhysics;
   LevelLoader *levelLoader;
+  btScalar xTilt;
+  btScalar zTilt;
+  btScalar totalXTilt;
+  btScalar totalZTilt;
 
   // CEGUI
   CEGUI::OgreRenderer* mRenderer;
