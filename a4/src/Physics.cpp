@@ -91,6 +91,14 @@ int Physics::addObject(GameObject *obj) {
   return simID++;
 }
 
+int Physics::addObject(GameObject *obj, short group, short mask) {
+  objList.push_back(obj);
+  obj->setSimID(simID);
+  getDynamicsWorld()->addRigidBody(obj->getBody(), group, mask);
+  
+  return simID++;
+}
+
 void Physics::removeAllObjects() {
   for (int i = 0; i < objList.size(); i++) {
     getDynamicsWorld()->removeRigidBody(objList[i]->getBody());

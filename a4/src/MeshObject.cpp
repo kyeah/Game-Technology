@@ -17,7 +17,8 @@ MeshObject::MeshObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   Ogre::MeshPtr meshptr = Ogre::Singleton<Ogre::MeshManager>::getSingletonPtr()->load(_meshName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   MeshStrider *strider = new MeshStrider(meshptr.get());
   collisionShape = new btBvhTriangleMeshShape(strider,true,true);
-  addToSimulator();
+  addToSimulator(Collisions::CollisionTypes::COL_LEVEL,
+                 Collisions::levelColliders);
   if (rotation) rotate(*rotation);
 }
 

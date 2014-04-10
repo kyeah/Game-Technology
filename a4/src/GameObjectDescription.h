@@ -1,6 +1,6 @@
 #pragma once 
+#include "Collisions.h"
 #include "GameObject.h"
-
 
 class OgreBall : public GameObject{
  public:
@@ -36,5 +36,4 @@ class MeshObject : public GameObject {
         btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   virtual void update(float elapsedTime);  
-
 };

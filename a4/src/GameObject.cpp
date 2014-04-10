@@ -104,9 +104,11 @@ void GameObject::setSpecular(float sr, float sg, float sb, float sa) {
   pass->setSpecular(sr, sg, sb, sa);
   entity->setMaterialName(mat->getName());
 }
+
 void GameObject::addToSimulator() {
   motionState = 0;
   updateTransform();
+
   //using motionState is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
   motionState = new OgreMotionState(transform, node);
 
@@ -118,6 +120,26 @@ void GameObject::addToSimulator() {
   body->setUserPointer(this);
   body->setLinearVelocity(initVel);
   physics->addObject(this);
+  updateTransform();
+
+  cCallback = new BulletContactCallback(*body, contexts);
+}
+
+void GameObject::addToSimulator(short group, short mask) {
+  motionState = 0;
+  updateTransform();
+
+  //using motionState is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+  motionState = new OgreMotionState(transform, node);
+
+  //rigidbody is dynamic if and only if mass is non zero, otherwise static
+  if (mass != 0.0f) collisionShape->calculateLocalInertia(mass, inertia);
+  btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, collisionShape, inertia);
+  body = new btRigidBody(rbInfo);
+  body->setRestitution(rest);
+  body->setUserPointer(this);
+  body->setLinearVelocity(initVel);
+  physics->addObject(this, group, mask);
   updateTransform();
 
   cCallback = new BulletContactCallback(*body, contexts);

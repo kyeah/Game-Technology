@@ -26,7 +26,8 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   node->_updateBounds();
   Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
   collisionShape = new btSphereShape(s[0]);
-  addToSimulator();
+  addToSimulator(Collisions::CollisionTypes::COL_PLAYER,
+                 Collisions::playerColliders);
 
   // body->setCcdMotionThreshold(1);
   // body->setCcdSweptSphereRadius(0.4);
@@ -38,4 +39,3 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
 
 void OgreBall::update(float elapsedTime) {
 }
-

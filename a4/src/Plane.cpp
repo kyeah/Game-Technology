@@ -17,7 +17,8 @@ Plane::Plane(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshN
   Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
 
   collisionShape = new btBoxShape(btVector3(s[0], s[1], s[2]));
-  addToSimulator();
+  addToSimulator(Collisions::CollisionTypes::COL_LEVEL,
+                 Collisions::levelColliders);
   if (rotation) rotate(*rotation);
 }
 

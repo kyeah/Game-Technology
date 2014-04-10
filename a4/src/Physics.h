@@ -36,6 +36,8 @@ class Physics {
                             btVector3 origin=btVector3(0,0,0), btQuaternion *rotation=0);
 
   int addObject(GameObject *obj);
+  int addObject(GameObject *obj, short group, short mask);
+
   void removeObject(GameObject *obj);
   bool checkCollisions(GameObject *obj);
   bool checkCollisionPair(GameObject *obj1, GameObject *obj2);
