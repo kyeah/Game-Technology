@@ -26,7 +26,6 @@ class Plane : public GameObject {
   virtual void update(float elapsedTime);
 };
 
-<<<<<<< HEAD
 class Collectible : public GameObject {
   public:
     Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::String _meshName, Ogre::SceneNode* parentNode,
