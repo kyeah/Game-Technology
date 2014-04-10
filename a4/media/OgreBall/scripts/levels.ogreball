@@ -44,6 +44,14 @@ level baseLevel {
                   }
             }
       }
+      collectible {
+            meshname upPlane
+            rest 0.8
+            pos {
+                start 0 100 0
+            }
+
+      }
       extrudedObject {
             meshname teardropMesh
             material OgreBall/Transparent

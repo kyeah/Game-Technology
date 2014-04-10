@@ -79,6 +79,10 @@ class OgreBallApplication : public BaseApplication
   CEGUI::WindowManager* Wmgr;
   CEGUI::Window* menu;
   
+  OgreBall *mPlayer;
+  btVector3 playerVelocity;
+  btScalar MAX_SPEED;
+
 };
 
 #endif // #ifndef __OgreBallApplication_h_

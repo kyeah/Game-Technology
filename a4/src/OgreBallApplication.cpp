@@ -33,6 +33,7 @@ OgreBallApplication::OgreBallApplication(void)
   totalZTilt = 0;
   ROTATION_FACTOR = 0.0001; //Increasing this increases the speed at which the level rotates on key press
   MAX_TILT = .1; //Increasing this increases the maximum degree to which the level can rotate
+  MAX_SPEED = btScalar(100); //Increasing this increases the max speed at which the player ball can move
 }
 
 //-------------------------------------------------------------------------------------
@@ -47,7 +48,7 @@ void OgreBallApplication::createScene(void)
   levelLoader->loadResources("media/OgreBall/scripts");
   levelLoader->loadLevel("baseLevel");
 
-  new OgreBall(mSceneMgr, "player1", "player1", "penguin.mesh", 0, mPhysics, 
+  mPlayer = new OgreBall(mSceneMgr, "player1", "player1", "penguin.mesh", 0, mPhysics, 
                levelLoader->playerStartPositions[0]);
 }
 
@@ -80,6 +81,15 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   time = mTimer->getMilliseconds();
 
   if (mPhysics) mPhysics->stepSimulation(elapsedTime);
+  //limit ball velocity
+  playerVelocity = mPlayer->getBody()->getLinearVelocity();
+  btScalar speed = playerVelocity.length();
+  if(speed > MAX_SPEED){
+    playerVelocity *= MAX_SPEED/speed;
+    mPlayer->getBody()->setLinearVelocity(playerVelocity);
+  }
+
+  //Tilt the level 
   if(zTilt != 0){
     btVector3 axis = btVector3(0, 0, 1);
     if (zTilt > 0 && totalZTilt >= MAX_TILT){}

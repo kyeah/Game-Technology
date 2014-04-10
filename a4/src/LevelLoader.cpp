@@ -462,6 +462,9 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   if (type.compare("plane") == 0) {
     go = new Plane(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                    btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
+  } else if (type.compare("collectible") == 0){
+    go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
+                   btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
   } else if (type.compare("extrudedObject") == 0) {
     go = new ExtrudedObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                             btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
