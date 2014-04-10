@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Menu/MultiBackground">
+    <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <!--Property Name="Image" Value="set:MenuBackground image:Background" /-->
+    <Property Name="Alpha" Value="0.0" />
+    <Window Type="WindowsLook/Button" Name="Menu/Host">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.2,0.0},{0.6,0.0},{0.4,0.0}}" />
+      <Property Name="NormalImage" Value="set:TaharezLook image:ButtonLeftNormal" />
+      <Property Name="HoverImage" Value="set:TaharezLook image:ButtonLeftHighlight" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonLeftPushed" />
+      <Property Name="Tooltip" Value="Host a New Server"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+      <Window Type="TaharezLook/StaticText" Name="btnHost_text__">
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
+        <Property Name="FrameEnabled"      Value="False" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="HorzFormatting"    Value="WordWrapCentred" />
+        <Property Name="VertFormatting"    Value="Middle" />
+        <!-- We MUST disable the text so that it is the button that gets our mouse events, -->
+        <Property Name="Disabled"          Value="True" />
+        <Property Name="Text">Host a New Server</Property>
+      </Window>
+    </Window>
+
+    <Window Type="WindowsLook/Button" Name="Menu/Client">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.6,0.0},{0.65,0.0}}" />
+      <Property Name="NormalImage" Value="set:TaharezLook image:ButtonMiddleNormal" />
+      <Property Name="HoverImage" Value="set:TaharezLook image:ButtonMiddleHighlight" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="Tooltip" Value="Join an Existing Server"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+      <Window Type="TaharezLook/StaticText" Name="btnClient_text__">
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
+        <Property Name="FrameEnabled"      Value="False" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="HorzFormatting"    Value="WordWrapCentred" />
+        <Property Name="VertFormatting"    Value="Middle" />
+        <!-- We MUST disable the text so that it is the button that gets our mouse events, -->
+        <Property Name="Disabled"          Value="True" />
+        <Property Name="Text">Join Existing Server</Property>
+      </Window>
+    </Window>
+
+    <Window Type="WindowsLook/Button" Name="Menu/Return">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.7,0.0},{0.6,0.0},{0.9,0.0}}" />
+      <Property Name="NormalImage" Value="set:TaharezLook image:ButtonRightNormal" />
+      <Property Name="HoverImage" Value="set:TaharezLook image:ButtonRightHighlight" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonRightPushed" />
+      <Property Name="Tooltip" Value="Return"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+      <Window Type="TaharezLook/StaticText" Name="btnReturn_text__">
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
+        <Property Name="FrameEnabled"      Value="False" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="HorzFormatting"    Value="WordWrapCentred" />
+        <Property Name="VertFormatting"    Value="Middle" />
+        <!-- We MUST disable the text so that it is the button that gets our mouse events, -->
+        <Property Name="Disabled"          Value="True" />
+        <Property Name="Text">Return</Property>
+      </Window>
+    </Window>
+  </Window>
+</GUILayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Menu/Background">
+    <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <Property Name="Alpha" Value="0.0" />
+    
+    <Window Type="WindowsLook/Button" Name="Menu/SinglePlayer">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.2,0.0},{0.6,0.0},{0.4,0.0}}" />
+      <Property Name="NormalImage" Value="set:TaharezLook image:ButtonLeftNormal" />
+      <Property Name="HoverImage" Value="set:TaharezLook image:ButtonLeftHighlight" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonLeftPushed" />
+      <Property Name="Tooltip" Value="Start a new game"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+      <Window Type="TaharezLook/StaticText" Name="btnNewGame_text__">
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
+        <Property Name="FrameEnabled"      Value="False" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="HorzFormatting"    Value="WordWrapCentred" />
+        <Property Name="VertFormatting"    Value="Middle" />
+        <!-- We MUST disable the text so that it is the button that gets our mouse events, -->
+        <Property Name="Disabled"          Value="True" />
+        <Property Name="Text">Single Player</Property>
+      </Window>
+    </Window>
+
+    <Window Type="WindowsLook/Button" Name="Menu/MultiPlayer">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.6,0.0},{0.65,0.0}}" />
+      <Property Name="NormalImage" Value="set:TaharezLook image:ButtonMiddleNormal" />
+      <Property Name="HoverImage" Value="set:TaharezLook image:ButtonMiddleHighlight" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="Tooltip" Value="Multiplayer"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+      <Window Type="TaharezLook/StaticText" Name="btnMultiplayerGame_text__">
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
+        <Property Name="FrameEnabled"      Value="False" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="HorzFormatting"    Value="WordWrapCentred" />
+        <Property Name="VertFormatting"    Value="Middle" />
+        <!-- We MUST disable the text so that it is the button that gets our mouse events, -->
+        <Property Name="Disabled"          Value="True" />
+        <Property Name="Text">Multiplayer</Property>
+      </Window>
+    </Window>
+
+    <Window Type="WindowsLook/Button" Name="Menu/QuitGame">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.7,0.0},{0.6,0.0},{0.9,0.0}}" />
+      <Property Name="NormalImage" Value="set:TaharezLook image:ButtonRightNormal" />
+      <Property Name="HoverImage" Value="set:TaharezLook image:ButtonRightHighlight" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonRightPushed" />
+      <Property Name="Tooltip" Value="Exit to Desktop"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+      <Window Type="TaharezLook/StaticText" Name="btnQuitGame_text__">
+        <Property Name="UnifiedAreaRect" Value="{{0.2,0.0},{0.45,0.0},{0.8,0.0},{0.65,0.0}}" />
+        <Property Name="FrameEnabled"      Value="False" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="HorzFormatting"    Value="WordWrapCentred" />
+        <Property Name="VertFormatting"    Value="Middle" />
+        <!-- We MUST disable the text so that it is the button that gets our mouse events, -->
+        <Property Name="Disabled"          Value="True" />
+        <Property Name="Text">Exit to Desktop</Property>
+      </Window>
+    </Window>
+  </Window>
+</GUILayout>

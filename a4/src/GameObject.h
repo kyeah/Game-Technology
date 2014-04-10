@@ -23,6 +23,7 @@ class GameObject {
   virtual void update(float elapsedTime);
   void updateTransform();
   void addToSimulator();
+  void addToSimulator(short group, short mask);
   
   void setKinematic(bool kinematic);
   void setColor(float ar, float ag, float ab,

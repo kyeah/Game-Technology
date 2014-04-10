@@ -15,6 +15,8 @@
   -----------------------------------------------------------------------------
 */
 #include "OgreBallApplication.h"
+#include "MenuActivity.h"
+#include "SinglePlayerActivity.h"
 
 using namespace Ogre;
 using namespace std;
@@ -24,16 +26,10 @@ using namespace sh;
 
 OgreBallApplication::OgreBallApplication(void)
 {
-  mPhysics = new Physics(btVector3(0, -490, 0));
+  mPhysics = new Physics(btVector3(0, -1960, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
-  xTilt = 0;
-  zTilt = 0;
-  totalXTilt = 0;
-  totalZTilt = 0;
-  ROTATION_FACTOR = 0.0001; //Increasing this increases the speed at which the level rotates on key press
-  MAX_TILT = .1; //Increasing this increases the maximum degree to which the level can rotate
-  MAX_SPEED = btScalar(100); //Increasing this increases the max speed at which the player ball can move
+
 }
 
 //-------------------------------------------------------------------------------------
@@ -42,14 +38,34 @@ OgreBallApplication::~OgreBallApplication(void)
 }
 
 //-------------------------------------------------------------------------------------
+void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
+  mPhysics->removeAllObjects();
+  mSceneMgr->destroyAllEntities();
+  mSceneMgr->getRootSceneNode()->removeAndDestroyAllChildren();
+  mSceneMgr->destroyAllLights();
+  // mSceneMgr->destroyAllParticleSystems();
+  // mSceneMgr->destroyAllRibbonTrails();
+
+  levelRoot = mSceneMgr->getRootSceneNode()->createChildSceneNode("root");
+  levelLoader->levelRoot = levelRoot;
+  levelLoader->clearKnobs();
+}
+
+//-------------------------------------------------------------------------------------
+void OgreBallApplication::switchActivity(Activity *activity) {
+  this->activity = activity;
+  destroyAllEntitiesAndNodes();
+  activity->start();
+}
+
+//-------------------------------------------------------------------------------------
 void OgreBallApplication::createScene(void)
 {
-  levelLoader = new LevelLoader(mSceneMgr, mCamera, mPhysics);
+  levelLoader = new LevelLoader(mSceneMgr, mCamera, mPhysics, levelRoot);
   levelLoader->loadResources("media/OgreBall/scripts");
-  levelLoader->loadLevel("baseLevel");
 
-  mPlayer = new OgreBall(mSceneMgr, "player1", "player1", "penguin.mesh", 0, mPhysics, 
-               levelLoader->playerStartPositions[0]);
+  switchActivity(new MenuActivity(this));
+
 }
 
 void OgreBallApplication::createCamera(void) {
@@ -57,8 +73,8 @@ void OgreBallApplication::createCamera(void) {
   mCamera->lookAt(0,0,0);
 }
 
-void OgreBallApplication::createFrameListener(void) {
-  BaseApplication::createFrameListener();
+void OgreBallApplication::loadResources(void) {
+  BaseApplication::loadResources();
 
   // Initialize CEGUI
   CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
@@ -68,8 +84,18 @@ void OgreBallApplication::createFrameListener(void) {
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
 
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-  //  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-  //  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
+  // CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
+  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow"); 
+ 
+  Wmgr = &CEGUI::WindowManager::getSingleton();
+  Wmgr->loadWindowLayout("Menu.layout");
+  Wmgr->loadWindowLayout("MultiSubMenu.layout");
+  Wmgr->loadWindowLayout("Chatbox.layout");
+  sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
+  // CEGUI::System::getSingleton().setGUISheet(sheet);
 }
 
 //-------------------------------------------------------------------------------------
@@ -81,81 +107,66 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   time = mTimer->getMilliseconds();
 
   if (mPhysics) mPhysics->stepSimulation(elapsedTime);
-  //limit ball velocity
-  playerVelocity = mPlayer->getBody()->getLinearVelocity();
-  btScalar speed = playerVelocity.length();
-  if(speed > MAX_SPEED){
-    playerVelocity *= MAX_SPEED/speed;
-    mPlayer->getBody()->setLinearVelocity(playerVelocity);
+
+
+  activity->frameStarted(elapsedTime);
+
+
+  return result;
+}
+
+bool OgreBallApplication::frameRenderingQueued( const Ogre::FrameEvent &evt ) {
+  if(mWindow->isClosed())
+    return false;
+
+  if(mShutDown)
+    return false;
+
+  //Need to capture/update each device
+  mKeyboard->capture();
+  mMouse->capture();
+
+  mTrayMgr->frameRenderingQueued(evt);
+  if (!mTrayMgr->isDialogVisible()) {
+    mCameraMan->frameRenderingQueued(evt);
   }
 
-  //Tilt the level 
-  if(zTilt != 0){
-    btVector3 axis = btVector3(0, 0, 1);
-    if (zTilt > 0 && totalZTilt >= MAX_TILT){}
-    else if(zTilt < 0 && totalZTilt <= -1 * MAX_TILT){}
-    else{
-      levelLoader->rotateLevel(&axis, zTilt);
-      totalZTilt += zTilt;
-    }
-  }
-  if(xTilt != 0){
-    btVector3 axis = btVector3(1, 0, 0);
-    if (xTilt > 0 && totalXTilt >= MAX_TILT){}
-    else if(xTilt < 0 && totalXTilt <= -1 * MAX_TILT){}
-    else{
-      levelLoader->rotateLevel(&axis, xTilt);
-      totalXTilt += xTilt;
-    }
-  }
-  return result;
+  activity->frameRenderingQueued(evt);
+  
+  return true;
 }
 
 //-------------------------------------------------------------------------------------
 bool OgreBallApplication::keyPressed( const OIS::KeyEvent &arg ) {
-
-  switch(arg.key){
-    
-    case OIS::KC_D:
-      zTilt += ROTATION_FACTOR;
-      break;
-    case OIS::KC_A:
-      zTilt += -1.0 * ROTATION_FACTOR;
-      break;
-    case OIS::KC_W:
-      xTilt += -1.0 * ROTATION_FACTOR;
-      break;
-    case OIS::KC_S:
-      xTilt += ROTATION_FACTOR;
-      break;
+  if (!activity->keyPressed(arg)) {
+    return BaseApplication::keyPressed(arg);
   }
-  return BaseApplication::keyPressed(arg);
+  return true;
 }
 
 bool OgreBallApplication::keyReleased( const OIS::KeyEvent &arg ) {
-  switch(arg.key){
-    
-    case OIS::KC_D:
-      zTilt -= ROTATION_FACTOR;
-      break;
-    case OIS::KC_A:
-      zTilt -= -1.0 * ROTATION_FACTOR;
-      break;
-    case OIS::KC_W:
-      xTilt -= -1.0 * ROTATION_FACTOR;
-      break;
-    case OIS::KC_S:
-      xTilt -= ROTATION_FACTOR;
-      break;
+  if (!activity->keyReleased(arg)) {
+    return BaseApplication::keyReleased(arg);
   }
-  return BaseApplication::keyReleased(arg);
+  return true;
 }
 
 bool OgreBallApplication::mouseMoved( const OIS::MouseEvent &arg ) {
-  return BaseApplication::mouseMoved(arg);
+  if (!activity->mouseMoved(arg)) {
+    return BaseApplication::mouseMoved(arg);
+  }
+  return true;
 }
+
+bool OgreBallApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+  return activity->mousePressed(arg, id);
+}
+
 bool OgreBallApplication::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
-  return BaseApplication::mouseReleased(arg, id);
+  if (!activity->mouseReleased(arg, id)) {
+    return BaseApplication::mouseReleased(arg, id);
+  }
+  return true;
 }
 
 

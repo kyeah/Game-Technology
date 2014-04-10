@@ -42,7 +42,6 @@ public:
 
     virtual void go(void);
 
-protected:
     virtual bool setup();
     virtual bool configure(void);
     virtual void chooseSceneManager(void);

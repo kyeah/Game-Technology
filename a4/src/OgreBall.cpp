@@ -3,7 +3,7 @@
 #include "GameObjectDescription.h"
 
 OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::String _meshName, Ogre::SceneNode* parentNode,
-                   Physics* _physics, 
+                   Physics* _physics,
                    btVector3 origin, btVector3 scale,
                    btVector3 velocity, btScalar _mass, btScalar _rest,
                    btVector3 _localInertia, btQuaternion *rotation)
@@ -22,19 +22,20 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   headNode->attachObject(charHead);
   headNode->scale(2,2,2);
 
-  Ogre::Vector3 s = entity->getBoundingBox().getHalfSize();
+  node->_update(true,true);
+  node->_updateBounds();
+  Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
   collisionShape = new btSphereShape(s[0]);
-  addToSimulator();
+  addToSimulator(Collisions::CollisionTypes::COL_PLAYER,
+                 Collisions::playerColliders);
 
   // body->setCcdMotionThreshold(1);
   // body->setCcdSweptSphereRadius(0.4);
 
-  //  body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-  //  body->setActivationState(DISABLE_DEACTIVATION);
   setAmbient(0.5,0.5,0.9);
   setSpecular(0.1,0,0,0.4);
+  if (rotation) rotate(*rotation);
 }
 
 void OgreBall::update(float elapsedTime) {
 }
-

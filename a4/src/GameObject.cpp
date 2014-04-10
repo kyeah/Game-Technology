@@ -1,6 +1,7 @@
 #include <OgreSubEntity.h>
 #include "Collisions.h"
 #include "GameObject.h"
+#include "Interpolator.h"
 #include "OgreMotionState.h"
 
 GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
@@ -18,9 +19,6 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   node = parentNode->createChildSceneNode(_nodeName);
 
   node->translate(Ogre::Vector3(origin[0], origin[1], origin[2]));
-  if (rotation)
-    node->rotate(Ogre::Quaternion((*rotation)[0], (*rotation)[1], (*rotation)[2], (*rotation)[3]));
-
   node->scale(scale[0], scale[1], scale[2]);
   transform.setIdentity();
 
@@ -106,9 +104,11 @@ void GameObject::setSpecular(float sr, float sg, float sb, float sa) {
   pass->setSpecular(sr, sg, sb, sa);
   entity->setMaterialName(mat->getName());
 }
+
 void GameObject::addToSimulator() {
   motionState = 0;
   updateTransform();
+
   //using motionState is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
   motionState = new OgreMotionState(transform, node);
 
@@ -120,6 +120,26 @@ void GameObject::addToSimulator() {
   body->setUserPointer(this);
   body->setLinearVelocity(initVel);
   physics->addObject(this);
+  updateTransform();
+
+  cCallback = new BulletContactCallback(*body, contexts);
+}
+
+void GameObject::addToSimulator(short group, short mask) {
+  motionState = 0;
+  updateTransform();
+
+  //using motionState is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+  motionState = new OgreMotionState(transform, node);
+
+  //rigidbody is dynamic if and only if mass is non zero, otherwise static
+  if (mass != 0.0f) collisionShape->calculateLocalInertia(mass, inertia);
+  btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, collisionShape, inertia);
+  body = new btRigidBody(rbInfo);
+  body->setRestitution(rest);
+  body->setUserPointer(this);
+  body->setLinearVelocity(initVel);
+  physics->addObject(this, group, mask);
   updateTransform();
 
   cCallback = new BulletContactCallback(*body, contexts);
@@ -174,39 +194,14 @@ void GameObject::setVelocity(btVector3 vel) {
 
 void GameObject::update(float elapsedTime) {
   if (posKnobs.size() > 0) {
-    currentInterpPosTime = fmod((currentInterpPosTime + elapsedTime), totalInterpTime);
-
-    for (int i = 1; i < posInterpTimes.size(); i++) {
-      if (currentInterpPosTime < posInterpTimes[i]) {
-        // Interp time is between position (i-1) and position i
-        btVector3 first = posKnobs[i-1];
-        btVector3 second = posKnobs[i];
-
-        float dt = currentInterpPosTime - posInterpTimes[i-1];
-        float proportion = dt/(posInterpTimes[i]-posInterpTimes[i-1]);
-
-        btVector3 pos = first.lerp(second, proportion);
-        setPosition(pos);
-        break;
-      }
-    }
+    btVector3 v = Interpolator::interpV3(currentInterpPosTime, elapsedTime, totalInterpTime,
+                                         posKnobs, posInterpTimes);
+    setPosition(v);
   }
 
   if (rotKnobs.size() > 0) {
-    currentInterpRotTime = fmod((currentInterpRotTime + elapsedTime), totalInterpRotTime);
-
-    for (int i = 1; i < rotInterpTimes.size(); i++) {
-      if (currentInterpRotTime < rotInterpTimes[i]) {
-        btQuaternion first = rotKnobs[i-1];
-        btQuaternion second = rotKnobs[i];
-
-        float dt = currentInterpRotTime - rotInterpTimes[i-1];
-        float proportion = dt/(rotInterpTimes[i] - rotInterpTimes[i-1]);
-        
-        btQuaternion rot = first.slerp(second, proportion);
-        setOrientation(rot);
-        break;
-      }
-    }
+    btQuaternion q = Interpolator::interpQuat(currentInterpRotTime, elapsedTime, totalInterpRotTime,
+                                              rotKnobs, rotInterpTimes);
+    setOrientation(q);
   }
 }

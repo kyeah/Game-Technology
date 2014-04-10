@@ -21,7 +21,7 @@ vector<string> LevelLoader::split(const string &s, char delim) {
   return elems;
 }
 
-LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam) { }
+LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) { }
 
 void LevelLoader::loadResources(const string& path) {
   ConfigLoader *mScriptLoader = new ConfigLoader(".ogreball");
@@ -35,25 +35,35 @@ void LevelLoader::loadResources(const string& path) {
   vector<string> extrudedMeshNames;
 
   for(map<string, ConfigNode*>::iterator it = scripts.begin(); it != scripts.end(); ++it) {
-    cout << it->first << endl;
     vector<string> name = split(it->first, ' ');
-    cout << name[0] << " " << name[1] << endl;
     if (name[0].compare("planemesh") == 0) {
       planeMeshes.push_back(it->second);
       planeMeshNames.push_back(name[1]);
+
     } else if (name[0].compare("extrudedMesh") == 0) {
       extrudedMeshes.push_back(it->second);
       extrudedMeshNames.push_back(name[1]);
+
     } else if (name[0].compare("level") == 0) {
       levels.push_back(it->second);
       levelNames.push_back(name[1]);
     }
   }
 
-  cout << "loading planes" << endl;
   loadPlaneMeshes(planeMeshes, planeMeshNames);
-  cout << "loaded planes" << endl;
   loadExtrudedMeshes(extrudedMeshes, extrudedMeshNames);
+  cout << "Loaded Mesh scripts" << endl;
+}
+
+void LevelLoader::clearKnobs(void) {
+  camPosKnobs.clear();
+  camPosInterpTimes.clear();
+  camLookAtKnobs.clear();
+  camLookAtInterpTimes.clear();
+  totalCamPosInterpTime = 0;
+  totalCamLookAtInterpTime = 0;
+  currentInterpCamPosTime = 0;
+  currentInterpCamLookAtTime = 0;
 }
 
 void LevelLoader::loadLevel(char* levelName) {
@@ -71,7 +81,7 @@ void LevelLoader::loadLevel(char* levelName) {
           loadObject(objs[j]);
         }
       }
-
+      
       break;
     }
   }
@@ -80,17 +90,17 @@ void LevelLoader::loadLevel(char* levelName) {
 void LevelLoader::loadStartParameters(ConfigNode *root) {
   ConfigNode *camNode = root->findChild("camera");
   if (camNode) {
-    btVector3 camPos = camNode->getValueV3();
-    mCamera->setPosition(camPos[0], camPos[1], camPos[2]);
-  }
-
-  ConfigNode *goalNode = root->findChild("goal");
-  if (goalNode) {
-    ConfigNode *gposNode = goalNode->findChild("pos");
-    ConfigNode *grotNode = goalNode->findChild("rot");
-
-    if (gposNode) goalPosition = gposNode->getValueV3();
-    if (grotNode) goalRotation = grotNode->getValueYPR();
+    ConfigNode *cposNode = camNode->findChild("pos");
+    ConfigNode *clookNode = camNode->findChild("lookAt");
+    
+    if (cposNode) {
+      btVector3 camPos = cposNode->getValueV3();
+      mCamera->setPosition(camPos[0], camPos[1], camPos[2]);
+    }
+    if (clookNode) {
+      btVector3 clook = clookNode->getValueV3();
+      mCamera->lookAt(clook[0], clook[1], clook[2]);
+    }
   }
 
   ConfigNode *wpNode = root->findChild("waypoints");
@@ -204,8 +214,6 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
 
     float utiles, vtiles;
     utiles = vtiles = 1.0;
-
-    cout << "test" << endl;
 
     Procedural::Path p;
     parsePath(info[0], p);
@@ -457,6 +465,10 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   string name = ss.str();
   id++;
 
+  if (!parentNode && kinematic) {
+    parentNode = levelRoot;
+  }
+
   string type = obj->getName();
   GameObject *go;
   if (type.compare("plane") == 0) {
@@ -466,8 +478,11 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
                    btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
   } else if (type.compare("extrudedObject") == 0) {
-    go = new ExtrudedObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+    go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                             btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
+  } else if (type.compare("goal") == 0) {
+    go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   }
   levelPieces.push_back(go);
 
@@ -494,8 +509,11 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
 
   void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){
     btQuaternion q = btQuaternion(*axis, degree);
-    for(int i = 0; i < levelPieces.size(); i++){
-      GameObject *go = levelPieces[i];
-      go->rotate(q);
-    }
+    //    for(int i = 0; i < levelPieces.size(); i++){
+    //      GameObject *go = levelPieces[i];
+    //      go->rotate(q);
+    //    }
+    
+    std::cout << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << std::endl;
+    levelRoot->rotate(Ogre::Quaternion(q.w(), q.x(), q.y(), q.z()));
 }

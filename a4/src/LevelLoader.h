@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include "Physics.h"
 #include "ProceduralStableHeaders.h"
@@ -9,10 +10,12 @@
 
 class LevelLoader {
  public:
-  LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys);
+  LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *levelRoot);
 
   static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
   static std::vector<std::string> split(const std::string &s, char delim);
+
+  void clearKnobs();
 
   void loadResources(const std::string& path);
   void loadLevel(char* levelName);
@@ -32,6 +35,7 @@ class LevelLoader {
   void rotateLevel(btVector3 *axis, btScalar degree);
 
   Ogre::SceneManager *mSceneMgr;
+  Ogre::SceneNode *levelRoot;
   Ogre::Camera *mCamera;
   Physics *mPhysics;
 
@@ -43,6 +47,19 @@ class LevelLoader {
   btVector3 playerStartPositions[4];
   btQuaternion playerStartRotations[4];
 
+  // Camera Interpolations when level is the menu background
+  std::vector<btVector3> camPosKnobs;
+  std::vector<float> camPosInterpTimes;
+  float totalCamPosInterpTime;
+
+  std::vector<btVector3> camLookAtKnobs;
+  std::vector<float> camLookAtInterpTimes;
+  float totalCamLookAtInterpTime;
+
+  float currentInterpCamPosTime;
+  float currentInterpCamLookAtTime;
+
+  // Shouldn't need these; create goal object directly when loading
   btVector3 goalPosition;
   btQuaternion goalRotation;
 };
