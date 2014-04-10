@@ -15,6 +15,8 @@ class LevelLoader {
   static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
   static std::vector<std::string> split(const std::string &s, char delim);
 
+  void clearKnobs();
+
   void loadResources(const std::string& path);
   void loadLevel(char* levelName);
 
@@ -42,6 +44,19 @@ class LevelLoader {
   btVector3 playerStartPositions[4];
   btQuaternion playerStartRotations[4];
 
+  // Camera Interpolations when level is the menu background
+  std::vector<btVector3> camPosKnobs;
+  std::vector<float> camPosInterpTimes;
+  float totalCamPosInterpTime;
+
+  std::vector<btVector3> camLookAtKnobs;
+  std::vector<float> camLookAtInterpTimes;
+  float totalCamLookAtInterpTime;
+
+  float currentInterpCamPosTime;
+  float currentInterpCamLookAtTime;
+
+  // Shouldn't need these; create goal object directly when loading
   btVector3 goalPosition;
   btQuaternion goalRotation;
 };

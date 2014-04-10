@@ -55,6 +55,17 @@ void LevelLoader::loadResources(const string& path) {
   cout << "Loaded Mesh scripts" << endl;
 }
 
+void LevelLoader::clearKnobs(void) {
+  camPosKnobs.clear();
+  camPosInterpTimes.clear();
+  camLookAtKnobs.clear();
+  camLookAtInterpTimes.clear();
+  totalCamPosInterpTime = 0;
+  totalCamLookAtInterpTime = 0;
+  currentInterpCamPosTime = 0;
+  currentInterpCamLookAtTime = 0;
+}
+
 void LevelLoader::loadLevel(char* levelName) {
   for (int i = 0; i < levelNames.size(); i++) {
     if (levelNames[i].compare(levelName) == 0) {

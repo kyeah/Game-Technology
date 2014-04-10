@@ -1,3 +1,4 @@
+#include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
@@ -17,7 +18,27 @@ bool MenuActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
-  // Do cool camera panning stuff here
+  // Rad camera panning
+  if (app->levelLoader->camPosKnobs.size() > 0) {
+    btVector3 pos = Interpolator::interpV3(app->levelLoader->currentInterpCamPosTime,
+                                           elapsedTime,
+                                           app->levelLoader->totalCamPosInterpTime,
+                                           app->levelLoader->camPosKnobs,
+                                           app->levelLoader->camPosInterpTimes);
+
+    app->mCamera->setPosition(pos[0], pos[1], pos[2]);
+  }
+
+  if (app->levelLoader->camLookAtKnobs.size() > 0) {
+    btVector3 lk = Interpolator::interpV3(app->levelLoader->currentInterpCamLookAtTime,
+                                          elapsedTime,
+                                          app->levelLoader->totalCamLookAtInterpTime,
+                                          app->levelLoader->camLookAtKnobs,
+                                          app->levelLoader->camLookAtInterpTimes);
+
+    app->mCamera->lookAt(lk[0], lk[1], lk[2]);
+  }
+
   return true;
 }
 
@@ -27,13 +48,13 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
   CEGUI::Window* singlePlayerButton = app->Wmgr->getWindow("Menu/SinglePlayer");
   CEGUI::Window* multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
   CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
-  
+
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                      CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
 
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
-  
+
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 }
@@ -50,16 +71,16 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 
 bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/MultiBackground"));
-  
+
   CEGUI::Window* hostButton = app->Wmgr->getWindow("Menu/Host");
   CEGUI::Window* clientButton = app->Wmgr->getWindow("Menu/Client");
   CEGUI::Window* returnButton = app->Wmgr->getWindow("Menu/Return");
-  
+
   /*
-  hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                             CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
-  clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-  CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));*/
+    hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
+    clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));*/
   returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
 }
@@ -124,11 +145,11 @@ bool MenuActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID 
   return true;
 }
 
-//-------------------------------------------------------------------------------------                          
+//-------------------------------------------------------------------------------------
 
-bool MenuActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )                                 
-{                                                                                                                
-  CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));                                          
-  return true;                                                                                                   
-}                                                                                                                
-  
+bool MenuActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
+{
+  CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
+  return true;
+}
+

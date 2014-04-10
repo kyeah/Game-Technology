@@ -1,6 +1,7 @@
 #include <OgreSubEntity.h>
 #include "Collisions.h"
 #include "GameObject.h"
+#include "Interpolator.h"
 #include "OgreMotionState.h"
 
 GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
@@ -171,39 +172,14 @@ void GameObject::setVelocity(btVector3 vel) {
 
 void GameObject::update(float elapsedTime) {
   if (posKnobs.size() > 0) {
-    currentInterpPosTime = fmod((currentInterpPosTime + elapsedTime), totalInterpTime);
-
-    for (int i = 1; i < posInterpTimes.size(); i++) {
-      if (currentInterpPosTime < posInterpTimes[i]) {
-        // Interp time is between position (i-1) and position i
-        btVector3 first = posKnobs[i-1];
-        btVector3 second = posKnobs[i];
-
-        float dt = currentInterpPosTime - posInterpTimes[i-1];
-        float proportion = dt/(posInterpTimes[i]-posInterpTimes[i-1]);
-
-        btVector3 pos = first.lerp(second, proportion);
-        setPosition(pos);
-        break;
-      }
-    }
+    btVector3 v = Interpolator::interpV3(currentInterpPosTime, elapsedTime, totalInterpTime,
+                                         posKnobs, posInterpTimes);
+    setPosition(v);
   }
 
   if (rotKnobs.size() > 0) {
-    currentInterpRotTime = fmod((currentInterpRotTime + elapsedTime), totalInterpRotTime);
-
-    for (int i = 1; i < rotInterpTimes.size(); i++) {
-      if (currentInterpRotTime < rotInterpTimes[i]) {
-        btQuaternion first = rotKnobs[i-1];
-        btQuaternion second = rotKnobs[i];
-
-        float dt = currentInterpRotTime - rotInterpTimes[i-1];
-        float proportion = dt/(rotInterpTimes[i] - rotInterpTimes[i-1]);
-
-        btQuaternion rot = first.slerp(second, proportion);
-        setOrientation(rot);
-        break;
-      }
-    }
+    btQuaternion q = Interpolator::interpQuat(currentInterpRotTime, elapsedTime, totalInterpRotTime,
+                                              rotKnobs, rotInterpTimes);
+    setOrientation(q);
   }
 }

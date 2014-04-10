@@ -45,6 +45,7 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
 
   levelRoot = mSceneMgr->getRootSceneNode()->createChildSceneNode("root");
   levelLoader->levelRoot = levelRoot;
+  levelLoader->clearKnobs();
 }
 
 //-------------------------------------------------------------------------------------
