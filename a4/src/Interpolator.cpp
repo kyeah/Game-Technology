@@ -1,5 +1,23 @@
 #include "Interpolator.h"
 
+btVector3 Interpolator::interpV3(float& currTime, float elapsedTime, float totalTime
+                                 btVector3 first, btVector3 second) {
+  currTime += elapsedTime;
+  if (currTime >= totalTime) currTime = totalTime;
+
+  float proportion = currTime/elapsedTime;
+  return first.lerp(second, proportion);
+}
+
+btQuaternion Interpolator::interpQuat(float& currTime, float elapsedTime, float totalTime,
+                                      btQuaternion first, btQuaternion second) {
+  currTime += elapsedTime;
+  if (currTime >= totalTime) currTime = totalTime;
+
+  float proportion = currTime/elapsedTime;
+  return first.slerp(second, proportion);
+}
+
 btVector3 Interpolator::interpV3(float& currTime, float elapsedTime, float totalTime,
                                  std::vector<btVector3>& knobs, std::vector<float>& times, bool once) {
 

@@ -5,6 +5,12 @@
 
 class Interpolator {
  public: 
+
+  // Use Bullet interpolation with proportions bound below 1
+  static btVector3 interpV3(float& currTime, float elapsedTime, float totalTime);
+  static btQuaternion interpQuat(float& currTime, float elapsedTime, float totalTime);
+
+  // Interpolate between a series of knobs; use once to avoid wrap-around.
   static btVector3 interpV3(float& currTime, float elapsedTime, float totalTime, 
                             std::vector<btVector3>& knobs, std::vector<float>& times, bool once=false);
   
