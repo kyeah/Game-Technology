@@ -103,16 +103,6 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
-  ConfigNode *goalNode = root->findChild("goal");
-  if (goalNode) {
-    ConfigNode *gposNode = goalNode->findChild("pos");
-    ConfigNode *grotNode = goalNode->findChild("rot");
-
-    // Should have an actual Goal Object class with position and rotation knobs that we create
-    if (gposNode) goalPosition = gposNode->getValueV3();
-    if (grotNode) goalRotation = grotNode->getValueYPR();
-  }
-
   ConfigNode *wpNode = root->findChild("waypoints");
   if (wpNode) {
     vector<ConfigNode*> wps = wpNode->getChildren();
@@ -484,6 +474,9 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   } else if (type.compare("extrudedObject") == 0) {
     go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                             btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
+  } else if (type.compare("goal") == 0) {
+    go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   }
 
   if (materialName.length() > 0)

@@ -8,10 +8,6 @@ level menuBG {
                     pos 250 500 0
                     rot 0 0 0
             }
-            goal {
-                 pos 1000 0 0
-                 rot 0 0 0
-            }
             waypoints {
             }
       }
@@ -70,6 +66,14 @@ level baseLevel {
                     pos 20 80 50
              }
       }
+      goal {
+           pos {
+               start 1000 0 0
+           }
+           rot { 
+               start 0 0 0
+           }
+      }
       plane {            
             meshname upPlane
             rest 0.8
@@ -116,15 +120,20 @@ level clearPath {
                    pos 0 1000 -100
                    rot 0 0 0
             }
-            goal {
-                 pos 0 0 -12000
-            }
       }
       lights {
              ambient .5 .5 .5
              light1 {
                     pos 20 80 50
              }
+      }
+      goal {
+           pos {
+               start 0 0 -12000
+           }
+           rot {
+               start 0 0 0
+           }
       }
       plane {
             meshname upPlane
