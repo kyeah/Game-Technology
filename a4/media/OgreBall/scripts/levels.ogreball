@@ -143,7 +143,7 @@ level clearPath {
                 start 0 0 -7000
             }
             rot {
-                start 0 -5 0
+                start 0 0 0
             }
       }
 }

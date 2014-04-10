@@ -32,6 +32,8 @@ class LevelLoader {
 
   void loadObject(sh::ConfigNode *plane, Ogre::SceneNode *parentNode = NULL);
 
+  void rotateLevel(btVector3 *axis, btScalar degree);
+
   Ogre::SceneManager *mSceneMgr;
   Ogre::SceneNode *levelRoot;
   Ogre::Camera *mCamera;
@@ -39,6 +41,7 @@ class LevelLoader {
 
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
+  std::vector<GameObject*> levelPieces;
 
   // Start Parameters for most recently loaded level
   btVector3 playerStartPositions[4];

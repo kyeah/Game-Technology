@@ -1,6 +1,15 @@
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
+SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app) : Activity(app) {
+  xTilt = 0;
+  zTilt = 0;
+  totalXTilt = 0;
+  totalZTilt = 0;
+  ROTATION_FACTOR = 0.0001; //Increasing this increases the speed at which the level rotates on key press
+  MAX_TILT = .1; //Increasing this increases the maximum degree to which the level can rotate
+}
+
 SinglePlayerActivity::~SinglePlayerActivity(void) {
 }
 
@@ -25,6 +34,26 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+
+  if(zTilt != 0){
+    btVector3 axis = btVector3(0, 0, 1);
+    if (zTilt > 0 && totalZTilt >= MAX_TILT){}
+    else if(zTilt < 0 && totalZTilt <= -1 * MAX_TILT){}
+    else {
+      app->levelLoader->rotateLevel(&axis, zTilt);
+      totalZTilt += zTilt;
+    }
+  }
+  if(xTilt != 0){
+    btVector3 axis = btVector3(1, 0, 0);
+    if (xTilt > 0 && totalXTilt >= MAX_TILT){}
+    else if(xTilt < 0 && totalXTilt <= -1 * MAX_TILT){}
+    else{
+      app->levelLoader->rotateLevel(&axis, xTilt);
+      totalXTilt += xTilt;
+    }
+  }
+
   return true;
 }
 
@@ -32,20 +61,52 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
 bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
-  if (arg.key == OIS::KC_ESCAPE)
-    {
-      CEGUI::MouseCursor::getSingleton().show();
-      app->switchActivity(new MenuActivity(app));
-      return true;
-    }
-  return false;
+  switch(arg.key){
+  case OIS::KC_D:
+    zTilt += ROTATION_FACTOR;
+    break;
+  case OIS::KC_A:
+    zTilt += -1.0 * ROTATION_FACTOR;
+    break;
+  case OIS::KC_W:
+    xTilt += -1.0 * ROTATION_FACTOR;
+    break;
+  case OIS::KC_S:
+    xTilt += ROTATION_FACTOR;
+    break;
+  case OIS::KC_ESCAPE:
+    CEGUI::MouseCursor::getSingleton().show();
+    app->switchActivity(new MenuActivity(app));
+    break;
+  default:
+    return false;
+  }
+
+  return true;
 }
 
 //-------------------------------------------------------------------------------------
 
 bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 {
-  return false;
+  switch(arg.key){
+  case OIS::KC_D:
+    zTilt -= ROTATION_FACTOR;
+    break;
+  case OIS::KC_A:
+    zTilt -= -1.0 * ROTATION_FACTOR;
+    break;
+  case OIS::KC_W:
+    xTilt -= -1.0 * ROTATION_FACTOR;
+    break;
+  case OIS::KC_S:
+    xTilt -= ROTATION_FACTOR;
+    break;
+  default:
+    return false;
+  }
+
+  return true;
 }
 
 //-------------------------------------------------------------------------------------

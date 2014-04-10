@@ -456,6 +456,9 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     }
   }
 
+
+
+  
   static int id = 0;
   stringstream ss;
   ss << "object" << id;
@@ -478,6 +481,7 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   }
+  levelPieces.push_back(go);
 
   if (materialName.length() > 0)
     go->getEntity()->setMaterialName(materialName);
@@ -495,4 +499,18 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   for (int i = 0; i < childObjects.size(); i++) {
     loadObject(childObjects[i], go->getNode());
   }
+
+
+
+}
+
+  void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){
+    btQuaternion q = btQuaternion(*axis, degree);
+    //    for(int i = 0; i < levelPieces.size(); i++){
+    //      GameObject *go = levelPieces[i];
+    //      go->rotate(q);
+    //    }
+    
+    std::cout << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << std::endl;
+    levelRoot->rotate(Ogre::Quaternion(q.w(), q.x(), q.y(), q.z()));
 }
