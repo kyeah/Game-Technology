@@ -1,3 +1,4 @@
+#include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -31,6 +32,12 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
 bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
+  if (arg.key == OIS::KC_ESCAPE)
+    {
+      CEGUI::MouseCursor::getSingleton().show();
+      app->switchActivity(new MenuActivity(app));
+      return true;
+    }
   return false;
 }
 
