@@ -1,18 +1,25 @@
 Super Monkey Ball
 =====================
-Level layout scripts 
-Dynamic Levels (moving parts described by positions and interpolation times)
+(X) Level layout scripts
+(X) Dynamic Levels (moving parts described by positions and interpolation times)
+(X) meshes in ball as characters
+(X) curved planes
+
 Randomized Levels (randomized paths between two points, random holes, random path widths)
+
 Controller Support (GC, Wiimote)
+
 Multiplayer? (Plane tilt controls = players have different gravities/orientations)
-meshes in ball as characters
-curved planes
-menu -> mp -> serverlist (read list from file) -> waiting room with chatlog and level selector for host, start button for host
 Show small plane under each opposing character in multiplayer to show what their local orientation is
 
+menu -> mp -> serverlist (read list from file) -> waiting room with chatlog and level selector for host, start button for host
 
 CONTROLS, Wiimote
 SOUND (multiple sounds)
 MENU/GUI
 MULTIPLAYER ???/
 AI
+
+Ghost Trials
+High Scores (Save leaderboards)
+Level Selector (with preview - Need LevelLoader to take in a scenemanager, camera, levelRoot when it loads a level => levelViewer class => MenuActivity holds vector of levelViewer classes, each with their own scenemgr that need their framestarted to be called)
