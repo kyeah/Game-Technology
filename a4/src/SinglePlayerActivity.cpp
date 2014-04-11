@@ -2,24 +2,24 @@
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
-SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app) : Activity(app) {
+SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
   lastTilt = btQuaternion(0,0,0);
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
+  startingLevelName = levelName;
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
 }
 
 void SinglePlayerActivity::start(void) {
-  CEGUI::System::getSingleton().setGUISheet(app->sheet);
-  //  loadLevel("baseLevel");
-  loadLevel("clearPath");
+  CEGUI::System::getSingleton().setGUISheet(app->sheet);  // Should load our own GUI sheet for single player
+  loadLevel(startingLevelName);
 }
 
-void SinglePlayerActivity::loadLevel(char* name) {
+void SinglePlayerActivity::loadLevel(const char* name) {
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
 

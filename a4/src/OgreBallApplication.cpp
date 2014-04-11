@@ -42,8 +42,8 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
   mSceneMgr->destroyAllEntities();
   mSceneMgr->getRootSceneNode()->removeAndDestroyAllChildren();
   mSceneMgr->destroyAllLights();
-  // mSceneMgr->destroyAllParticleSystems();
-  // mSceneMgr->destroyAllRibbonTrails();
+  mSceneMgr->destroyAllParticleSystems();
+  mSceneMgr->destroyAllRibbonTrails();
 
   levelRoot = mSceneMgr->getRootSceneNode()->createChildSceneNode("root");
   levelLoader->levelRoot = levelRoot;
@@ -64,7 +64,6 @@ void OgreBallApplication::createScene(void)
   levelLoader->loadResources("media/OgreBall/scripts");
 
   switchActivity(new MenuActivity(this));
-
 }
 
 void OgreBallApplication::createCamera(void) {
@@ -106,10 +105,7 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   time = mTimer->getMilliseconds();
 
   if (mPhysics) mPhysics->stepSimulation(elapsedTime);
-
-
   activity->frameStarted(elapsedTime);
-
 
   return result;
 }

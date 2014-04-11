@@ -6,10 +6,10 @@
 
 class SinglePlayerActivity : public Activity {
  public:
-  SinglePlayerActivity(OgreBallApplication *app);
+  SinglePlayerActivity(OgreBallApplication *app, const char* levelName);
   virtual ~SinglePlayerActivity(void);
 
-  virtual void start(void);
+  void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );
   virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
@@ -20,9 +20,13 @@ class SinglePlayerActivity : public Activity {
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
-  void loadLevel( char* name );
+  void loadLevel( const char* name );
+
+  const char* startingLevelName;
 
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
+
+  CEGUI::Window *guiSheet;
 };

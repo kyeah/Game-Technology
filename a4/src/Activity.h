@@ -6,6 +6,7 @@ class OgreBallApplication;
 class Activity {
  public:
  Activity(OgreBallApplication *_app) : app(_app) {}
+  virtual ~Activity(void) { }
   
   virtual void start(void) = 0;
   virtual bool frameStarted( Ogre::Real elapsedTime ) = 0;

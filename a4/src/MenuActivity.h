@@ -6,9 +6,11 @@
 
 class MenuActivity : public Activity {
  public:
- MenuActivity(OgreBallApplication *app) : Activity(app) {}
+  MenuActivity(OgreBallApplication *app);
+  virtual ~MenuActivity(void);
   
   virtual void start(void);
+
   virtual bool frameStarted( Ogre::Real elapsedTime );
   virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
   
@@ -23,7 +25,11 @@ class MenuActivity : public Activity {
   bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
 
-  bool StartSinglePlayer(const CEGUI::EventArgs& e);
+  bool StartSinglePlayer( const CEGUI::EventArgs& e );
 
   bool quit(const CEGUI::EventArgs& e);
+
+  CEGUI::Window *levelSelectorWindow;
+  int selectorStart, selectorRows, selectorColumns;
+  std::vector<LevelViewer*> levelViewers;
 };

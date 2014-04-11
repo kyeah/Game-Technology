@@ -1,10 +1,20 @@
 #include "Interpolator.h"
+#include "LevelViewer.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
+MenuActivity::MenuActivity(OgreBallApplication *app) : Activity(app) {
+  selectorStart = 0;
+  selectorRows = 2;
+  selectorColumns = 4;
+}
+
+MenuActivity::~MenuActivity(void) {
+}
+
 void MenuActivity::start(void) {
   app->levelLoader->loadLevel("menuBG");
-
+  
   new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0]);
 
@@ -18,27 +28,10 @@ bool MenuActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
-  // Rad camera panning
-  if (app->levelLoader->camPosKnobs.size() > 0) {
-    btVector3 pos = Interpolator::interpV3(app->levelLoader->currentInterpCamPosTime,
-                                           elapsedTime,
-                                           app->levelLoader->totalCamPosInterpTime,
-                                           app->levelLoader->camPosKnobs,
-                                           app->levelLoader->camPosInterpTimes);
-
-    app->mCamera->setPosition(pos[0], pos[1], pos[2]);
+  for (int i = 0; i < levelViewers.size(); i++) {
+    levelViewers[i]->frameStarted(elapsedTime);
   }
-
-  if (app->levelLoader->camLookAtKnobs.size() > 0) {
-    btVector3 lk = Interpolator::interpV3(app->levelLoader->currentInterpCamLookAtTime,
-                                          elapsedTime,
-                                          app->levelLoader->totalCamLookAtInterpTime,
-                                          app->levelLoader->camLookAtKnobs,
-                                          app->levelLoader->camLookAtInterpTimes);
-
-    app->mCamera->lookAt(lk[0], lk[1], lk[2]);
-  }
-
+  
   return true;
 }
 
@@ -50,7 +43,7 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
   CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
 
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                     CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
+                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToLevelSelectMenu, this));
 
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
@@ -59,14 +52,42 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 }
 
-bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
-  CEGUI::MouseCursor::getSingleton().hide();
-  app->switchActivity(new SinglePlayerActivity(app));
-  return true;
+bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
+  CEGUI::WindowManager *wmgr = CEGUI::WindowManager::getSingletonPtr();
+
+  // Find level selector sheet
+  if (wmgr->isWindowPresent("levelSelector"))
+    levelSelectorWindow = wmgr->getWindow("levelSelector");
+  else
+    levelSelectorWindow = wmgr->createWindow("DefaultWindow", "levelSelector");
+
+  LevelLoader *loader = LevelLoader::getSingleton();
+
+  // Load each level in a new level viewer
+  int selectorEnd = selectorStart + (selectorRows*selectorColumns);
+  for (int i = selectorStart; i < selectorEnd && i < loader->levelNames.size(); i++) {
+
+    LevelViewer *v = new LevelViewer(app->mRenderer, loader->levelNames[i].c_str());
+    levelSelectorWindow->addChildWindow(v->window);
+
+    v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
+                              CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
+
+    v->setPositionPercent(0.05 + (i%selectorColumns)*0.9/selectorColumns,
+                          0.2 + (i/selectorColumns)*0.8/selectorRows);
+    
+    levelViewers.push_back(v);
+  }
+
+  CEGUI::System::getSingleton().setGUISheet(levelSelectorWindow);
 }
 
-bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
+bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
+  CEGUI::MouseCursor::getSingleton().hide();
 
+  CEGUI::String levelName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getName();
+  app->switchActivity(new SinglePlayerActivity(app, levelName.c_str()));
+  return true;
 }
 
 bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {

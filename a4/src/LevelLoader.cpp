@@ -5,6 +5,8 @@
 using namespace std;
 using namespace sh;
 
+LevelLoader* LevelLoader::instance;
+
 vector<string>& LevelLoader::split(const string &s, char delim, vector<string> &elems) {
   stringstream ss(s);
   string item;
@@ -21,7 +23,16 @@ vector<string> LevelLoader::split(const string &s, char delim) {
   return elems;
 }
 
-LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) { }
+LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) { 
+  instance = this;
+}
+
+void LevelLoader::setScene(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) { 
+  mSceneMgr = mgr;
+  mPhysics = phys;
+  mCamera = cam;
+  levelRoot = lvlRoot;
+}
 
 void LevelLoader::loadResources(const string& path) {
   ConfigLoader *mScriptLoader = new ConfigLoader(".ogreball");
@@ -66,7 +77,18 @@ void LevelLoader::clearKnobs(void) {
   currentInterpCamLookAtTime = 0;
 }
 
-void LevelLoader::loadLevel(char* levelName) {
+void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
+  Ogre::SceneManager *mgr = mSceneMgr;
+  Physics *physics = mPhysics;
+  Ogre::Camera *cam = mCamera;
+  Ogre::SceneNode *lvlRoot = levelRoot;
+  
+  setScene(viewer->mSceneMgr, viewer->mCamera, viewer->mPhysics, viewer->levelRoot);
+  loadLevel(levelName);
+  setScene(mgr, cam, physics, lvlRoot);
+}
+
+void LevelLoader::loadLevel(const char* levelName) {
   for (int i = 0; i < levelNames.size(); i++) {
     if (levelNames[i].compare(levelName) == 0) {
       ConfigNode *level = levels[i];
@@ -81,7 +103,7 @@ void LevelLoader::loadLevel(char* levelName) {
           loadObject(objs[j]);
         }
       }
-      
+
       break;
     }
   }
@@ -484,7 +506,6 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   }
-  levelPieces.push_back(go);
 
   if (materialName.length() > 0)
     go->getEntity()->setMaterialName(materialName);
@@ -507,7 +528,7 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
 
 }
 
-  void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){
-    btQuaternion q = btQuaternion(*axis, degree);
-    levelRoot->rotate(Ogre::Quaternion(q.w(), q.x(), q.y(), q.z()));
+void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){
+  btQuaternion q = btQuaternion(*axis, degree);
+  levelRoot->rotate(Ogre::Quaternion(q.w(), q.x(), q.y(), q.z()));
 }

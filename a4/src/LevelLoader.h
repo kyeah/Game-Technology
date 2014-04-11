@@ -2,6 +2,7 @@
 
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
+#include "LevelViewer.h"
 #include "Physics.h"
 #include "ProceduralStableHeaders.h"
 #include "Procedural.h"
@@ -9,16 +10,21 @@
 #include "../libs/ConfigLoader.hpp"
 
 class LevelLoader {
+  static LevelLoader* instance;
+
  public:
   LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *levelRoot);
 
+  static LevelLoader* getSingleton() { return instance; }
   static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
   static std::vector<std::string> split(const std::string &s, char delim);
 
   void clearKnobs();
+  void setScene(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *levelRoot);
 
-  void loadResources(const std::string& path);
-  void loadLevel(char* levelName);
+  void loadResources(const std::string& path);  
+  void loadLevel(const char* levelName);
+  void loadLevel(LevelViewer *viewer, const char* levelName);
 
   void loadStartParameters(sh::ConfigNode *root);
   void loadLights(sh::ConfigNode *root);
@@ -41,7 +47,6 @@ class LevelLoader {
 
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
-  std::vector<GameObject*> levelPieces;
 
   // Start Parameters for most recently loaded level
   btVector3 playerStartPositions[4];
@@ -58,8 +63,4 @@ class LevelLoader {
 
   float currentInterpCamPosTime;
   float currentInterpCamLookAtTime;
-
-  // Shouldn't need these; create goal object directly when loading
-  btVector3 goalPosition;
-  btQuaternion goalRotation;
 };
