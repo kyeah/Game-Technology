@@ -40,7 +40,7 @@ level clearPath {
                       start 0 120 -7000
                   }
       }
-      collectible {
+      decorative {
                   meshname ogrehead.mesh
                   scale 20 20 20
                   pos {

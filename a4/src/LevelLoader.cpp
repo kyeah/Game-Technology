@@ -505,6 +505,9 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   } else if (type.compare("goal") == 0) {
     go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
+  } else {
+    go = new DecorativeObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
+                              btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
   }
 
   if (materialName.length() > 0)
