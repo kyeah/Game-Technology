@@ -22,11 +22,7 @@ class SinglePlayerActivity : public Activity {
 
   void loadLevel( char* name );
 
-  btScalar ROTATION_FACTOR;
   btScalar MAX_TILT;
-
-  btScalar xTilt;
-  btScalar zTilt;
-  btScalar totalXTilt;
-  btScalar totalZTilt;
+  btQuaternion lastTilt, currTilt, tiltDest;
+  float currTiltDelay, tiltDelay;
 };

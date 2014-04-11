@@ -26,10 +26,9 @@ using namespace sh;
 
 OgreBallApplication::OgreBallApplication(void)
 {
-  mPhysics = new Physics(btVector3(0, -9800, 0));
+  mPhysics = new Physics(btVector3(0, -19600, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
-
 }
 
 //-------------------------------------------------------------------------------------

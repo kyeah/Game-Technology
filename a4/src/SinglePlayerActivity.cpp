@@ -1,13 +1,13 @@
+#include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app) : Activity(app) {
-  xTilt = 0;
-  zTilt = 0;
-  totalXTilt = 0;
-  totalZTilt = 0;
-  ROTATION_FACTOR = 0.005; //Increasing this increases the speed at which the level rotates on key press
-  MAX_TILT = .15; //Increasing this increases the maximum degree to which the level can rotate
+  MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
+  currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
+  lastTilt = btQuaternion(0,0,0);
+  currTilt = btQuaternion(0,0,0);
+  tiltDest = btQuaternion(0,0,0);
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -25,7 +25,7 @@ void SinglePlayerActivity::loadLevel(char* name) {
 
   new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
-               160.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+               16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
@@ -33,25 +33,13 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+  currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
+                                      lastTilt, tiltDest);
 
-  if(zTilt != 0){
-    btVector3 axis = btVector3(0, 0, 1);
-    if (zTilt > 0 && totalZTilt >= MAX_TILT){}
-    else if(zTilt < 0 && totalZTilt <= -1 * MAX_TILT){}
-    else {
-      app->levelLoader->rotateLevel(&axis, zTilt);
-      totalZTilt += zTilt;
-    }
-  } 
-  if(xTilt != 0){
-    btVector3 axis = btVector3(1, 0, 0);
-    if (xTilt > 0 && totalXTilt >= MAX_TILT){}
-    else if(xTilt < 0 && totalXTilt <= -1 * MAX_TILT){}
-    else{
-      app->levelLoader->rotateLevel(&axis, xTilt);
-      totalXTilt += xTilt;
-    }
-  }
+  app->levelLoader->levelRoot->setOrientation(Ogre::Quaternion(currTilt.w(),
+                                                               currTilt.x(),
+                                                               currTilt.y(),
+                                                               currTilt.z()));
 
   return true;
 }
@@ -62,16 +50,24 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
   switch(arg.key){
   case OIS::KC_D:
-    zTilt += ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,0,-MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_A:
-    zTilt += -1.0 * ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,0,MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_W:
-    xTilt += -1.0 * ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,-MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_S:
-    xTilt += ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_ESCAPE:
     CEGUI::MouseCursor::getSingleton().show();
@@ -90,16 +86,24 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 {
   switch(arg.key){
   case OIS::KC_D:
-    zTilt -= ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,0,MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_A:
-    zTilt -= -1.0 * ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,0,-MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_W:
-    xTilt -= -1.0 * ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   case OIS::KC_S:
-    xTilt -= ROTATION_FACTOR;
+    tiltDest *= btQuaternion(0,-MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
     break;
   default:
     return false;
