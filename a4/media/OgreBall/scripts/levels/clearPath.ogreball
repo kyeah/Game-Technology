@@ -1,0 +1,58 @@
+level clearPath {
+      start {
+            camera {
+                   pos 0 1200 1200
+                   lookAt 0 0 -7000
+            }
+            player1 {
+                     pos 0 1000 -100
+                     rot 0 0 0
+            }
+      }
+      lights {
+             ambient .5 .5 .5
+             light1 {
+                    pos 20 80 50
+             }
+      }
+      goal {
+           pos {
+               start 0 0 -12000
+           }
+           rot {
+               start 0 0 0
+           }
+      }
+      plane {
+            meshname upPlane
+            scale 1 1 15
+            rest 0.3
+            pos {
+                start 0 0 -7000
+            }
+            rot {
+                start 0 0 0
+            }
+      }
+      collectible {
+                  meshname sphere.mesh
+                  pos {
+                      start 0 120 -7000
+                  }
+      }
+      collectible {
+                  meshname ogrehead.mesh
+                  scale 20 20 20
+                  pos {
+                      start 0 600 -14000
+                  }
+                  rot {
+                      start 0 0 0
+                      interp 500 90 0 0
+                      interp 500 180 0 0
+                      interp 500 270 0 0
+                      interp 500 360 0 0                      
+                  }
+      }      
+
+}

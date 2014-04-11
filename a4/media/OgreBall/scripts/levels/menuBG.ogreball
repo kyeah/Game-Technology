@@ -1,0 +1,44 @@
+level menuBG {
+      start {
+             camera {
+                    pos -3500 800 1000
+                    lookAt 0 800 1800
+             }
+             player1 {
+                     pos 250 500 0
+                     rot 0 0 0
+             }
+             waypoints {
+             }
+      }
+      lights {
+             ambient .5 .5 .5
+             light1 {
+                    pos 20 80 50
+             }
+      }
+      plane {
+            meshname upPlane
+            rest 0.8
+            pos {
+                start 250 0 0
+                interp 3000 250 100 0
+                interp 3000 250 0 0
+            }
+            rot {
+                start 0 0 0
+                rotate 1000 90 0 0
+                rotate 1000 180 0 0
+                rotate 1000 270 0 0
+                rotate 1000 360 0 0
+            }
+     }
+     extrudedObject {
+                    meshname mountainTeardropMesh
+                    material OgreBall/Transparent
+                    rest 0.1
+                    rot {
+                        start 0 0 0
+                    }
+    }
+}
