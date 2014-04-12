@@ -3,6 +3,7 @@
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include "Activity.h"
+#include "GameObjectDescription.h"
 
 class SinglePlayerActivity : public Activity {
  public:
@@ -29,4 +30,5 @@ class SinglePlayerActivity : public Activity {
   float currTiltDelay, tiltDelay;
 
   CEGUI::Window *guiSheet;
+  OgreBall *player;
 };

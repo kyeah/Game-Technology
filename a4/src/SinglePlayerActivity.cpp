@@ -23,9 +23,9 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
 
-  new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
-               app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
-               16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+  player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
+                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
+                        16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
@@ -36,11 +36,19 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
 
-  app->levelLoader->levelRoot->setOrientation(Ogre::Quaternion(currTilt.w(),
-                                                               currTilt.x(),
-                                                               currTilt.y(),
-                                                               currTilt.z()));
+  player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
+                                .rotate(currTilt.getAxis(), -currTilt.getAngle()));
+  
+  //////////////////////////////////////
+  // Alyssa's Magic Camera Stuff here //
+  //////////////////////////////////////
 
+
+  // More magic stuff here to make the level look like it's rotating
+  /*  app->mCamera->setOrientation(Ogre::Quaternion(currTilt.w(),
+                                                -currTilt.x(),
+                                                -currTilt.y(),
+                                                -currTilt.z()));*/
   return true;
 }
 
