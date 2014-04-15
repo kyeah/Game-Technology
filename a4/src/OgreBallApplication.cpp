@@ -115,6 +115,7 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("Chatbox.layout");
   Wmgr->loadWindowLayout("PauseMenu.layout");
   Wmgr->loadWindowLayout("GameWon.layout");
+  Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
   // CEGUI::System::getSingleton().setGUISheet(sheet);
 }

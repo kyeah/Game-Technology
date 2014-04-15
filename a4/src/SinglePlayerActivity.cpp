@@ -17,7 +17,7 @@ SinglePlayerActivity::~SinglePlayerActivity(void) {
 }
 
 void SinglePlayerActivity::start(void) {
-  CEGUI::System::getSingleton().setGUISheet(app->sheet);  // Should load our own GUI sheet for single player
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
   loadLevel(startingLevelName);
 }
 
@@ -75,7 +75,7 @@ void SinglePlayerActivity::togglePauseMenu( ) {
   } else {
     app->paused = false;
     CEGUI::MouseCursor::getSingleton().hide();
-    CEGUI::System::getSingleton().setGUISheet(app->sheet);
+    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
   }
 }
 
