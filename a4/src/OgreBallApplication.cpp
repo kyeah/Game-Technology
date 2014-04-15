@@ -22,13 +22,33 @@ using namespace Ogre;
 using namespace std;
 using namespace sh;
 
+OgreBallApplication *OgreBallApplication::instance;
 
+CEGUI::MouseButton OgreBallApplication::convertButton(OIS::MouseButtonID buttonID)
+{
+  switch (buttonID)
+    {
+    case OIS::MB_Left:
+      return CEGUI::LeftButton;
+
+    case OIS::MB_Right:
+      return CEGUI::RightButton;
+
+    case OIS::MB_Middle:
+      return CEGUI::MiddleButton;
+
+    default:
+      return CEGUI::LeftButton;
+    }
+}
 
 OgreBallApplication::OgreBallApplication(void)
 {
   mPhysics = new Physics(btVector3(0, -19600, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
+  paused = false;
+  instance = this;
 }
 
 //-------------------------------------------------------------------------------------
@@ -54,6 +74,7 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
 void OgreBallApplication::switchActivity(Activity *activity) {
   this->activity = activity;
   destroyAllEntitiesAndNodes();
+  paused = false;
   activity->start();
 }
 
@@ -86,12 +107,14 @@ void OgreBallApplication::loadResources(void) {
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
   // CEGUI::SchemeManager::getSingleton().create("GameGUI.scheme");
-  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow"); 
- 
+  CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
+
   Wmgr = &CEGUI::WindowManager::getSingleton();
   Wmgr->loadWindowLayout("Menu.layout");
   Wmgr->loadWindowLayout("MultiSubMenu.layout");
   Wmgr->loadWindowLayout("Chatbox.layout");
+  Wmgr->loadWindowLayout("PauseMenu.layout");
+  Wmgr->loadWindowLayout("GameWon.layout");
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
   // CEGUI::System::getSingleton().setGUISheet(sheet);
 }
@@ -104,8 +127,10 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();
 
-  if (mPhysics) mPhysics->stepSimulation(elapsedTime);
-  activity->frameStarted(elapsedTime);
+  if (!paused) {
+    if (mPhysics) mPhysics->stepSimulation(elapsedTime);
+    activity->frameStarted(elapsedTime);
+  }
 
   return result;
 }
@@ -127,7 +152,7 @@ bool OgreBallApplication::frameRenderingQueued( const Ogre::FrameEvent &evt ) {
   }
 
   activity->frameRenderingQueued(evt);
-  
+
   return true;
 }
 

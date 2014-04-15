@@ -20,8 +20,12 @@ class SinglePlayerActivity : public Activity {
   virtual bool mouseMoved( const OIS::MouseEvent &arg );
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+  virtual void handleGameEnd();
 
   void loadLevel( const char* name );
+  bool ExitToMenu( const CEGUI::EventArgs& e );
+  bool togglePauseMenu( const CEGUI::EventArgs& e );
+  void togglePauseMenu();
 
   const char* startingLevelName;
 
@@ -29,6 +33,8 @@ class SinglePlayerActivity : public Activity {
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
 
-  CEGUI::Window *guiSheet;
   OgreBall *player;
+  CEGUI::Window *guiSheet;
+  bool menuActive;
+  bool ceguiActive;
 };

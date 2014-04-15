@@ -1,4 +1,5 @@
 #include "GameObjectDescription.h"
+#include "OgreBallApplication.h"
 
 GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName,
              Ogre::SceneNode* parentNode, Physics* _physics,
@@ -29,7 +30,7 @@ void GoalObject::update(float elapsedTime) {
   if(physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object && dynamic_cast<OgreBall*>(contexts[i]->object)) {
-        std::cout << "YOU WON!!!!!!!!" << std::endl;    
+        OgreBallApplication::getSingleton()->activity->handleGameEnd();
       }
     }
   }

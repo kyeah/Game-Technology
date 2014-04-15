@@ -1,4 +1,5 @@
 #pragma once
+
 #include "OgreBallApplication.h" 
 
 class OgreBallApplication;
@@ -6,6 +7,7 @@ class OgreBallApplication;
 class Activity {
  public:
  Activity(OgreBallApplication *_app) : app(_app) {}
+  
   virtual ~Activity(void) { }
   
   virtual void start(void) = 0;
@@ -19,5 +21,6 @@ class Activity {
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) = 0;
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) = 0;
 
+  virtual void handleGameEnd() = 0;
   OgreBallApplication *app;
 };
