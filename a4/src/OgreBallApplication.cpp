@@ -23,7 +23,6 @@ using namespace std;
 using namespace sh;
 
 
-
 OgreBallApplication::OgreBallApplication(void)
 {
   mPhysics = new Physics(btVector3(0, -19600, 0));
@@ -106,7 +105,7 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
 
   if (mPhysics) mPhysics->stepSimulation(elapsedTime);
   activity->frameStarted(elapsedTime);
-
+  
   return result;
 }
 

@@ -3,6 +3,7 @@
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include "Activity.h"
+#include "CameraObject.h"
 
 class SinglePlayerActivity : public Activity {
  public:
@@ -21,12 +22,13 @@ class SinglePlayerActivity : public Activity {
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
   void loadLevel( const char* name );
-
   const char* startingLevelName;
 
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
+  OgreBall* mOgreBall;  
+  CameraObject* mCameraObj;
 
   CEGUI::Window *guiSheet;
 };

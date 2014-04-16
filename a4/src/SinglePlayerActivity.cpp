@@ -2,6 +2,7 @@
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
+
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
@@ -23,9 +24,10 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
 
-  new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
+  mOgreBall = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
                16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+  mCameraObj = new CameraObject(app->mCamera);
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
@@ -40,6 +42,12 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
                                                                currTilt.x(),
                                                                currTilt.y(),
                                                                currTilt.z()));
+
+  if(mCameraObj->previousPos == Ogre::Vector3::ZERO)
+        mCameraObj->setPreviousPosition((Ogre::Vector3)mOgreBall->getPosition());
+  if(!mCameraObj->fixedDist)
+        mCameraObj->setFixedDistance(((Ogre::Vector3)mOgreBall->getPosition()).distance(app->levelLoader->cameraStartPos));
+  mCameraObj->update((Ogre::Vector3)mOgreBall->getPosition());
 
   return true;
 }
@@ -116,19 +124,19 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 
 bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 {
-  return false;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------
 
 bool SinglePlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  return false;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------
 
 bool SinglePlayerActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  return false;
+  return true;
 }

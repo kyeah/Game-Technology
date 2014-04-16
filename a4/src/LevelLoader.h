@@ -63,4 +63,5 @@ class LevelLoader {
 
   float currentInterpCamPosTime;
   float currentInterpCamLookAtTime;
+  Ogre::Vector3 cameraStartPos;
 };
