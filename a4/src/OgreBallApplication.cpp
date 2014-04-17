@@ -107,7 +107,6 @@ void OgreBallApplication::loadResources(void) {
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
   CEGUI::SchemeManager::getSingleton().create("OgreBall.scheme");
-  //  CEGUI::SchemeManager::getSingleton().create("OgreBalla.scheme");
   CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
 
   Wmgr = &CEGUI::WindowManager::getSingleton();

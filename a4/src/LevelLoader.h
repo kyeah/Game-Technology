@@ -33,7 +33,7 @@ class LevelLoader {
   void loadExtrudedMeshes(std::vector<sh::ConfigNode*>& meshes, std::vector<std::string>& meshNames);
   
   void parsePath(sh::ConfigNode *path, Procedural::Path& p);
-  Procedural::Shape* parseShape(sh::ConfigNode *shape);
+  void parseShape(sh::ConfigNode *shape, Procedural::Shape& s);
   Procedural::Track* parseTrack(sh::ConfigNode *track);
 
   void loadObject(sh::ConfigNode *plane, Ogre::SceneNode *parentNode = NULL);
