@@ -1,7 +1,7 @@
 level clearPath {
       start {
             camera {
-                   pos 0 1200 1200
+                   pos 0 500 1200
                    lookAt 0 0 -7000
             }
             player1 {

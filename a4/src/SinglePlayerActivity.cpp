@@ -42,11 +42,11 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                 .rotate(currTilt.getAxis(), -currTilt.getAngle()));
-
-  if(mCameraObj->previousPos == Ogre::Vector3::ZERO)
-        mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
-  if(!mCameraObj->fixedDist)
-        mCameraObj->setFixedDistance(((Ogre::Vector3)player->getPosition()).distance(app->levelLoader->cameraStartPos));
+  
+  if(!mCameraObj->previousPosIsSet)
+       	mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
+  if(!mCameraObj->fixedDist || (app->levelLoader->cameraStartPos != mCameraObj->cameraStartPosition))
+       	mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   return true;
