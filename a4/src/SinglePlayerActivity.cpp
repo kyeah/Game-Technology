@@ -44,10 +44,10 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
                                 .rotate(currTilt.getAxis(), -currTilt.getAngle()));
 
   if(mCameraObj->previousPos == Ogre::Vector3::ZERO)
-        mCameraObj->setPreviousPosition((Ogre::Vector3)mOgreBall->getPosition());
+        mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
   if(!mCameraObj->fixedDist)
-        mCameraObj->setFixedDistance(((Ogre::Vector3)mOgreBall->getPosition()).distance(app->levelLoader->cameraStartPos));
-  mCameraObj->update((Ogre::Vector3)mOgreBall->getPosition(), elapsedTime);
+        mCameraObj->setFixedDistance(((Ogre::Vector3)player->getPosition()).distance(app->levelLoader->cameraStartPos));
+  mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   return true;
 }

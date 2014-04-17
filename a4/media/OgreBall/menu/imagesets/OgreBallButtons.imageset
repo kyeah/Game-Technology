@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 
 <Imageset Name="OgreBall/Buttons" Imagefile="MenuButtons.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false">
-  <Image Name="ButtonDown" XPos="0.0" YPos="0.0" Width="500" Height="50" />
-  <Image Name="ButtonUp" XPos="0.0" YPos="50.0" Width="500" Height="44" />
+  <Image Name="ButtonDown" XPos="0" YPos="0" Width="500" Height="50" />
+  <Image Name="ButtonUp" XPos="0" YPos="50" Width="500" Height="44" />
   <!--Image Name="ButtonDown" XPos="0.0" YPos="128.0" Width="512" Height="128" /-->
   <!--Image Name="ButtonDisabled" XPos="0.0" YPos="256.0" Width="512" Height="128" /-->
   <!--Image Name="ButtonHighlighted" XPos="0.0" YPos="384.14" Width="512" Height="128" /-->
