@@ -33,6 +33,11 @@ class Activity;
 class OgreBallApplication : public BaseApplication
 {
  public:
+  static OgreBallApplication *instance;
+  static CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID);
+
+  static OgreBallApplication* getSingleton() { return instance; }
+
   OgreBallApplication(void);
   virtual ~OgreBallApplication(void);
 
@@ -58,6 +63,8 @@ class OgreBallApplication : public BaseApplication
   Activity *activity;  // Our application will dispatch events to activities to deal with different game states.
 
   Ogre::Timer *mTimer;
+  bool paused;
+
   Physics *mPhysics;
   LevelLoader *levelLoader;
   Ogre::SceneNode *levelRoot;
@@ -71,8 +78,7 @@ class OgreBallApplication : public BaseApplication
   btVector3 playerVelocity;
   btScalar MAX_SPEED;
   CEGUI::Window *sheet;
-
-
+  
 };
 
 #endif // #ifndef __OgreBallApplication_h_

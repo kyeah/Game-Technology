@@ -20,6 +20,7 @@ class MenuActivity : public Activity {
   virtual bool mouseMoved( const OIS::MouseEvent &arg );
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+  virtual void handleGameEnd();
 
   bool SwitchToMainMenu(const CEGUI::EventArgs& e);
   bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
