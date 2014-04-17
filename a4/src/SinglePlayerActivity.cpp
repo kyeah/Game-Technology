@@ -2,6 +2,8 @@
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
+int score = 0;
+
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
@@ -11,6 +13,7 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   startingLevelName = levelName;
   menuActive = false;
   ceguiActive = false;
+
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -18,6 +21,7 @@ SinglePlayerActivity::~SinglePlayerActivity(void) {
 
 void SinglePlayerActivity::start(void) {
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  scoreWindow = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   loadLevel(startingLevelName);
 }
 
@@ -40,6 +44,10 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                 .rotate(currTilt.getAxis(), -currTilt.getAngle()));
+
+  std::stringstream sst;
+  sst << "SCORE: " << score;
+  scoreWindow->setText(sst.str());
 
   //////////////////////////////////////
   // Alyssa's Magic Camera Stuff here //

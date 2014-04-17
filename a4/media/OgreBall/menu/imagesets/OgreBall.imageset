@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
 
 <Imageset Name="OgreBall" Imagefile="ogreball-logo.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false">
-  <Image Name="Logo" XPos="0.0" YPos="0.0" Width="568" Height="58" />
+  <Image Name="Logo" XPos="0" YPos="0" Width="568" Height="58" />
 </Imageset>

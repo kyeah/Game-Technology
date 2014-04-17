@@ -17,6 +17,7 @@ GameObject::GameObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   }
 
   node = parentNode->createChildSceneNode(_nodeName);
+  mMgr = mgr;
 
   node->translate(Ogre::Vector3(origin[0], origin[1], origin[2]));
   node->scale(scale[0], scale[1], scale[2]);
@@ -143,6 +144,19 @@ void GameObject::addToSimulator(short group, short mask) {
   updateTransform();
 
   cCallback = new BulletContactCallback(*body, contexts);
+}
+
+void GameObject::removeFromSimulator(Ogre::SceneNode *mNode){
+  // btCollisionObject *obj = static_cast<btCollisionObject *> (body);
+  // physics->dynamicsWorld->removeCollisionObject(obj);
+
+  physics->dynamicsWorld->removeRigidBody(body);
+  // delete body->getMotionState();
+  // delete body;
+
+  node->removeAndDestroyAllChildren();
+  node->scale(0, 0, 0);
+  //mMgr->destroySceneNode(node);
 }
 
 void GameObject::updateTransform() {

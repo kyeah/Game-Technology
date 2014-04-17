@@ -28,6 +28,7 @@
 #include "Physics.h"
 #include "../libs/ConfigLoader.hpp"
 
+
 class Activity;
 
 class OgreBallApplication : public BaseApplication

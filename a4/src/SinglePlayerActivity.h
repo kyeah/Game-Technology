@@ -5,6 +5,8 @@
 #include "Activity.h"
 #include "GameObjectDescription.h"
 
+extern int score;
+
 class SinglePlayerActivity : public Activity {
  public:
   SinglePlayerActivity(OgreBallApplication *app, const char* levelName);
@@ -35,6 +37,7 @@ class SinglePlayerActivity : public Activity {
 
   OgreBall *player;
   CEGUI::Window *guiSheet;
+  CEGUI::Window *scoreWindow;
   bool menuActive;
   bool ceguiActive;
 };

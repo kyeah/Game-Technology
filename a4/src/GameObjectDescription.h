@@ -35,6 +35,7 @@ class Collectible : public GameObject {
                    btVector3 localInertia=btVector3(0,0,0), btQuaternion *rotation=0);
 
     virtual void update(float elapsedTime);
+    bool isHit;
 };
 
 class MeshObject : public GameObject {
