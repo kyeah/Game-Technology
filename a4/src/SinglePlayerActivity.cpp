@@ -9,13 +9,15 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
   startingLevelName = levelName;
+  menuActive = false;
+  ceguiActive = false;
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
 }
 
 void SinglePlayerActivity::start(void) {
-  CEGUI::System::getSingleton().setGUISheet(app->sheet);  // Should load our own GUI sheet for single player
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
   loadLevel(startingLevelName);
 }
 
@@ -23,9 +25,9 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
 
-  new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
-               app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
-               16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+  player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
+                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
+                        16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
@@ -36,18 +38,79 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
 
-  app->levelLoader->levelRoot->setOrientation(Ogre::Quaternion(currTilt.w(),
-                                                               currTilt.x(),
-                                                               currTilt.y(),
-                                                               currTilt.z()));
+  player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
+                                .rotate(currTilt.getAxis(), -currTilt.getAngle()));
 
+  //////////////////////////////////////
+  // Alyssa's Magic Camera Stuff here //
+  //////////////////////////////////////
+
+  // More magic stuff here to make the level look like it's rotating
+  /*  app->mCamera->setOrientation(Ogre::Quaternion(currTilt.w(),
+      -currTilt.x(),
+      -currTilt.y(),
+      -currTilt.z()));*/
   return true;
+}
+
+//-------------------------------------------------------------------------------------
+
+bool SinglePlayerActivity::togglePauseMenu( const CEGUI::EventArgs& e ) {
+  togglePauseMenu();
+  return true;
+}
+
+void SinglePlayerActivity::togglePauseMenu( ) {
+  menuActive = !menuActive;
+  if (menuActive) {
+    app->paused = true;
+    CEGUI::MouseCursor::getSingleton().show();
+    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
+    app->Wmgr->getWindow("PauseMenu/Quit")
+      ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                       CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+    app->Wmgr->getWindow("PauseMenu/Return")
+      ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                       CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
+  } else {
+    app->paused = false;
+    CEGUI::MouseCursor::getSingleton().hide();
+    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  }
+}
+
+bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
+  app->switchActivity(new MenuActivity(app));
+  return true;
+}
+
+void SinglePlayerActivity::handleGameEnd() {
+  ceguiActive = true;
+  CEGUI::MouseCursor::getSingleton().show();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
+
+  app->Wmgr->getWindow("GameWon/BackToMenu")
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+  /*  app->Wmgr->getWindow("GameWon/NextLevel")
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
 }
 
 //-------------------------------------------------------------------------------------
 
 bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
+  if (arg.key == OIS::KC_ESCAPE) {
+    togglePauseMenu();
+    return true;
+  }
+
+  if (ceguiActive || menuActive) {
+    CEGUI::System::getSingleton().injectKeyDown(arg.key);
+    CEGUI::System::getSingleton().injectChar(arg.text);
+  }
+
   switch(arg.key){
   case OIS::KC_D:
     tiltDest *= btQuaternion(0,0,-MAX_TILT);
@@ -69,10 +132,6 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
-  case OIS::KC_ESCAPE:
-    CEGUI::MouseCursor::getSingleton().show();
-    app->switchActivity(new MenuActivity(app));
-    break;
   default:
     return false;
   }
@@ -84,6 +143,10 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 
 bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 {
+  if (menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  }
+
   switch(arg.key){
   case OIS::KC_D:
     tiltDest *= btQuaternion(0,0,MAX_TILT);
@@ -116,6 +179,15 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 
 bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 {
+  if (menuActive || ceguiActive) {
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
+    // Scroll wheel.
+    if (arg.state.Z.rel)
+      sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
+    return true;
+  }
+
   return false;
 }
 
@@ -123,6 +195,10 @@ bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 
 bool SinglePlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
+  if (menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
+    return true;
+  }
   return false;
 }
 
@@ -130,5 +206,9 @@ bool SinglePlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseB
 
 bool SinglePlayerActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
+  if (menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
+    return true;
+  }
   return false;
 }

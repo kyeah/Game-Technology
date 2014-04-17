@@ -22,6 +22,10 @@ void MenuActivity::start(void) {
   SwitchToMainMenu(*args);
 }
 
+void MenuActivity::handleGameEnd() {
+
+}
+
 bool MenuActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
   CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
   return true;
@@ -130,24 +134,6 @@ bool MenuActivity::keyReleased( const OIS::KeyEvent &arg )
 
 //-------------------------------------------------------------------------------------
 
-CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
-{
-  switch (buttonID)
-    {
-    case OIS::MB_Left:
-      return CEGUI::LeftButton;
-
-    case OIS::MB_Right:
-      return CEGUI::RightButton;
-
-    case OIS::MB_Middle:
-      return CEGUI::MiddleButton;
-
-    default:
-      return CEGUI::LeftButton;
-    }
-}
-
 bool MenuActivity::mouseMoved( const OIS::MouseEvent &arg )
 {
   CEGUI::System &sys = CEGUI::System::getSingleton();
@@ -162,7 +148,7 @@ bool MenuActivity::mouseMoved( const OIS::MouseEvent &arg )
 
 bool MenuActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
+  CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
   return true;
 }
 
@@ -170,7 +156,7 @@ bool MenuActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID 
 
 bool MenuActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
+  CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
   return true;
 }
 
