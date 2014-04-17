@@ -47,7 +47,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
         mCameraObj->setPreviousPosition((Ogre::Vector3)mOgreBall->getPosition());
   if(!mCameraObj->fixedDist)
         mCameraObj->setFixedDistance(((Ogre::Vector3)mOgreBall->getPosition()).distance(app->levelLoader->cameraStartPos));
-  mCameraObj->update((Ogre::Vector3)mOgreBall->getPosition());
+  mCameraObj->update((Ogre::Vector3)mOgreBall->getPosition(), elapsedTime);
 
   return true;
 }
