@@ -559,9 +559,6 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     }
   }
 
-
-
-  
   static int id = 0;
   stringstream ss;
   ss << "object" << id;
@@ -607,9 +604,6 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   for (int i = 0; i < childObjects.size(); i++) {
     loadObject(childObjects[i], go->getNode());
   }
-
-
-
 }
 
 void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){

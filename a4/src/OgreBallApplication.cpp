@@ -49,6 +49,8 @@ OgreBallApplication::OgreBallApplication(void)
   mTimer->reset();
   paused = false;
   instance = this;
+
+
 }
 
 //-------------------------------------------------------------------------------------

@@ -6,21 +6,22 @@ class OgreBallApplication;
 
 class Activity {
  public:
- Activity(OgreBallApplication *_app) : app(_app) {}
+ Activity(OgreBallApplication *_app) : app(_app), score(0) {}
   
   virtual ~Activity(void) { }
   
-  virtual void start(void) = 0;
-  virtual bool frameStarted( Ogre::Real elapsedTime ) = 0;
-  virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt) = 0;
+  virtual void start(void) { }
+  virtual bool frameStarted( Ogre::Real elapsedTime ) { }
+  virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt) { }
  
-  virtual bool keyPressed( const OIS::KeyEvent &arg ) = 0;
-  virtual bool keyReleased( const OIS::KeyEvent &arg ) = 0;
+  virtual bool keyPressed( const OIS::KeyEvent &arg ) { }
+  virtual bool keyReleased( const OIS::KeyEvent &arg ) { }
 
-  virtual bool mouseMoved( const OIS::MouseEvent &arg ) = 0;
-  virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) = 0;
-  virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) = 0;
+  virtual bool mouseMoved( const OIS::MouseEvent &arg ) { }
+  virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) { }
+  virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) { }
 
-  virtual void handleGameEnd() = 0;
+  virtual void handleGameEnd() { }
   OgreBallApplication *app;
+  int score;
 };

@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "GameObjectDescription.h"
 #include "../libs/MeshStrider.h"
+#include "SinglePlayerActivity.h"
 
 Collectible::Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
                          Physics* _physics,
@@ -27,6 +28,8 @@ Collectible::Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::S
   setAmbient(0.5,0.0,0.0);
   setSpecular(0.1,0,0,0.4);
   if (rotation) rotate(*rotation);
+
+  isHit = false;
 }
 
 void Collectible::update(float elapsedTime) {
@@ -36,8 +39,15 @@ void Collectible::update(float elapsedTime) {
     for(int i = 0; i < contexts.size(); i++){
       if(contexts[i]->object){
         OgreBall *ob = dynamic_cast<OgreBall*>(contexts[i]->object);
-        if(ob){
-          //TODO: Update score and remove collectible from scene here
+        if(ob && !isHit){
+          isHit = true;
+          std::cout << "Hit" << std::endl;
+          removeFromSimulator();
+
+          Activity *a = OgreBallApplication::getSingleton()->activity;
+          if (a) a->score++;
+
+          //TODO: Add sound
         }
       }
     }

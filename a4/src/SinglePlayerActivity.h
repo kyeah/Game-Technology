@@ -37,11 +37,12 @@ class SinglePlayerActivity : public Activity {
   // Menu Variables
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
     *collectDisplay, *livesDisplay, *levelDisplay;
+
   bool menuActive;
   bool ceguiActive;
 
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
-  int collectibles, lives, score;
+  int collectibles, lives;
 };

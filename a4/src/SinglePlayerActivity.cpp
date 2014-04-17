@@ -55,7 +55,10 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                 .rotate(currTilt.getAxis(), -currTilt.getAngle()));
 
-  scoreDisplay->setText(std::to_string(score));
+  std::stringstream sst;
+  sst << "SCORE: " << score;
+  scoreDisplay->setText(sst.str());
+
   livesDisplay->setText(std::to_string(lives));
   collectDisplay->setText(std::to_string(collectibles));
 
