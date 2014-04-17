@@ -17,6 +17,7 @@
 #include "OgreBallApplication.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
+#include "Sounds.h"
 
 using namespace Ogre;
 using namespace std;
@@ -29,6 +30,7 @@ OgreBallApplication::OgreBallApplication(void)
   mPhysics = new Physics(btVector3(0, -19600, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
+  Sounds::init();
 }
 
 //-------------------------------------------------------------------------------------

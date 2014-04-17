@@ -1,6 +1,7 @@
 #include <OgreMeshManager.h>
 #include "GameObjectDescription.h"
 #include "LevelLoader.h"
+#include "Sounds.h"
 
 using namespace std;
 using namespace sh;
@@ -146,6 +147,14 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
       if (rotNode) playerStartRotations[i] = rotNode->getValueYPR();
     }
   }
+
+  ConfigNode* pSound = root->findChild("Sound");
+
+  if(pSound){
+      ConfigNode* pBackground = pSound->findChild("background");
+      Ogre::String backgroundMusic = pBackground->getValue();
+      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
+    }
 }
 
 void LevelLoader::loadLights(ConfigNode *root) {

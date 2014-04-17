@@ -10,6 +10,9 @@ level menuBG {
              }
              waypoints {
              }
+      	     Sound{
+     		background media/OgreBall/sounds/background.mp3
+            }
       }
       lights {
              ambient .5 .5 .5

@@ -27,5 +27,10 @@ PKG_CHECK_MODULES(CEGUI_OGRE, [CEGUI-OGRE >= 0.7])
 AC_SUBST(CEGUI_OGRE_CFLAGS)                                                                                      
 AC_SUBST(CEGUI_OGRE_LIBS) 
 
+SDLMIXER_CFLAGS=`sdl-config --cflags`
+SDLMIXER_LIBS="`sdl-config --libs` -lSDL_mixer"
+AC_SUBST(SDLMIXER_CFLAGS)
+AC_SUBST(SDLMIXER_LIBS)
+
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT
