@@ -5,6 +5,7 @@ btVector3 Interpolator::interpV3(float& currTime, float elapsedTime, float total
   currTime += elapsedTime;
   if (currTime >= totalTime) {
     currTime = totalTime;
+    printf("NOT RETURNING NEW VECTOR\n");
     return second;
   }
 
