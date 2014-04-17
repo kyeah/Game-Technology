@@ -6,17 +6,25 @@
     <Property Name="Alpha" Value="0.0" />
     <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
     <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-    <Window Type="TaharezLook/Button" Name="PauseMenu/Return" >
+    <Window Type="OgreBall/TextButton" Name="PauseMenu/Return" >
       <Property Name="InheritsAlpha" Value="False" />
       <Property Name="Text" Value="Return to Game" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.40,0},{0.415,0},{0.60,0},{0.465,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0},{0.415,0},{0.75,0},{0.465,0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
     </Window>
-    <Window Type="TaharezLook/Button" Name="PauseMenu/Quit" >
+    <Window Type="OgreBall/TextButton" Name="PauseMenu/Quit" >
       <Property Name="InheritsAlpha" Value="False" />
       <Property Name="Text" Value="Quit" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.40,0},{0.475,0},{0.60,0},{0.525,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0},{0.475,0},{0.75,0},{0.525,0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
     </Window>
   </Window>
 </GUILayout>
