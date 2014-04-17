@@ -24,6 +24,7 @@ class GameObject {
   void updateTransform();
   void addToSimulator();
   void addToSimulator(short group, short mask);
+  void removeFromSimulator();
   
   void setKinematic(bool kinematic);
   void setColor(float ar, float ag, float ab,
@@ -68,6 +69,7 @@ class GameObject {
   Physics *physics;
   Ogre::Entity *entity;
   Ogre::SceneNode *node;
+  Ogre::SceneManager *mMgr;
 
   OgreMotionState *motionState;
   btCollisionShape *collisionShape;

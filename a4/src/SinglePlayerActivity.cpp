@@ -9,9 +9,10 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   lastTilt = btQuaternion(0,0,0);
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
-  startingLevelName = levelName;
+  currentLevelName = levelName;
   menuActive = false;
   ceguiActive = false;
+  lives = 10;
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -19,14 +20,28 @@ SinglePlayerActivity::~SinglePlayerActivity(void) {
 
 void SinglePlayerActivity::start(void) {
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
-  loadLevel(startingLevelName);
+  scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
+  livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
+  collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
+  timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
+  levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
+
+  loadLevel(currentLevelName);
 }
 
 void SinglePlayerActivity::loadLevel(const char* name) {
+
+  app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
 
   mCameraObj = new CameraObject(app->mCamera);
+  levelDisplay->setText(name);
+
+  timeLeft = 60000;  // TODO: Should get timeLeft from level script
+  collectibles = 0;  // TODO: Get total number of collectibles when loading level
+  score = 0;
+
   player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
                         16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
@@ -37,18 +52,42 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+  timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
 
   player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                 .rotate(currTilt.getAxis(), -currTilt.getAngle()));
   
+
+  std::stringstream sst;
+  sst << "SCORE: " << score;
+  scoreDisplay->setText(sst.str());
+
+  livesDisplay->setText(std::to_string(lives));
+  collectDisplay->setText(std::to_string(collectibles));
+
+  std::stringstream timess;
+  int seconds = std::round(timeLeft/1000);
+  int millis = std::min((float)99.0, std::round(fmod(timeLeft,1000)/10));
+
+  timess << seconds << ":";
+  if (millis < 10) timess << "0";
+  timess << millis;
+
+  timeDisplay->setText(timess.str());
+
   if(!mCameraObj->previousPosIsSet)
        	mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
   if(!mCameraObj->fixedDist || (app->levelLoader->cameraStartPos != mCameraObj->cameraStartPosition))
        	mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
+  // More magic stuff here to make the level look like it's rotating
+  /*  app->mCamera->setOrientation(Ogre::Quaternion(currTilt.w(),
+      -currTilt.x(),
+      -currTilt.y(),
+      -currTilt.z()));*/
   return true;
 }
 
