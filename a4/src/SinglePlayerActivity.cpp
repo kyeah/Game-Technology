@@ -1,4 +1,4 @@
-B1;2802;0c#include "Interpolator.h"
+#include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
