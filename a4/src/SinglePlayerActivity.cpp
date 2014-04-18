@@ -2,6 +2,7 @@
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
+
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
@@ -29,9 +30,12 @@ void SinglePlayerActivity::start(void) {
 }
 
 void SinglePlayerActivity::loadLevel(const char* name) {
+
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
+  app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
 
+  mCameraObj = new CameraObject(app->mCamera);
   levelDisplay->setText(name);
 
   timeLeft = 60000;  // TODO: Should get timeLeft from level script
@@ -54,6 +58,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                 .rotate(currTilt.getAxis(), -currTilt.getAngle()));
+  
 
   std::stringstream sst;
   sst << "SCORE: " << score;
@@ -64,7 +69,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   std::stringstream timess;
   int seconds = std::round(timeLeft/1000);
-  int millis = std::min(99.0d, std::round(fmod(timeLeft,1000)/10));
+  int millis = std::min((float)99.0, std::round(fmod(timeLeft,1000)/10));
 
   timess << seconds << ":";
   if (millis < 10) timess << "0";
@@ -72,9 +77,11 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   timeDisplay->setText(timess.str());
 
-  //////////////////////////////////////
-  // Alyssa's Magic Camera Stuff here //
-  //////////////////////////////////////
+  if(!mCameraObj->previousPosIsSet)
+       	mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
+  if(!mCameraObj->fixedDist || (app->levelLoader->cameraStartPos != mCameraObj->cameraStartPosition))
+       	mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
+  mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   // More magic stuff here to make the level look like it's rotating
   /*  app->mCamera->setOrientation(Ogre::Quaternion(currTilt.w(),

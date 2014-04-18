@@ -3,6 +3,7 @@
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include "Activity.h"
+#include "CameraObject.h"
 #include "GameObjectDescription.h"
 
 class SinglePlayerActivity : public Activity {
@@ -33,6 +34,8 @@ class SinglePlayerActivity : public Activity {
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
+  OgreBall* mOgreBall;  
+  CameraObject* mCameraObj;
 
   // Menu Variables
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 

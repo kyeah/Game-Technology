@@ -7,7 +7,6 @@ btVector3 Interpolator::interpV3(float& currTime, float elapsedTime, float total
     currTime = totalTime;
     return second;
   }
-
   float proportion = currTime/totalTime;
   return first.lerp(second, proportion);
 }

@@ -120,6 +120,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     if (cposNode) {
       btVector3 camPos = cposNode->getValueV3();
       mCamera->setPosition(camPos[0], camPos[1], camPos[2]);
+      cameraStartPos = (Ogre::Vector3)camPos;
     }
     if (clookNode) {
       btVector3 clook = clookNode->getValueV3();
