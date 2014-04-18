@@ -23,11 +23,11 @@ vector<string> LevelLoader::split(const string &s, char delim) {
   return elems;
 }
 
-LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) { 
+LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) {
   instance = this;
 }
 
-void LevelLoader::setScene(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) { 
+void LevelLoader::setScene(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) {
   mSceneMgr = mgr;
   mPhysics = phys;
   mCamera = cam;
@@ -82,7 +82,7 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
   Physics *physics = mPhysics;
   Ogre::Camera *cam = mCamera;
   Ogre::SceneNode *lvlRoot = levelRoot;
-  
+
   setScene(viewer->mSceneMgr, viewer->mCamera, viewer->mPhysics, viewer->levelRoot);
   loadLevel(levelName);
   setScene(mgr, cam, physics, lvlRoot);
@@ -116,7 +116,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
   if (camNode) {
     ConfigNode *cposNode = camNode->findChild("pos");
     ConfigNode *clookNode = camNode->findChild("lookAt");
-    
+
     if (cposNode) {
       btVector3 camPos = cposNode->getValueV3();
       mCamera->setPosition(camPos[0], camPos[1], camPos[2]);
@@ -167,7 +167,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
   if (skydomeNode) {
     if (skydomeNode->getNumChildren() > 3) {
       // Curvature, Tiling, Distance; default 10-8-4000
-      mSceneMgr->setSkyDome(true, skydomeNode->getValue(), skydomeNode->getValue(1), skydomeNode->getValue(2), skydomeNode->getValue(3));
+      mSceneMgr->setSkyDome(true, skydomeNode->getValue(), skydomeNode->getValueF(1), skydomeNode->getValueF(2), skydomeNode->getValueF(3));
     } else {
       mSceneMgr->setSkyDome(true, skydomeNode->getValue());
     }
@@ -256,24 +256,76 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     float utiles, vtiles;
     utiles = vtiles = 1.0;
 
-    Procedural::Path p;
-    Procedural::Shape s;
+    Procedural::Path p, lastPath;
+    Procedural::Shape s, lastShape;
 
     vector<ConfigNode*> children = root->getChildren();
     for (int i = 0; i < children.size(); i++) {
       if (children[i]->getName().compare("") == 0) {
         Procedural::Path pappend;
-        parsePath(children[i], pappend);
+
+        ConfigNode *typeNode = children[i]->findChild("type");
+        if (typeNode && typeNode->getValue().compare("previous") == 0) {
+          pappend = lastPath;
+        } else if (typeNode && typeNode->getValue().compare("previous-combined") == 0) {
+          pappend = p;
+        } else {
+          parsePath(children[i], pappend);
+        }
+
+        ConfigNode *scaleNode = children[i]->findChild("scale");
+        ConfigNode *translateNode = children[i]->findChild("translate");
+        if (scaleNode) pappend.scale(scaleNode->getValueF(), scaleNode->getValueF(1), scaleNode->getValueF(2));
+        if (translateNode) pappend.translate(translateNode->getValueF(), translateNode->getValueF(1), translateNode->getValueF(2));
+
         p.appendPath(pappend);
+        lastPath = pappend;
+
       } else if (children[i]->getName().compare("shape") == 0) {
-        Procedural::Path sappend;
-        parseShape(children[i], sappend);
-        s.appendShape(sappend);
+        Procedural::Shape sappend;
+
+        ConfigNode *typeNode = children[i]->findChild("type");
+        if (typeNode && typeNode->getValue().compare("previous") == 0) {
+          sappend = lastShape;
+        } else if (typeNode && typeNode->getValue().compare("previous-combined") == 0) {
+          sappend = s;
+        } else {
+          parseShape(children[i], sappend);
+        }
+
+        ConfigNode *scaleNode = children[i]->findChild("scale");
+        ConfigNode *rotateNode = children[i]->findChild("rotate");
+        ConfigNode *translateNode = children[i]->findChild("translate");
+        //        ConfigNode *mirrorNode = children[i]->findChild("mirror");
+        //        ConfigNode *mirroraxisNode = children[i]->findChild("mirror-axis");
+        if (scaleNode) sappend.scale(scaleNode->getValueF(), scaleNode->getValueF(1));
+        if (rotateNode) sappend.rotate(Ogre::Degree(scaleNode->getValueF()));
+        if (translateNode) sappend.translate(translateNode->getValueF(), translateNode->getValueF(1));
+        //        if (mirrorNode) sappend.mirror(mirrorNode->getValueF(), mirrorNode->getValueF(1));
+        //        if (mirroraxis) sappend.mirrorAroundAxis(Ogre::Vector2(mirrorNode->getValueF(), mirrorNode->getValueF(1)));
+
+        ConfigNode *combineType = children[i]->findChild("combine");
+        if (combineType) {
+          string type = combineType->getValue();
+          if (type.compare("union")) {
+            s.booleanUnion(sappend);
+          } /*else if (type.compare("intersection")) {
+              s.booleanIntersection(sappend);
+              } */ else if (type.compare("difference")) {
+            s.booleanDifference(sappend);
+          } else {
+            s.appendShape(sappend);
+          }
+        } else {
+          s.appendShape(sappend);
+        }
+
+        lastShape = sappend;
       }
     }
 
     ConfigNode *trackNode = root->findChild("track");
-    Procedural::Track *t = parseTrack(info[2]);
+    Procedural::Track *t = parseTrack(trackNode);
 
     Ogre::Vector3 scale(1,1,1);
 
@@ -313,7 +365,7 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
       ConfigNode *closeNode = path->findChild("close");
       if (closeNode && closeNode->getValue().compare("true") == 0)
         spline->close();
-      
+
       p = spline->realizePath();
 
     } else if (type.compare("cubicHermiteSpline") == 0) {
@@ -402,7 +454,7 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
       ConfigNode *closeNode = path->findChild("close");
       if (closeNode && closeNode->getValue().compare("true") == 0)
         spline->close();
-      
+
       s = spline->realizeShape();
 
     } else if (type.compare("cubicHermiteSpline") == 0) {
@@ -450,7 +502,75 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
 
     } else if (type.compare("bezierCurve") == 0) {
       // We got the wrong version of OgreProcedural :(
-    }
+    } else if (type.compare("kcSpline") == 0) {
+      Procedural::KochanekBartelsSpline2 *spline = new Procedural::KochanekBartelsSpline2();
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSeg(segments);
+
+      ConfigNode *pointsNode = path->findChild("points");
+      if (pointsNode) {
+        vector<ConfigNode*> points = pointsNode->getChildren();
+        for (int i = 0; i < points.size(); i++) {
+          spline->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+        }
+      }
+
+      ConfigNode *closeNode = path->findChild("close");
+      if (closeNode && closeNode->getValue().compare("true") == 0)
+        spline->close();
+
+      s = spline->realizeShape();
+
+    } else if (type.compare("rectangle") == 0) {
+      Procedural::RectangleShape *shape = new Procedural::RectangleShape();
+      ConfigNode *widthNode = path->findChild("width");
+      if (widthNode) shape->setWidth(widthNode->getValueF());
+
+      ConfigNode *heightNode = path->findChild("height");
+      if (heightNode) shape->setHeight(heightNode->getValueF());
+
+      s = shape->realizeShape();
+
+    } else if (type.compare("circle") == 0) {
+      Procedural::CircleShape *shape = new Procedural::CircleShape();
+      ConfigNode *radiusNode = path->findChild("radius");
+      if (radiusNode) shape->setRadius(radiusNode->getValueF());
+
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) shape->setNumSeg(segNode->getValueI());
+
+      s = shape->realizeShape();
+
+    } /* else if (type.compare("ellipse") == 0) {
+         Procedural::EllipseShape *shape = new Procedural::EllipseShape();
+         ConfigNode *radiusNode = path->findChild("radius");
+         if (radiusNode) {
+         shape->setRadiusX(radiusNode->getValueF());
+         shape->setRadiusY(radiusNode->getValueF(1));
+         }
+
+         ConfigNode *segNode = path->findChild("segments");
+         if (segNode) shape->setNumSeg(segNode->getValueI());
+
+         s = shape->realizeShape();
+
+         } else if (type.compare("triangle") == 0) {
+         Procedural::TriangleShape *shape = new Procedural::TriangleShape();
+         ConfigNode *lengthNode = path->findChild("length");
+         if (lengthNode) {
+         if (lengthNode->getNumChildren() > 2) {
+         shape->setLengthA(lengthNode->getValueF());
+         shape->setLengthB(lengthNode->getValueF(1));
+         shape->setLengthC(lengthNode->getValueF(2));
+         } else {
+         shape->setLength(lengthNode->getValueF());
+         }
+         }
+
+         s = shape->realizeShape();
+
+         }*/
   } else {
     ConfigNode *pointsNode = path->findChild("points");
     if (pointsNode) {
@@ -464,6 +584,9 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
   ConfigNode *outsideNode = path->findChild("outside");
   if (outsideNode && outsideNode->getValue().compare("left") == 0)
     s.setOutSide(Procedural::SIDE_LEFT);
+
+  ConfigNode *thickenNode = path->findChild("thicken");
+  if (thickenNode) s.thicken(thickenNode->getValueF());
 }
 
 Procedural::Track* LevelLoader::parseTrack(ConfigNode *path) {
@@ -607,16 +730,16 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     go = new Plane(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                    btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("collectible") == 0){
-    go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
-                   btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
+    go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                         btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
   } else if (type.compare("extrudedObject") == 0) {
     go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
-                            btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
+                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("goal") == 0) {
     go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else {
-    go = new DecorativeObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
+    go = new DecorativeObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                               btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
   }
 
