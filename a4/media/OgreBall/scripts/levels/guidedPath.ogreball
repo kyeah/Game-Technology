@@ -1,5 +1,6 @@
 level guidedPath {
       start {
+            skydome Examples/CloudySky 5 8 4000
             camera {
                    pos 0 5000 0
                    lookAt 0 0 -7000

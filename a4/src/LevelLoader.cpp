@@ -110,6 +110,8 @@ void LevelLoader::loadLevel(const char* levelName) {
 }
 
 void LevelLoader::loadStartParameters(ConfigNode *root) {
+
+  // Initial camera positions and lookAts (i.e. for levelViewer)
   ConfigNode *camNode = root->findChild("camera");
   if (camNode) {
     ConfigNode *cposNode = camNode->findChild("pos");
@@ -125,6 +127,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Waypoints
   ConfigNode *wpNode = root->findChild("waypoints");
   if (wpNode) {
     vector<ConfigNode*> wps = wpNode->getChildren();
@@ -134,6 +137,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Player Starting positions and rotations
   string ids[] = { "player1", "player2", "player3", "player4" };
 
   for (int i = 0; i < 4; i++) {
@@ -144,6 +148,27 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
 
       if (posNode) playerStartPositions[i] = posNode->getValueV3();
       if (rotNode) playerStartRotations[i] = rotNode->getValueYPR();
+    }
+  }
+
+  // Skyboxes and Skydomes
+  ConfigNode *skyboxNode = root->findChild("skybox");
+  if (skyboxNode) {
+    if (skyboxNode->getNumChildren() > 1) {
+      // Distance; default 5000
+      mSceneMgr->setSkyBox(true, skyboxNode->getValue(), skyboxNode->getValueF(1));
+    } else {
+      mSceneMgr->setSkyBox(true, skyboxNode->getValue());
+    }
+  }
+
+  ConfigNode *skydomeNode = root->findChild("skydome");
+  if (skydomeNode) {
+    if (skydomeNode->getNumChildren() > 3) {
+      // Curvature, Tiling, Distance; default 10-8-4000
+      mSceneMgr->setSkyDome(true, skydomeNode->getValue(), skydomeNode->getValue(1), skydomeNode->getValue(2), skydomeNode->getValue(3));
+    } else {
+      mSceneMgr->setSkyDome(true, skydomeNode->getValue());
     }
   }
 }
@@ -223,24 +248,30 @@ void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<string>& m
 
 void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>& meshNames) {
   for (int i = 0; i < meshes.size(); i++) {
-    ConfigNode *root;
-    ConfigNode *info[3];
-    string ids[] = { "path", "shape", "track" };
-    root = meshes[i];
+    ConfigNode *root = meshes[i];
 
-    for (int i = 0; i < 3; i++) {
-      info[i] = root->findChild(ids[i]);
-    }
-
-    if (!info[0] || !info[1]) continue;
+    if (!root->findChild("path") || !root->findChild("shape")) continue;
 
     float utiles, vtiles;
     utiles = vtiles = 1.0;
 
     Procedural::Path p;
-    parsePath(info[0], p);
     Procedural::Shape s;
-    parseShape(info[1], s);
+
+    vector<ConfigNode*> children = root->getChildren();
+    for (int i = 0; i < children.size(); i++) {
+      if (children[i]->getName().compare("") == 0) {
+        Procedural::Path pappend;
+        parsePath(children[i], pappend);
+        p.appendPath(pappend);
+      } else if (children[i]->getName().compare("shape") == 0) {
+        Procedural::Path sappend;
+        parseShape(children[i], sappend);
+        s.appendShape(sappend);
+      }
+    }
+
+    ConfigNode *trackNode = root->findChild("track");
     Procedural::Track *t = parseTrack(info[2]);
 
     Ogre::Vector3 scale(1,1,1);
