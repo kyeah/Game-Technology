@@ -11,7 +11,8 @@ level menuBG {
              waypoints {
              }
       	     Sound{
-     		background media/OgreBall/sounds/background.mp3
+     		background media/OgreBall/sounds/background.wav
+		winMusic media/OgreBall/sounds/hitGoal.wav
             }
       }
       lights {

@@ -1,6 +1,7 @@
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
+#include "Sounds.h"
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
@@ -89,6 +90,7 @@ void SinglePlayerActivity::handleGameEnd() {
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
 
+  Sounds::playSoundEffect(app->levelLoader->mWinMusic.c_str(), Sounds::MAX_VOLUME);
   app->Wmgr->getWindow("GameWon/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));

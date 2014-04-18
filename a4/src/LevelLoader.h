@@ -45,6 +45,8 @@ class LevelLoader {
   Ogre::Camera *mCamera;
   Physics *mPhysics;
 
+  Ogre::String mWinMusic;
+
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
 

@@ -49,6 +49,24 @@ void Sounds::musicDone() {
 }
 
 void Sounds::playSoundEffect(const char* aFilePath, int aVolume){
-  //TODO
+  //clamp volume
+  if(aVolume > MAX_VOLUME) aVolume = 128;
+  if(aVolume < MIN_VOLUME) aVolume = 0;
 
+  Mix_Chunk* soundEffect = NULL;
+  soundEffect = Mix_LoadWAV(aFilePath);
+  if(soundEffect){
+    int channel = Mix_PlayChannel(-1, soundEffect, 0);
+    Mix_Volume(channel, aVolume);
+    Mix_ChannelFinished(channelDone);
+  }
+  else{
+    printf("[SOUNDS::playSoundEffect]: Sound effect was not loaded successfully from file");
+    std::cout << " filePath is: " << aFilePath << std::endl;
+  }
+
+}
+
+void Sounds::channelDone(int aChannel){
+  printf("channel %d finished playing.\n", aChannel);
 }

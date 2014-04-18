@@ -15,9 +15,10 @@ public:
         static int enabled;
         static Mix_Music* mBackgroundMusic;
 
-	static void musicDone();
 	static void init();
-	static void playSoundEffect(const char*, int);
 	static void playBackground(const char*, int);
+	static void playSoundEffect(const char*, int);
+	static void musicDone();
+	static void channelDone(int);
 };
 

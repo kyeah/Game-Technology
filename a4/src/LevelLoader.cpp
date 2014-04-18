@@ -152,8 +152,15 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
 
   if(pSound){
       ConfigNode* pBackground = pSound->findChild("background");
-      Ogre::String backgroundMusic = pBackground->getValue();
-      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
+      if(pBackground){
+        Ogre::String backgroundMusic = pBackground->getValue();
+        Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
+      }
+      ConfigNode* pWinMusic = pSound->findChild("winMusic");
+      if(pWinMusic) {
+        mWinMusic = pWinMusic->getValue();
+        std::cout << "winMusic is: " << mWinMusic << std::endl;
+      }
     }
 }
 
