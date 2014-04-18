@@ -87,6 +87,7 @@ void OgreBallApplication::createScene(void)
   levelLoader->loadResources("media/OgreBall/scripts");
 
   switchActivity(new MenuActivity(this));
+  mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
 void OgreBallApplication::createCamera(void) {

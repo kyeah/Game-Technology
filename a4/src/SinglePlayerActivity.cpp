@@ -1,4 +1,4 @@
-#include "Interpolator.h"
+B1;2802;0c#include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
@@ -31,9 +31,9 @@ void SinglePlayerActivity::start(void) {
 
 void SinglePlayerActivity::loadLevel(const char* name) {
 
-  app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
+  app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
 
   mCameraObj = new CameraObject(app->mCamera);
   levelDisplay->setText(name);

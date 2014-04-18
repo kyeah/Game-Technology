@@ -148,12 +148,13 @@ void GameObject::addToSimulator(short group, short mask) {
 
 void GameObject::removeFromSimulator(){
   physics->removeObject(this);
-  delete body->getMotionState();
-  delete body;
+  //  delete body->getMotionState();
+  //  delete body;
 
   node->removeAndDestroyAllChildren();
-  mMgr->destroySceneNode(node);
-  mMgr->destroyEntity(entity);
+  node->scale(0,0,0);
+  //  mMgr->destroySceneNode(node);
+  //  mMgr->destroyEntity(entity);
 }
 
 void GameObject::updateTransform() {
