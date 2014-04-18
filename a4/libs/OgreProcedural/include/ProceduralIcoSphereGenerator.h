@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,16 +33,19 @@ THE SOFTWARE.
 
 namespace Procedural
 {
-/** Builds an icosphere mesh, ie a sphere built with equally sized triangles
+/**
+ * \ingroup objgengrp
+ * Builds an icosphere mesh, ie a sphere built with equally sized triangles
+ * \image html primitive_icosphere.png
  */
 class _ProceduralExport IcoSphereGenerator : public MeshGenerator<IcoSphereGenerator>
 {
 	Ogre::Real mRadius;
 	unsigned int mNumIterations;
 
-public:	
+public:
 	/// Contructor with arguments
-	IcoSphereGenerator(Ogre::Real radius = 1.f, unsigned int numIterations = 2) : 
+	IcoSphereGenerator(Ogre::Real radius = 1.f, unsigned int numIterations = 2) :
 		mRadius(radius),
 		mNumIterations(numIterations)
 	{}
@@ -53,9 +56,14 @@ public:
 	 */
 	void addToTriangleBuffer(TriangleBuffer& buffer) const;
 
-	/** Sets the radius of the sphere (default=1) */
-	inline IcoSphereGenerator & setRadius(Ogre::Real radius)
+	/**
+	Sets the radius of the sphere (default=1)
+	\exception Ogre::InvalidParametersException Radius must be larger than 0!
+	*/
+	inline IcoSphereGenerator& setRadius(Ogre::Real radius)
 	{
+		if (radius <= 0.0f)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "Radius must be larger than 0!", "Procedural::IcoSphereGenerator::setRadius(Ogre::Real)");
 		mRadius = radius;
 		return *this;
 	}
@@ -64,9 +72,12 @@ public:
 		First iteration corresponds to a 20 face sphere.
 		Each iteration has 3 more faces than the previous.
 		(default=2)
+	\exception Ogre::InvalidParametersException Minimum of numIterations is 1
 	*/
-	inline IcoSphereGenerator & setNumIterations(unsigned int numIterations)
+	inline IcoSphereGenerator& setNumIterations(unsigned int numIterations)
 	{
+		if (numIterations == 0)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "There must be more than 0 iterations", "Procedural::IcoSphereGenerator::setNumRings(unsigned int)");
 		mNumIterations = numIterations;
 		return *this;
 	}

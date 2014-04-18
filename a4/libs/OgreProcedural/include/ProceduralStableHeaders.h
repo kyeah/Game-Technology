@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,4 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __OgreProceduralStableHeaders__
+#define __OgreProceduralStableHeaders__
+#include "ProceduralPlatform.h"
+
+#if (PROCEDURAL_PLATFORM == PROCEDURAL_PLATFORM_WIN32 && !defined(__MINGW32__)) || PROCEDURAL_PLATFORM == PROCEDURAL_PLATFORM_WINRT || PROCEDURAL_PLATFORM == PROCEDURAL_PLATFORM_APPLE || PROCEDURAL_PLATFORM == PROCEDURAL_PLATFORM_APPLE_IOS
 #include "Ogre.h"
+#endif
+#endif

@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,12 +46,12 @@ public:
 	/// POINT : right on the principal curve's key
 	enum AddressingMode
 	{
-		AM_ABSOLUTE_LINEIC, AM_RELATIVE_LINEIC, AM_POINT
+	    AM_ABSOLUTE_LINEIC, AM_RELATIVE_LINEIC, AM_POINT
 	};
 protected:
 	/// Adressing mode of the track (see the enum definition for more details)
 	AddressingMode mAddressingMode;
-	
+
 	/// Tells whether we should add new points to principal curve if a key is defined here but not on principal curve
 	bool mInsertPoint;
 
@@ -100,17 +100,17 @@ public:
 	std::map<Ogre::Real, Ogre::Real>::const_iterator _getKeyValueAfter(Ogre::Real absPos, Ogre::Real relPos, unsigned int index) const;
 
 	/// Get the key value couple after current point.
-	/// If current point is above maximum key, issues maximum key/value	
+	/// If current point is above maximum key, issues maximum key/value
 	std::map<Ogre::Real, Ogre::Real>::const_iterator _getKeyValueAfter(Ogre::Real pos) const;
 
 	/// Gets the first value in the track
-	Ogre::Real getFirstValue()
+	Ogre::Real getFirstValue() const
 	{
 		return mKeyFrames.begin()->second;
 	}
 
 	/// Gets the last value in the track
-	Ogre::Real getLastValue()
+	Ogre::Real getLastValue() const
 	{
 		return (--mKeyFrames.end())->second;
 	}

@@ -296,22 +296,22 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         ConfigNode *scaleNode = children[i]->findChild("scale");
         ConfigNode *rotateNode = children[i]->findChild("rotate");
         ConfigNode *translateNode = children[i]->findChild("translate");
-        //        ConfigNode *mirrorNode = children[i]->findChild("mirror");
-        //        ConfigNode *mirroraxisNode = children[i]->findChild("mirror-axis");
+        ConfigNode *mirrorNode = children[i]->findChild("mirror");
+        ConfigNode *mirroraxisNode = children[i]->findChild("mirror-axis");
         if (scaleNode) sappend.scale(scaleNode->getValueF(), scaleNode->getValueF(1));
         if (rotateNode) sappend.rotate(Ogre::Degree(scaleNode->getValueF()));
         if (translateNode) sappend.translate(translateNode->getValueF(), translateNode->getValueF(1));
-        //        if (mirrorNode) sappend.mirror(mirrorNode->getValueF(), mirrorNode->getValueF(1));
-        //        if (mirroraxis) sappend.mirrorAroundAxis(Ogre::Vector2(mirrorNode->getValueF(), mirrorNode->getValueF(1)));
+        if (mirrorNode) sappend.mirror(mirrorNode->getValueF(), mirrorNode->getValueF(1));
+        if (mirroraxisNode) sappend.mirrorAroundAxis(Ogre::Vector2(mirrorNode->getValueF(), mirrorNode->getValueF(1)));
 
         ConfigNode *combineType = children[i]->findChild("combine");
         if (combineType) {
           string type = combineType->getValue();
           if (type.compare("union")) {
             s.booleanUnion(sappend);
-          } /*else if (type.compare("intersection")) {
-              s.booleanIntersection(sappend);
-              } */ else if (type.compare("difference")) {
+          } else if (type.compare("intersection")) {
+            s.booleanIntersect(sappend);
+          }  else if (type.compare("difference")) {
             s.booleanDifference(sappend);
           } else {
             s.appendShape(sappend);
@@ -414,7 +414,25 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
       p = spline->realizePath();
 
     } else if (type.compare("bezierCurve") == 0) {
-      // We got the wrong version of OgreProcedural :(
+      Procedural::BezierCurve3 *spline = new Procedural::BezierCurve3();
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSeg(segments);
+
+      ConfigNode *pointsNode = path->findChild("points");
+      if (pointsNode) {
+        vector<ConfigNode*> points = pointsNode->getChildren();
+        for (int i = 0; i < points.size(); i++) {
+          btVector3 point = points[i]->getValueV3();
+          spline->addPoint(point[0], point[1], point[2]);
+        }
+      }
+
+      ConfigNode *closeNode = path->findChild("close");
+      if (closeNode && closeNode->getValue().compare("true") == 0)
+        spline->close();
+
+      p = spline->realizePath();
     }
   } else {
     ConfigNode *pointsNode = path->findChild("points");
@@ -501,7 +519,25 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
       s = spline->realizeShape();
 
     } else if (type.compare("bezierCurve") == 0) {
-      // We got the wrong version of OgreProcedural :(
+      Procedural::BezierCurve2 *spline = new Procedural::BezierCurve2();
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSeg(segments);
+
+      ConfigNode *pointsNode = path->findChild("points");
+      if (pointsNode) {
+        vector<ConfigNode*> points = pointsNode->getChildren();
+        for (int i = 0; i < points.size(); i++) {
+          spline->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+        }
+      }
+
+      ConfigNode *closeNode = path->findChild("close");
+      if (closeNode && closeNode->getValue().compare("true") == 0)
+        spline->close();
+
+      s = spline->realizeShape();
+
     } else if (type.compare("kcSpline") == 0) {
       Procedural::KochanekBartelsSpline2 *spline = new Procedural::KochanekBartelsSpline2();
       ConfigNode *segNode = path->findChild("segments");
@@ -542,35 +578,35 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
 
       s = shape->realizeShape();
 
-    } /* else if (type.compare("ellipse") == 0) {
-         Procedural::EllipseShape *shape = new Procedural::EllipseShape();
-         ConfigNode *radiusNode = path->findChild("radius");
-         if (radiusNode) {
-         shape->setRadiusX(radiusNode->getValueF());
-         shape->setRadiusY(radiusNode->getValueF(1));
-         }
+    }  else if (type.compare("ellipse") == 0) {
+      Procedural::EllipseShape *shape = new Procedural::EllipseShape();
+      ConfigNode *radiusNode = path->findChild("radius");
+      if (radiusNode) {
+        shape->setRadiusX(radiusNode->getValueF());
+        shape->setRadiusY(radiusNode->getValueF(1));
+      }
 
-         ConfigNode *segNode = path->findChild("segments");
-         if (segNode) shape->setNumSeg(segNode->getValueI());
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) shape->setNumSeg(segNode->getValueI());
 
-         s = shape->realizeShape();
+      s = shape->realizeShape();
 
-         } else if (type.compare("triangle") == 0) {
-         Procedural::TriangleShape *shape = new Procedural::TriangleShape();
-         ConfigNode *lengthNode = path->findChild("length");
-         if (lengthNode) {
-         if (lengthNode->getNumChildren() > 2) {
-         shape->setLengthA(lengthNode->getValueF());
-         shape->setLengthB(lengthNode->getValueF(1));
-         shape->setLengthC(lengthNode->getValueF(2));
-         } else {
-         shape->setLength(lengthNode->getValueF());
-         }
-         }
+    } else if (type.compare("triangle") == 0) {
+      Procedural::TriangleShape *shape = new Procedural::TriangleShape();
+      ConfigNode *lengthNode = path->findChild("length");
+      if (lengthNode) {
+        if (lengthNode->getNumChildren() > 2) {
+          shape->setLengthA(lengthNode->getValueF());
+          shape->setLengthB(lengthNode->getValueF(1));
+          shape->setLengthC(lengthNode->getValueF(2));
+        } else {
+          shape->setLength(lengthNode->getValueF());
+        }
+      }
 
-         s = shape->realizeShape();
+      s = shape->realizeShape();
 
-         }*/
+    }
   } else {
     ConfigNode *pointsNode = path->findChild("points");
     if (pointsNode) {
