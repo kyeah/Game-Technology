@@ -334,6 +334,12 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
       scale = Ogre::Vector3(sNode->getValueF(0), sNode->getValueF(1), sNode->getValueF(2));
     }
 
+    ConfigNode *tileNode = root->findChild("tiles");
+    if (tileNode) {
+      utiles = tileNode->getValueI();
+      vtiles = tileNode->getValueI(1);
+    }
+
     Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).setScale(scale).realizeMesh(meshNames[i]);
   }
 }
@@ -538,7 +544,7 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
 
       s = spline->realizeShape();
 
-    } else if (type.compare("kcSpline") == 0) {
+    } else if (type.compare("kbSpline") == 0) {
       Procedural::KochanekBartelsSpline2 *spline = new Procedural::KochanekBartelsSpline2();
       ConfigNode *segNode = path->findChild("segments");
       if (segNode) segments = segNode->getValueI();
