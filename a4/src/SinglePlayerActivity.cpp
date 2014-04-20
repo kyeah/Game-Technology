@@ -56,10 +56,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
 
-  player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
-                                .rotate(currTilt.getAxis(), -currTilt.getAngle()));
-  
-
+  // Update HUD
   std::stringstream sst;
   sst << "SCORE: " << score;
   scoreDisplay->setText(sst.str());
@@ -79,17 +76,35 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   timeDisplay->setText(timess.str());
 
+  // Set player's gravity based on the direction they are facing
+  Ogre::Vector3 ocam = app->mCamera->getPosition();
+  btVector3 facingDirection = player->getPosition() - btVector3(ocam[0], ocam[1], ocam[2]);
+  facingDirection.normalize();
+
+  btScalar yaw = btVector3(0,0,-1).angle(facingDirection);
+  btQuaternion q(-yaw,0,0);
+  q.normalize();
+
+  if (facingDirection[0] < 0) q = btQuaternion(yaw,0,0);
+  player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
+                                .rotate(currTilt.getAxis(), -currTilt.getAngle())
+                                .rotate(q.getAxis(), q.getAngle()));
+
+  // Update Camera Position
   if(!mCameraObj->previousPosIsSet)
-       	mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
+    mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
   if(!mCameraObj->fixedDist || (app->levelLoader->cameraStartPos != mCameraObj->cameraStartPosition))
-       	mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
+    mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   // More magic stuff here to make the level look like it's rotating
-  /*  app->mCamera->setOrientation(Ogre::Quaternion(currTilt.w(),
-      -currTilt.x(),
-      -currTilt.y(),
-      -currTilt.z()));*/
+  /*  app->mCameraLookAtNode->setOrientation(Ogre::Quaternion(currTilt.w(),
+                                                          currTilt.x(),
+                                                          currTilt.y(),
+                                                          currTilt.z()));*/
+
+  //  app->mCamera->lookAt((Ogre::Vector3)player->getPosition());
+
   return true;
 }
 
@@ -133,8 +148,8 @@ void SinglePlayerActivity::handleGameEnd() {
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
   /*  app->Wmgr->getWindow("GameWon/NextLevel")
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
+      ->subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
 }
 
 //-------------------------------------------------------------------------------------

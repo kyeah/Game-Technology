@@ -47,7 +47,6 @@ void CameraObject::update(Ogre::Vector3 newPosition, Ogre::Real elapsedTime){
     avgPos = newPosition - dir*fixedDist;
   }
 
-  printf("setting position (%f,%f,%f)\n", avgPos[0], avgPos[1], avgPos[2]);
   camera->setPosition(avgPos[0], std::max(0.0f, std::max(newPosition[1] + 300, avgPos[1])), avgPos[2]);
   camera->lookAt(newPosition);
 }
