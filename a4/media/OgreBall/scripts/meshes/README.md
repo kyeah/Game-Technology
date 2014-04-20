@@ -69,4 +69,10 @@ Combine shapes by placing them one after another (can change how they combine us
 
 Duplicate paths or strings by using type=previous (duplicate last path created) or type=previous-combined (duplicate the entirety of the path created up until that point)
 
+## Notes
+
 Most options are NOT needed, but if you omit an option that IS needed, the program will crash with a segfault...sorry
+
+Do NOT repeat points when making a path, shape, or track, or the extruder will hang and you will be sad. A shape is required to be closed, and will be closed implicitly.
+
+For some reason, updating to the newest version of OgreProcedural broke scaling, so scale all of your points manually for points and shapes.

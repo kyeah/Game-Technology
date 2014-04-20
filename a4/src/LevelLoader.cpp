@@ -249,6 +249,7 @@ void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<string>& m
 
 void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>& meshNames) {
   for (int i = 0; i < meshes.size(); i++) {
+    cout << "loading Extruded mesh " << meshNames[i] << endl;
     ConfigNode *root = meshes[i];
 
     if (!root->findChild("path") || !root->findChild("shape")) continue;
@@ -261,7 +262,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
 
     vector<ConfigNode*> children = root->getChildren();
     for (int i = 0; i < children.size(); i++) {
-      if (children[i]->getName().compare("") == 0) {
+      if (children[i]->getName().compare("path") == 0) {
         Procedural::Path pappend;
 
         ConfigNode *typeNode = children[i]->findChild("type");
@@ -305,6 +306,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         if (mirroraxisNode) sappend.mirrorAroundAxis(Ogre::Vector2(mirrorNode->getValueF(), mirrorNode->getValueF(1)));
 
         ConfigNode *combineType = children[i]->findChild("combine");
+
         if (combineType) {
           string type = combineType->getValue();
           if (type.compare("union")) {
@@ -340,7 +342,8 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
       vtiles = tileNode->getValueI(1);
     }
 
-    Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).setScale(scale).realizeMesh(meshNames[i]);
+    s.close();
+    Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
   }
 }
 

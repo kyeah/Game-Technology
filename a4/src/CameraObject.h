@@ -14,6 +14,7 @@ public:
 	
 	Ogre::Camera *camera;
 	Ogre::Vector3 previousPos;
+        Ogre::Vector3 destPos;
 	Ogre::Real fixedDist;
 	Ogre::Vector3 cameraStartPosition;
 	bool doneFalling;

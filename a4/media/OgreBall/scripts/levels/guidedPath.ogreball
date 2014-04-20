@@ -6,7 +6,7 @@ level guidedPath {
                    lookAt 0 0 0
             }
             player1 {
-                    pos 0 500 0
+                    pos 0 1000 0
                     rot 0 0 0
             }
             waypoints {
@@ -61,7 +61,7 @@ level guidedPath {
 
       }
       extrudedObject {
-            meshname guidedPlaneMesh
+            meshname guidedPathMesh
             material Examples/BeachStones
             rest 0.1
             rot {

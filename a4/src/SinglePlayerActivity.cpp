@@ -64,12 +64,14 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   sst << "SCORE: " << score;
   scoreDisplay->setText(sst.str());
 
-  livesDisplay->setText(std::to_string(lives));
+  std:: stringstream livesSS;
+  livesSS << lives << " Lives";
+  livesDisplay->setText(livesSS.str());
   collectDisplay->setText(std::to_string(collectibles));
 
   std::stringstream timess;
   int seconds = std::round(timeLeft/1000);
-  int millis = std::min((float)99.0, std::round(fmod(timeLeft,1000)/10));
+  int millis = std::min((float)99.0, (float)std::round(fmod(timeLeft,1000)/10));
 
   timess << seconds << ":";
   if (millis < 10) timess << "0";

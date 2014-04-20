@@ -21,6 +21,7 @@ extrudedMesh teardropMesh {
        p 1 .2
        p 1.2 .2
      }
+     close true
   }
   track {
      addressingMode point
@@ -66,40 +67,39 @@ extrudedMesh mountainTeardropMesh {
   }  
 }
 
-extrudedMesh guidedPlaneMesh {
+extrudedMesh guidedPathMesh {
   scale 500 500 500
   path {
      type catmullSpline
      segments 16
      points {
        p 0 0 0
-       p 0 0 -10
-       p 10 0 -10
-       p 10 0 -20
+       p 0 0 -5000
+       p 5000 0 -5000
+       p 5000 0 -10000
      }
-     close true
+     close false
   }
   shape {
      outside right
      points {
-       p -1 0
-       p 1 0
-       p 1 0.5
-       p 0.8 0.5
-       p 0.8 0.4
-       p -0.8 0.4
-       p -0.8 0.5
-       p -1 0.5
-       p -1 0
+       p -500 0
+       p 500 0
+       p 500 300
+       p 400 300
+       p 400 200
+       p -400 200
+       p -400 300
+       p -500 300
      }
   }
   track {
      addressingMode point
      keyframes {
        k 0 0
-       k 4 .2
-       k 6 .8
-       k 8 1
+       k 2 0.2
+       k 3 0.8
+       k 5 1
      }
   }  
 }
