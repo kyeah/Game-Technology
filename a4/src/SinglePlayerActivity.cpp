@@ -79,6 +79,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   // Set player's gravity based on the direction they are facing
   Ogre::Vector3 ocam = app->mCamera->getPosition();
   btVector3 facingDirection = player->getPosition() - btVector3(ocam[0], ocam[1], ocam[2]);
+  facingDirection[1] = 0;
   facingDirection.normalize();
 
   btScalar yaw = btVector3(0,0,-1).angle(facingDirection);
