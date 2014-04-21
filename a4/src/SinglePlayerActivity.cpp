@@ -98,11 +98,23 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
     mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
+  /*
+  Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
+  Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
+  Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
+                                             currTilt.x(),
+                                             currTilt.y(),
+                                             currTilt.z());
+
+  app->mCamera->rotate(oq);
+  app->mCamera->rotate(notilt);
+  app->mCamera->rotate(noq);
+  */
   // More magic stuff here to make the level look like it's rotating
   /*  app->mCameraLookAtNode->setOrientation(Ogre::Quaternion(currTilt.w(),
-                                                          currTilt.x(),
-                                                          currTilt.y(),
-                                                          currTilt.z()));*/
+      currTilt.x(),
+      currTilt.y(),
+      currTilt.z()));*/
 
   //  app->mCamera->lookAt((Ogre::Vector3)player->getPosition());
 
