@@ -51,6 +51,8 @@ OgreBallApplication::OgreBallApplication(void)
   Sounds::init();
   paused = false;
   instance = this;
+
+
 }
 
 //-------------------------------------------------------------------------------------
@@ -87,6 +89,7 @@ void OgreBallApplication::createScene(void)
   levelLoader->loadResources("media/OgreBall/scripts");
 
   switchActivity(new MenuActivity(this));
+  mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
 void OgreBallApplication::createCamera(void) {
@@ -109,7 +112,6 @@ void OgreBallApplication::loadResources(void) {
   CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
   CEGUI::SchemeManager::getSingleton().create("OgreBall.scheme");
-  //  CEGUI::SchemeManager::getSingleton().create("OgreBalla.scheme");
   CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
 
   Wmgr = &CEGUI::WindowManager::getSingleton();
@@ -131,6 +133,9 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();
 
+  if (mPhysics) mPhysics->stepSimulation(elapsedTime);
+  activity->frameStarted(elapsedTime);
+  
   if (!paused) {
     if (mPhysics) mPhysics->stepSimulation(elapsedTime);
     activity->frameStarted(elapsedTime);

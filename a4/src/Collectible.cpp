@@ -2,12 +2,14 @@
 #include "GameObject.h"
 #include "GameObjectDescription.h"
 #include "../libs/MeshStrider.h"
+#include "SinglePlayerActivity.h"
+#include "Sounds.h"
 
 Collectible::Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
                          Physics* _physics,
                          btVector3 origin, btVector3 scale,
                          btVector3 velocity, btScalar _mass, btScalar _rest,
-                         btVector3 _localInertia, btQuaternion *rotation)
+                         btVector3 _localInertia, btQuaternion *rotation, Ogre::String hitSound)
   : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, scale, velocity, _mass, _rest, _localInertia, rotation)
 {
 
@@ -27,6 +29,9 @@ Collectible::Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::S
   setAmbient(0.5,0.0,0.0);
   setSpecular(0.1,0,0,0.4);
   if (rotation) rotate(*rotation);
+
+  isHit = false;
+  mHitSound = hitSound;
 }
 
 void Collectible::update(float elapsedTime) {
@@ -36,8 +41,15 @@ void Collectible::update(float elapsedTime) {
     for(int i = 0; i < contexts.size(); i++){
       if(contexts[i]->object){
         OgreBall *ob = dynamic_cast<OgreBall*>(contexts[i]->object);
-        if(ob){
-          //TODO: Update score and remove collectible from scene here
+        if(ob && !isHit){
+          isHit = true;
+          std::cout << "Hit" << std::endl;
+          removeFromSimulator();
+
+          Activity *a = OgreBallApplication::getSingleton()->activity;
+          if (a) a->score++;
+          Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME / 2));
+          //TODO: Add sound
         }
       }
     }

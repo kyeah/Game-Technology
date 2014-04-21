@@ -119,6 +119,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     if (cposNode) {
       btVector3 camPos = cposNode->getValueV3();
       mCamera->setPosition(camPos[0], camPos[1], camPos[2]);
+      cameraStartPos = (Ogre::Vector3)camPos;
     }
     if (clookNode) {
       btVector3 clook = clookNode->getValueV3();
@@ -155,11 +156,6 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
       if(pBackground){
         Ogre::String backgroundMusic = pBackground->getValue();
         Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
-      }
-      ConfigNode* pWinMusic = pSound->findChild("winMusic");
-      if(pWinMusic) {
-        mWinMusic = pWinMusic->getValue();
-        std::cout << "winMusic is: " << mWinMusic << std::endl;
       }
     }
 }
@@ -255,7 +251,8 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
 
     Procedural::Path p;
     parsePath(info[0], p);
-    Procedural::Shape *s = parseShape(info[1]);
+    Procedural::Shape s;
+    parseShape(info[1], s);
     Procedural::Track *t = parseTrack(info[2]);
 
     Ogre::Vector3 scale(1,1,1);
@@ -265,7 +262,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
       scale = Ogre::Vector3(sNode->getValueF(0), sNode->getValueF(1), sNode->getValueF(2));
     }
 
-    Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).setScale(scale).realizeMesh(meshNames[i]);
+    Procedural::Extruder().setExtrusionPath(&p).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).setScale(scale).realizeMesh(meshNames[i]);
   }
 }
 
@@ -296,7 +293,7 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
       ConfigNode *closeNode = path->findChild("close");
       if (closeNode && closeNode->getValue().compare("true") == 0)
         spline->close();
-
+      
       p = spline->realizePath();
 
     } else if (type.compare("cubicHermiteSpline") == 0) {
@@ -347,26 +344,106 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
     } else if (type.compare("bezierCurve") == 0) {
       // We got the wrong version of OgreProcedural :(
     }
+  } else {
+    ConfigNode *pointsNode = path->findChild("points");
+    if (pointsNode) {
+      vector<ConfigNode*> points = pointsNode->getChildren();
+      for (int i = 0; i < points.size(); i++) {
+        btVector3 point = points[i]->getValueV3();
+        p.addPoint(point[0], point[1], point[2]);
+      }
+    }
   }
 }
 
-Procedural::Shape* LevelLoader::parseShape(ConfigNode *path) {
-  if (!path) return NULL;
-  Procedural::Shape *shape = new Procedural::Shape();
+void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
+  ConfigNode *typeNode = path->findChild("type");
+  if (typeNode) {
+    int segments = 8;
+    string type = typeNode->getValue();
 
-  ConfigNode *outsideNode = path->findChild("outside");
-  if (outsideNode && outsideNode->getValue().compare("left") == 0)
-    shape->setOutSide(Procedural::SIDE_LEFT);
+    // Templates with no base constructors are stupid
+    // Only the first line in each case statement is different
+    // Please practice good coding practices when making libraries
+    if (type.compare("catmullSpline") == 0) {
+      Procedural::CatmullRomSpline2 *spline = new Procedural::CatmullRomSpline2();
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSeg(segments);
 
-  ConfigNode *pointsNode = path->findChild("points");
-  if (pointsNode) {
-    vector<ConfigNode*> points = pointsNode->getChildren();
-    for (int i = 0; i < points.size(); i++) {
-      shape->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+      ConfigNode *pointsNode = path->findChild("points");
+      if (pointsNode) {
+        vector<ConfigNode*> points = pointsNode->getChildren();
+        for (int i = 0; i < points.size(); i++) {
+          spline->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+        }
+      }
+
+      ConfigNode *closeNode = path->findChild("close");
+      if (closeNode && closeNode->getValue().compare("true") == 0)
+        spline->close();
+      
+      s = spline->realizeShape();
+
+    } else if (type.compare("cubicHermiteSpline") == 0) {
+      Procedural::CubicHermiteSpline2 *spline = new Procedural::CubicHermiteSpline2();
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSeg(segments);
+
+      ConfigNode *pointsNode = path->findChild("points");
+      if (pointsNode) {
+        vector<ConfigNode*> points = pointsNode->getChildren();
+        for (int i = 0; i < points.size(); i++) {
+          spline->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+        }
+      }
+
+      ConfigNode *closeNode = path->findChild("close");
+      if (closeNode && closeNode->getValue().compare("true") == 0)
+        spline->close();
+
+      s = spline->realizeShape();
+
+    } else if (type.compare("roundedCornerSpline") == 0) {
+      Procedural::RoundedCornerSpline2 *spline = new Procedural::RoundedCornerSpline2();
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSeg(segments);
+
+      ConfigNode *radNode = path->findChild("radius");
+      if (radNode) spline->setRadius(radNode->getValueF());
+
+      ConfigNode *pointsNode = path->findChild("points");
+      if (pointsNode) {
+        vector<ConfigNode*> points = pointsNode->getChildren();
+        for (int i = 0; i < points.size(); i++) {
+          spline->addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+        }
+      }
+
+      ConfigNode *closeNode = path->findChild("close");
+      if (closeNode && closeNode->getValue().compare("true") == 0)
+        spline->close();
+
+      s = spline->realizeShape();
+
+    } else if (type.compare("bezierCurve") == 0) {
+      // We got the wrong version of OgreProcedural :(
+    }
+  } else {
+    ConfigNode *pointsNode = path->findChild("points");
+    if (pointsNode) {
+      vector<ConfigNode*> points = pointsNode->getChildren();
+      for (int i = 0; i < points.size(); i++) {
+        s.addPoint(points[i]->getValueF(0), points[i]->getValueF(1));
+      }
     }
   }
 
-  return shape;
+  ConfigNode *outsideNode = path->findChild("outside");
+  if (outsideNode && outsideNode->getValue().compare("left") == 0)
+    s.setOutSide(Procedural::SIDE_LEFT);
 }
 
 Procedural::Track* LevelLoader::parseTrack(ConfigNode *path) {
@@ -400,6 +477,7 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   btVector3 scale(1,1,1);
   btVector3 startPos;
   btQuaternion startRot;
+  Ogre::String soundEffect;
 
   vector<float> interpTimes;
   vector<btVector3> interpPos;
@@ -489,14 +567,15 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
           interpRot.push_back(rot[i]->getValueYPR(1));
         }
       }
+    }
+    else if (name.compare("soundEffect") == 0)
+    {
+      soundEffect = attrs[i]->getValue();
     } else {
       childObjects.push_back(attrs[i]);
     }
   }
 
-
-
-  
   static int id = 0;
   stringstream ss;
   ss << "object" << id;
@@ -514,14 +593,17 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
                    btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("collectible") == 0){
     go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
-                   btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
+                   btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot, soundEffect);
   } else if (type.compare("extrudedObject") == 0) {
     go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                             btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("goal") == 0) {
     go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
-                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
-  } else {
+                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+  } else if (type.compare("bumper") == 0){
+    go = new Bumper(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+  }else {
     go = new DecorativeObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale, 
                               btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
   }
@@ -542,9 +624,6 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   for (int i = 0; i < childObjects.size(); i++) {
     loadObject(childObjects[i], go->getNode());
   }
-
-
-
 }
 
 void LevelLoader::rotateLevel(btVector3 *axis, btScalar degree){

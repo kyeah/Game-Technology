@@ -3,6 +3,7 @@
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include "Activity.h"
+#include "CameraObject.h"
 #include "GameObjectDescription.h"
 
 class SinglePlayerActivity : public Activity {
@@ -27,14 +28,24 @@ class SinglePlayerActivity : public Activity {
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
 
-  const char* startingLevelName;
+  const char* currentLevelName;
 
+  // User Input Variables
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
+  OgreBall* mOgreBall;  
+  CameraObject* mCameraObj;
 
-  OgreBall *player;
-  CEGUI::Window *guiSheet;
+  // Menu Variables
+  CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
+    *collectDisplay, *livesDisplay, *levelDisplay;
+
   bool menuActive;
   bool ceguiActive;
+
+  // Game State Variables
+  OgreBall *player;
+  float timeLeft;  // In millis
+  int collectibles, lives;
 };

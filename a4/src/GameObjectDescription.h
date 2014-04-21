@@ -32,9 +32,11 @@ class Collectible : public GameObject {
                    Physics* physics, 
                    btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
                    btVector3 velocity=btVector3(0,0,0), btScalar mass=0.0f, btScalar rest=.9f,
-                   btVector3 localInertia=btVector3(0,0,0), btQuaternion *rotation=0);
+                   btVector3 localInertia=btVector3(0,0,0), btQuaternion *rotation=0, Ogre::String hitSound = "");
 
     virtual void update(float elapsedTime);
+    bool isHit;
+    Ogre::String mHitSound;
 };
 
 class MeshObject : public GameObject {
@@ -57,8 +59,8 @@ class GoalObject : public GameObject {
              btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
              btVector3 velocity=btVector3(0,0,0),
              btScalar mass=0.0f, btScalar rest=0.1f,
-             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
-
+             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0, Ogre::String hitSound = "");
+  Ogre::String mHitSound;
   virtual void update(float elapsedTime);
 };
 
@@ -71,4 +73,18 @@ class DecorativeObject : public GameObject {
                    btVector3 localInertia=btVector3(0,0,0), btQuaternion *rotation=0);
 
     virtual void update(float elapsedTime);
+};
+
+class Bumper : public GameObject{
+
+  public:
+    Bumper(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String nodeName,
+             Ogre::SceneNode* parentNode, Physics* physics,
+             btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
+             btVector3 velocity=btVector3(0,0,0),
+             btScalar mass=0.0f, btScalar rest=0.0f,
+             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0, Ogre::String hitSound = "");
+
+    virtual void update(float elapsedTime);
+    Ogre::String mHitSound;
 };

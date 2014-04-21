@@ -1,7 +1,7 @@
 level clearPath {
       start {
             camera {
-                   pos 0 1200 1200
+                   pos 0 500 1200
                    lookAt 0 0 -7000
             }
             player1 {
@@ -10,7 +10,6 @@ level clearPath {
             }
 	    Sound{
      		background media/OgreBall/sounds/background.wav
-		winMusic media/OgreBall/sounds/hitGoal.wav
             }
       }
       lights {
@@ -20,6 +19,7 @@ level clearPath {
              }
       }
       goal {
+	   soundEffect media/OgreBall/sounds/hitGoal.wav
            pos {
                start 0 0 -12000
            }
@@ -40,6 +40,7 @@ level clearPath {
       }
       collectible {
                   meshname sphere.mesh
+		  soundEffect media/OgreBall/sounds/pickup.wav
                   pos {
                       start 0 120 -7000
                   }
@@ -57,6 +58,11 @@ level clearPath {
                       interp 500 270 0 0
                       interp 500 360 0 0                      
                   }
+      }
+      bumper{
+   	pos{
+	     start 0 120 -8000
+	}
       }      
 
 }

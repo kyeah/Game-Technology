@@ -13,7 +13,8 @@ class Collisions {
     COL_LEVEL = BIT(0),
     COL_PLAYER = BIT(1),
     COL_COLLECTIBLE = BIT(2),
-    COL_GOAL = BIT(3)
+    COL_GOAL = BIT(3),
+    COL_BUMPER = BIT(4)
   };
   
   static int levelColliders, playerColliders, collectibleColliders, goalColliders;

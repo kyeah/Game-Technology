@@ -72,12 +72,21 @@ LevelViewer::LevelViewer(CEGUI::OgreRenderer *mRenderer, const char* levelName) 
 }
 
 LevelViewer::~LevelViewer(void) {
+  mPhysics->removeAllObjects();
+  mSceneMgr->destroyAllEntities();
+  mSceneMgr->getRootSceneNode()->removeAndDestroyAllChildren();
+  mSceneMgr->destroyAllLights();
+  mSceneMgr->destroyAllParticleSystems();
+  mSceneMgr->destroyAllRibbonTrails();
+  mSceneMgr->destroyAllCameras();
+  delete mSceneMgr;
+
   CEGUI::WindowManager::getSingleton().destroyWindow(window);
 }
 
 void LevelViewer::setPositionPercent(float x, float y) {
   window->setPosition(CEGUI::UVector2(CEGUI::UDim(x, 0),
-                                      CEGUI::UDim(y, 0)));  
+                                      CEGUI::UDim(y, 0)));
 }
 
 bool LevelViewer::frameStarted(Ogre::Real elapsedTime) {
