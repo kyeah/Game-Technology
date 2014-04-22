@@ -15,6 +15,8 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
+  delete player;
+  delete mCameraObj;
 }
 
 void SinglePlayerActivity::start(void) {

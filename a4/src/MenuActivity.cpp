@@ -10,6 +10,8 @@ MenuActivity::MenuActivity(OgreBallApplication *app) : Activity(app) {
 }
 
 MenuActivity::~MenuActivity(void) {
+  for (int i = 0; i < levelViewers.size(); i++)
+    delete levelViewers[i];
 }
 
 void MenuActivity::start(void) {
@@ -58,7 +60,6 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
 
 bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
   CEGUI::WindowManager *wmgr = CEGUI::WindowManager::getSingletonPtr();
-
   // Find level selector sheet
   if (wmgr->isWindowPresent("levelSelector"))
     levelSelectorWindow = wmgr->getWindow("levelSelector");
@@ -70,7 +71,6 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
   // Load each level in a new level viewer
   int selectorEnd = selectorStart + (selectorRows*selectorColumns);
   for (int i = selectorStart; i < selectorEnd && i < loader->levelNames.size(); i++) {
-
     LevelViewer *v = new LevelViewer(app->mRenderer, loader->levelNames[i].c_str());
     levelSelectorWindow->addChildWindow(v->window);
 

@@ -51,7 +51,7 @@ OgreBallApplication::OgreBallApplication(void)
   Sounds::init();
   paused = false;
   instance = this;
-
+  activity = NULL;
 
 }
 
@@ -75,8 +75,11 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
 }
 
 //-------------------------------------------------------------------------------------
-void OgreBallApplication::switchActivity(Activity *activity) {
-  this->activity = activity;
+void OgreBallApplication::switchActivity(Activity *newActivity) {
+  if (activity && dynamic_cast<MenuActivity*>(activity)) {
+    delete activity;
+  }
+  activity = newActivity;
   destroyAllEntitiesAndNodes();
   paused = false;
   activity->start();
