@@ -103,3 +103,71 @@ extrudedMesh guidedPathMesh {
      }
   }  
 }
+
+extrudedMesh rampMesh {
+  path {
+     type catmullSpline
+     segments 16
+     points {
+       p 0 0 0
+       p 0 -10000 -30000
+       p 0 -7400 -45000
+       p 0 -10000 -35000
+       p 0 -10000 0
+     }
+  }
+  shape {
+     type roundedCornerSpline
+     segments 16
+     points {
+            p -500 500
+            p -500 0
+            p 500 0
+            p 500 500
+     }
+     radius 400
+  }
+  shape {
+     points {
+            p 600 500
+            p 600 -50
+            p -600 -50
+            p -600 500
+     }
+  }
+  track {
+     keyframes {
+       k 0 0
+       k 0.1 0.2
+       k 0.4 0.8
+       k 0.8 1
+     }
+  }  
+}
+
+extrudedMesh holeMesh {
+  path {
+     points {
+       p 0 0 0
+       p 0 0 -30000
+     }
+  }
+  shape {
+     type rectangle
+     width 2000
+     height 2000
+  }
+  shape {
+     type circle
+     radius 800
+     combine difference
+  }
+  track {
+     keyframes {
+       k 0 0
+       k 0.1 0.2
+       k 0.4 0.8
+       k 0.8 1
+     }
+  }  
+}

@@ -1,0 +1,69 @@
+level Leap of Faith {
+      start {
+            skydome Examples/CloudySky 5 8 20000
+            camera {
+                   pos 0 500 1000
+                   lookAt 0 300 0
+            }
+            player1 {
+                    pos 0 1000 -500
+                    rot 0 0 0
+            }
+            waypoints {
+            }
+      }
+      lights {
+             ambient .5 .5 .5
+             light1 {
+                    pos 20 80 50
+             }
+      }
+      goal {
+           pos {
+               start -10000 -8000 -50000
+               interp 2000 -10000 -8000 -52000
+               interp 2000 -10000 -8000 -50000
+           }
+           rot { 
+               start 90 0 0
+               interp 1000 90 90 0
+               interp 1000 90 180 0
+               interp 1000 90 270 0
+               interp 1000 90 360 0
+           }
+      }
+      collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 0 100 0
+            }
+      }
+      extrudedObject {
+            meshname rampMesh
+            material Examples/WaterStream
+            rest 0.1
+            rot {
+                start 0 0 0
+            }
+      }
+      extrudedObject {
+                     meshname holeMesh
+                     material Examples/BeachStones
+                     rest 0.5
+                     pos {
+                         start 0 -8500 -45000
+                     }
+      }
+      extrudedObject {
+                     meshname guidedPathMesh
+                     material Examples/BeachStones
+                     rest 0.0
+                     pos {
+                         start 0 -8200 -46000
+                     }
+                     rot {
+                         start 90 0 0
+                     }
+     }
+}

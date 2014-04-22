@@ -37,7 +37,6 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   app->levelLoader->loadLevel(name);
   app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
 
-  mCameraObj = new CameraObject(app->mCamera);
   levelDisplay->setText(name);
 
   timeLeft = 60000;  // TODO: Should get timeLeft from level script
@@ -47,6 +46,12 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
                         16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+
+  mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
+                                (Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
+
+  app->mCamera->setPosition(Ogre::Vector3(0,0,0));
+  gameEnded = false;
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
@@ -79,46 +84,43 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   timeDisplay->setText(timess.str());
 
   // Set player's gravity based on the direction they are facing
-  Ogre::Vector3 ocam = app->mCamera->getPosition();
+  Ogre::Vector3 ocam = app->mCameraNode->_getDerivedPosition();
   btVector3 facingDirection = player->getPosition() - btVector3(ocam[0], ocam[1], ocam[2]);
   facingDirection[1] = 0;
   facingDirection.normalize();
 
   btScalar yaw = btVector3(0,0,-1).angle(facingDirection);
-  btQuaternion q(-yaw,0,0);
+  btQuaternion q((facingDirection[0] > 0 ? -yaw : yaw),0,0);
   q.normalize();
 
-  if (facingDirection[0] < 0) q = btQuaternion(yaw,0,0);
-  player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
-                                .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                .rotate(q.getAxis(), q.getAngle()));
+  if (gameEnded) {
+    player->getBody()->setGravity(btVector3(0, 1000, 0));
+  } else {
+    player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
+                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
+                                  .rotate(q.getAxis(), q.getAngle()));
+  }
 
   // Update Camera Position
-  if(!mCameraObj->previousPosIsSet)
-    mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
-  if(!mCameraObj->fixedDist || (app->levelLoader->cameraStartPos != mCameraObj->cameraStartPosition))
-    mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
-  /*
+  // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
+  app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0, 350,0), Ogre::SceneNode::TS_WORLD);
+
+  // Tilt Camera to simulate level tilt
   Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
   Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
+
+  Ogre::Real xTilt = currTilt.x();
+  if (xTilt < 0) xTilt /= 3;
   Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
-                                             currTilt.x(),
+                                             xTilt,
                                              currTilt.y(),
                                              currTilt.z());
 
-  app->mCamera->rotate(oq);
-  app->mCamera->rotate(notilt);
-  app->mCamera->rotate(noq);
-  */
-  // More magic stuff here to make the level look like it's rotating
-  /*  app->mCameraLookAtNode->setOrientation(Ogre::Quaternion(currTilt.w(),
-      currTilt.x(),
-      currTilt.y(),
-      currTilt.z()));*/
-
-  //  app->mCamera->lookAt((Ogre::Vector3)player->getPosition());
+  app->mCameraLookAtNode->rotate(oq);
+  app->mCameraLookAtNode->rotate(notilt*notilt);
+  app->mCameraLookAtNode->rotate(noq);
 
   return true;
 }
@@ -156,12 +158,15 @@ bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
 
 void SinglePlayerActivity::handleGameEnd() {
   ceguiActive = true;
+  gameEnded = true;
+
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
 
   app->Wmgr->getWindow("GameWon/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
   /*  app->Wmgr->getWindow("GameWon/NextLevel")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
@@ -258,7 +263,7 @@ bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
     return true;
   }
 
-  return false;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------

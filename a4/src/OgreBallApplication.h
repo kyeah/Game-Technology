@@ -68,7 +68,7 @@ class OgreBallApplication : public BaseApplication
 
   Physics *mPhysics;
   LevelLoader *levelLoader;
-  Ogre::SceneNode *levelRoot;
+  Ogre::SceneNode *levelRoot, *mCameraLookAtNode, *mCameraNode;
 
   // CEGUI
   CEGUI::OgreRenderer* mRenderer;
