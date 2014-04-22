@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,7 @@ THE SOFTWARE.
 #ifndef PROCEDURAL_TRIANGLEBUFFER_INCLUDED
 #define PROCEDURAL_TRIANGLEBUFFER_INCLUDED
 
-#include <OgreRoot.h>
-#include "OgreManualObject.h"
-#include "OgreMesh.h"
-#include "OgreSceneManager.h"
 #include "ProceduralUtils.h"
-#include "ProceduralRoot.h"
-#include <fstream>
 
 namespace Procedural
 {
@@ -42,7 +36,7 @@ namespace Procedural
  * It stores all the info needed to build an Ogre Mesh, yet is intented to be more flexible, since
  * there is no link towards hardware.
  */
-class TriangleBuffer
+class _ProceduralExport TriangleBuffer
 {
 public:
 	struct Vertex
@@ -51,21 +45,72 @@ public:
 		Ogre::Vector3 mNormal;
 		Ogre::Vector2 mUV;
 	};
+	struct Section
+	{
+		std::string mSectionName;
+		unsigned int mFirstIndex;
+		unsigned int mLastIndex;
+		unsigned int mFirstVertex;
+		unsigned int mLastVertex;
+		TriangleBuffer* buffer;
+	};
 protected:
 
 	std::vector<int> mIndices;
 
 	std::vector<Vertex> mVertices;
-	//std::vector<Vertex>::iterator mCurrentVertex;
 	int globalOffset;
 	int mEstimatedVertexCount;
 	int mEstimatedIndexCount;
 	Vertex* mCurrentVertex;
 
+	std::map<std::string, Section> mSections;
 
-	public:
+
+public:
 	TriangleBuffer() : globalOffset(0), mEstimatedVertexCount(0), mEstimatedIndexCount(0), mCurrentVertex(0)
 	{}
+
+	void append(const TriangleBuffer& other)
+	{
+		rebaseOffset();
+		for (std::vector<int>::const_iterator it = other.mIndices.begin(); it != other.mIndices.end(); ++it)
+			mIndices.push_back(globalOffset+ (*it));
+		
+		for (std::vector<Vertex>::const_iterator it = other.mVertices.begin(); it != other.mVertices.end(); ++it)
+			mVertices.push_back(*it);
+	}
+
+	Section beginSection(std::string sectionName = "")
+	{
+		rebaseOffset();
+		Section section;
+		section.mSectionName = "";
+		section.mFirstIndex = mIndices.size();
+		section.mFirstVertex = mVertices.size();
+		section.buffer = this;
+		return section;
+	}
+
+	void endSection(Section& section)
+	{
+		section.mLastIndex = mIndices.size() - 1;
+		section.mLastVertex = mVertices.size() - 1;
+		if (section.mSectionName != "")
+			mSections[section.mSectionName] = section;		
+	}
+
+	Section getFullSection()
+	{
+		Section section;
+		section.mFirstIndex = 0;
+		section.mLastIndex = mIndices.size() - 1;
+		section.mFirstVertex = 0;
+		section.mLastVertex = mVertices.size() - 1;
+		section.mSectionName = "";
+		section.buffer = this;
+		return section;
+	}
 
 	/// Gets a modifiable reference to vertices
 	std::vector<Vertex>& getVertices()
@@ -103,34 +148,26 @@ protected:
 	 * Builds an Ogre Mesh from this buffer.
 	 */
 	Ogre::MeshPtr transformToMesh(const std::string& name,
-		const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+	                              const Ogre::String& group = "General") const;
+
+	/** Adds a new vertex to the buffer */
+	inline TriangleBuffer& vertex(const Vertex& v)
 	{
-		Ogre::SceneManager* sceneMgr = Ogre::Root::getSingleton().getSceneManagerIterator().begin()->second;
-		Ogre::ManualObject * manual = sceneMgr->createManualObject();
-		manual->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+		mVertices.push_back(v);
+		mCurrentVertex = &mVertices.back();
+		return *this;
+	}
 
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it != mVertices.end();it++)
-		{
-			manual->position(it->mPosition);
-			manual->textureCoord(it->mUV);
-			manual->normal(it->mNormal);
-		}
-		for (std::vector<int>::iterator it = mIndices.begin(); it!=mIndices.end();it++)
-		{
-			manual->index(*it);
-		}
-		manual->end();
-		Ogre::MeshPtr mesh = manual->convertToMesh(name, group);
-
-		unsigned short src, dest;
-		if (!mesh->suggestTangentVectorBuildParams(Ogre::VES_TANGENT, src, dest))
-		{
-			mesh->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
-		}
-
-		sceneMgr->destroyManualObject(manual);
-
-		return mesh;
+	/** Adds a new vertex to the buffer */
+	inline TriangleBuffer& vertex(const Ogre::Vector3& position, const Ogre::Vector3& normal, const Ogre::Vector2& uv)
+	{
+		Vertex v;
+		v.mPosition = position;
+		v.mNormal = normal;
+		v.mUV = uv;
+		mVertices.push_back(v);
+		mCurrentVertex = &mVertices.back();
+		return *this;
 	}
 
 	/** Adds a new vertex to the buffer */
@@ -199,7 +236,7 @@ protected:
 	/// Applies a matrix to transform all vertices inside the triangle buffer
 	TriangleBuffer& applyTransform(const Ogre::Matrix4& matrix)
 	{
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); it++)
+		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); ++it)
 		{
 			it->mPosition = matrix * it->mPosition;
 			it->mNormal = matrix * it->mNormal;
@@ -209,10 +246,10 @@ protected:
 	}
 
 	/// Applies the translation immediately to all the points contained in that triangle buffer
-	/// @arg amount translation vector
+	/// @param amount translation vector
 	TriangleBuffer& translate(const Ogre::Vector3& amount)
 	{
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); it++)
+		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); ++it)
 		{
 			it->mPosition += amount;
 		}
@@ -226,10 +263,10 @@ protected:
 	}
 
 	/// Applies the rotation immediately to all the points contained in that triangle buffer
-	/// @arg quat the rotation quaternion to apply
+	/// @param quat the rotation quaternion to apply
 	TriangleBuffer& rotate(Ogre::Quaternion quat)
 	{
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); it++)
+		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); ++it)
 		{
 			it->mPosition = quat * it->mPosition;
 			it->mNormal = quat * it->mNormal;
@@ -239,10 +276,10 @@ protected:
 	}
 
 	/// Applies an immediate scale operation to that triangle buffer
-	/// @arg scale Scale vector
+	/// @param scale Scale vector
 	TriangleBuffer& scale(const Ogre::Vector3& scale)
 	{
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); it++)
+		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); ++it)
 		{
 			it->mPosition = scale * it->mPosition;
 		}
@@ -250,9 +287,9 @@ protected:
 	}
 
 	/// Applies an immediate scale operation to that triangle buffer
-	/// @arg x X scale component
-	/// @arg y Y scale component
-	/// @arg z Z scale component
+	/// @param x X scale component
+	/// @param y Y scale component
+	/// @param z Z scale component
 	TriangleBuffer& scale(Ogre::Real x, Ogre::Real y, Ogre::Real z)
 	{
 		return scale(Ogre::Vector3(x,y,z));
@@ -261,7 +298,7 @@ protected:
 	/// Applies normal inversion on the triangle buffer
 	TriangleBuffer& invertNormals()
 	{
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end();it++)
+		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end(); ++it)
 		{
 			it->mNormal = -it->mNormal;
 		}
@@ -293,36 +330,6 @@ protected:
 	{
 		mEstimatedIndexCount += indexCount;
 		mIndices.reserve(mEstimatedIndexCount);
-	}
-
-	/**
-	 * For debugging purposes, outputs the content of this buffer to a YAML styled file.
-	 */
-	void _dumpContentsToFile(const std::string& fileName)
-	{
-		std::ofstream outFile;
-		outFile.open(fileName.c_str());
-
-		outFile<< "Number of vertices : "<< Ogre::StringConverter::toString(mVertices.size()) <<std::endl;
-		outFile<< "Estimated number of vertices : "<< Ogre::StringConverter::toString(mEstimatedVertexCount) <<std::endl;
-		outFile<< "Vertices :"<<std::endl;
-		for (std::vector<Vertex>::iterator it = mVertices.begin(); it!=mVertices.end();it++)
-		{
-			outFile<<" - {";
-			outFile<<" Position: ["<<Ogre::StringConverter::toString(it->mPosition.x)<<", "<<Ogre::StringConverter::toString(it->mPosition.y)<<", "<<Ogre::StringConverter::toString(it->mPosition.z)<<"]";
-			outFile<<", Normal: ["<<Ogre::StringConverter::toString(it->mNormal.x)<<", "<<Ogre::StringConverter::toString(it->mNormal.y)<<", "<<Ogre::StringConverter::toString(it->mNormal.z)<<"]";
-			outFile<<", UV: ["<<Ogre::StringConverter::toString(it->mUV.x)<<", "<<Ogre::StringConverter::toString(it->mUV.y)<<"]";
-			outFile<<"}"<<std::endl;
-		}
-		outFile<< "Number of indices : "<< Ogre::StringConverter::toString(mIndices.size()) <<std::endl;
-		outFile<< "Estimated number of indices : "<< Ogre::StringConverter::toString(mEstimatedIndexCount) <<std::endl;
-		outFile<< "Indices :"<< std::endl;
-		for (size_t i = 0; i<mIndices.size()/3; i++)
-		{
-			outFile<<" - ["<<Ogre::StringConverter::toString(mIndices[i*3])<<", "<<Ogre::StringConverter::toString(mIndices[i*3+1])<<", "<<Ogre::StringConverter::toString(mIndices[i*3+2])<<"]"<<std::endl;
-		}
-
-		outFile.close();
 	}
 };
 }

@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef PROCEDURAL_H_INCLUDED
 #define PROCEDURAL_H_INCLUDED
 
+#include "ProceduralPlatform.h"
 #include "ProceduralBoxGenerator.h"
 #include "ProceduralCapsuleGenerator.h"
 #include "ProceduralConeGenerator.h"
@@ -39,16 +40,25 @@ THE SOFTWARE.
 #include "ProceduralTorusKnotGenerator.h"
 #include "ProceduralTubeGenerator.h"
 #include "ProceduralPlaneGenerator.h"
-#include "ProceduralRoot.h"
 #include "ProceduralExtruder.h"
 #include "ProceduralLathe.h"
 #include "ProceduralShape.h"
 #include "ProceduralShapeGenerators.h"
 #include "ProceduralMultiShape.h"
+#include "ProceduralMultiShapeGenerators.h"
 #include "ProceduralPath.h"
 #include "ProceduralPathGenerators.h"
 #include "ProceduralTriangulator.h"
 #include "ProceduralTriangleBuffer.h"
 #include "ProceduralTrack.h"
+#include "ProceduralBoolean.h"
+#include "ProceduralSpringGenerator.h"
+#include "ProceduralSVG.h"
+#include "ProceduralDebugRendering.h"
+#include "ProceduralTextureGenerator.h"
+#include "ProceduralTextureModifiers.h"
+#include "ProceduralNoise.h"
+#include "ProceduralMeshModifiers.h"
+#include "ProceduralTextureBuffer.h"
 
 #endif

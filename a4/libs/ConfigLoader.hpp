@@ -190,6 +190,11 @@ namespace sh
     {
       return m_parent;
     }
+
+    inline int getNumChildren() 
+    {
+      return m_children.size();
+    }
  
   private:
     std::string m_name;

@@ -1,5 +1,6 @@
 level baseLevel {
       start {
+            skydome Examples/CloudySky 5 8 4000
             camera {
                    pos -3500 800 1000
                    lookAt 0 800 1800
@@ -7,10 +8,6 @@ level baseLevel {
             player1 {
                     pos 0 500 0
                     rot 0 0 0
-            }
-            goal {
-                 pos 1000 0 0
-                 rot 0 0 0
             }
             waypoints {
             }

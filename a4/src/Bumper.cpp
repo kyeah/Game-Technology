@@ -17,12 +17,16 @@ Bumper::Bumper(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nod
 
   	node->attachObject(entity);
 
-  	Ogre::MeshPtr meshptr = Ogre::Singleton<Ogre::MeshManager>::getSingletonPtr()->load("cube.mesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    MeshStrider *strider = new MeshStrider(meshptr.get());
-    collisionShape = new btBvhTriangleMeshShape(strider,true,true);
+    node->_update(true,true);
+    node->_updateBounds();
+  	// Ogre::MeshPtr meshptr = Ogre::Singleton<Ogre::MeshManager>::getSingletonPtr()->load("cube.mesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    // MeshStrider *strider = new MeshStrider(meshptr.get());
+    Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
+
+    collisionShape = new btBoxShape(btVector3(s[0], s[1], s[2]));
 
     addToSimulator(Collisions::CollisionTypes::COL_BUMPER,
-                 Collisions::collectibleColliders);
+                 Collisions::);
 
     if (rotation) rotate(*rotation);
 

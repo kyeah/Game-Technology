@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,15 @@ THE SOFTWARE.
 #ifndef PROCEDURAL_MULTISHAPE_INCLUDED
 #define PROCEDURAL_MULTISHAPE_INCLUDED
 
-#include "ProceduralRoot.h"
+#include "ProceduralGeometryHelpers.h"
 
 namespace Procedural
 {
-	class Shape;
+class Shape;
 
-/** Holds a bunch of shapes.
+/**
+ * \ingroup shapegrp
+ * Holds a bunch of shapes.
  * There are a number of assumptions that are made and are not checked
  * against : the shapes must not cross each other
  *
@@ -43,7 +45,7 @@ class _ProceduralExport MultiShape
 {
 	std::vector<Shape> mShapes;
 
-	public:
+public:
 	/// Default constructor
 	MultiShape()
 	{}
@@ -55,8 +57,8 @@ class _ProceduralExport MultiShape
 	}
 
 	/// Constructor from a variable number of shapes
-	/// @arg count the number of shapes to add
-	/// @arg pointer to the shapes to add
+	/// @param count the number of shapes to add
+	/// @param ... pointer to the shapes to add
 	MultiShape(int count, ...);
 
 	/// Adds a shape to the list of shapes
@@ -66,14 +68,20 @@ class _ProceduralExport MultiShape
 		return *this;
 	}
 
+	/// Clears all the content
+	void clear()
+	{
+		mShapes.clear();
+	}
+
 	/// Returns the i-th shape
-	const Shape& getShape(int i) const
+	const Shape& getShape(unsigned int i) const
 	{
 		return mShapes[i];
 	}
 
 	/// Returns the i-th shape
-	Shape& getShape(int i)
+	Shape& getShape(unsigned int i)
 	{
 		return mShapes[i];
 	}
@@ -82,7 +90,7 @@ class _ProceduralExport MultiShape
 	std::vector<Ogre::Vector2> getPoints() const;
 
 	/// Returns the number of shapes in that MultiShape
-	int getShapeCount() const
+	unsigned int getShapeCount() const
 	{
 		return mShapes.size();
 	}
@@ -90,7 +98,7 @@ class _ProceduralExport MultiShape
 	/// Append every shape of an other multishape to the current multiShape
 	void addMultiShape(const MultiShape& other)
 	{
-		for (std::vector<Shape>::const_iterator it = other.mShapes.begin(); it!=other.mShapes.end(); it++)
+		for (std::vector<Shape>::const_iterator it = other.mShapes.begin(); it!=other.mShapes.end(); ++it)
 		{
 			mShapes.push_back(*it);
 		}
@@ -120,6 +128,8 @@ class _ProceduralExport MultiShape
 	 * Determines whether the outside as defined by user equals "real" outside
 	 */
 	bool isOutsideRealOutside() const;
+
+	void buildFromSegmentSoup(const std::vector<Segment2D>& segList);
 
 };
 }

@@ -5,12 +5,21 @@
     <Property Name="InheritsAlpha" Value="False" />
     <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
     <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+    <Window Type="TaharezLook/StaticImage" Name="SPHUD/ScoreBG" >
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.01,0},{0.25,0},{0.07,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:ScoreBG" />
+    </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Score" >
       <Property Name="Text" Value="SCORE: 0" />
       <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.01,0},{0.25,0},{0.07,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.03,0},{0.01,0},{0.25,0},{0.07,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Timer" >
       <Property Name="Text" Value="TIMER: swag o' clock" />
@@ -18,20 +27,42 @@
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
       <Property Name="UnifiedAreaRect" Value="{{0.4,0},{0.01,0},{0.6,0},{0.07,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+    </Window>
+    <Window Type="TaharezLook/StaticImage" Name="SPHUD/HUDBG" >
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.72,0},{0.01,0},{0.99,0},{0.25,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:playerBG" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.75" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Collectibles" >
       <Property Name="Text" Value="COLLECTIBLES" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.76,0},{0.01,0},{0.87,0},{0.07,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.83,0},{0.19,0},{0.91,0},{0.22,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Lives" >
       <Property Name="Text" Value="LIVES: 0" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.88,0},{0.01,0},{0.99,0},{0.07,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.845,0},{0.115,0},{0.985,0},{0.18,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+    </Window>
+    <Window Type="TaharezLook/StaticImage" Name="SPHUD/LevelBG" >
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.7,0},{0.93,0},{0.99,0},{0.99,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:LevelnameBG" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Level" >
       <Property Name="Text" Value="LEVEL" />
@@ -39,6 +70,8 @@
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
       <Property Name="UnifiedAreaRect" Value="{{0.7,0},{0.93,0},{0.99,0},{0.99,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
     </Window>
   </Window>
 </GUILayout>

@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,10 @@ THE SOFTWARE.
 
 namespace Procedural
 {
-/** Builds an UV sphere mesh
+/**
+ * \ingroup objgengrp
+ * Builds an UV sphere mesh
+ * \image html primitive_sphere.png
  */
 class _ProceduralExport SphereGenerator : public MeshGenerator<SphereGenerator>
 {
@@ -43,32 +46,47 @@ class _ProceduralExport SphereGenerator : public MeshGenerator<SphereGenerator>
 
 public:
 	/// Constructor with arguments
-	SphereGenerator(Ogre::Real radius = 1.f, int numRings = 16, int numSegments = 16) : 
-	  mRadius(radius),mNumRings(numRings), mNumSegments(numSegments)
+	SphereGenerator(Ogre::Real radius = 1.f, unsigned int numRings = 16, unsigned int numSegments = 16) :
+		mRadius(radius),mNumRings(numRings), mNumSegments(numSegments)
 
 	{}
 
-	/** Sets the radius of the sphere (default=1) */
-	inline SphereGenerator & setRadius(Ogre::Real radius)
+	/**
+	Sets the radius of the sphere (default=1)
+	\exception Ogre::InvalidParametersException Radius must be larger than 0!
+	*/
+	inline SphereGenerator& setRadius(Ogre::Real radius)
 	{
+		if (radius <= 0.0f)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "Radius must be larger than 0!", "Procedural::SphereGenerator::setRadius(Ogre::Real)");
 		mRadius = radius;
 		return *this;
 	}
 
-	/** Sets the number of rings (default=16) */
-	inline SphereGenerator & setNumRings(unsigned int numRings)
+	/**
+	Sets the number of rings (default=16)
+	\exception Ogre::InvalidParametersException Minimum of numRings is 1
+	*/
+	inline SphereGenerator& setNumRings(unsigned int numRings)
 	{
+		if (numRings == 0)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "There must be more than 0 rings", "Procedural::SphereGenerator::setNumRings(unsigned int)");
 		mNumRings = numRings;
 		return *this;
 	}
 
-	/** Sets the number of segments (default=16) */
-	inline SphereGenerator & setNumSegments(unsigned int numSegments)
+	/**
+	Sets the number of segments (default=16)
+	\exception Ogre::InvalidParametersException Minimum of numSegments is 1
+	*/
+	inline SphereGenerator& setNumSegments(unsigned int numSegments)
 	{
+		if (numSegments == 0)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "There must be more than 0 segments", "Procedural::SphereGenerator::setNumSegments(unsigned int)");
 		mNumSegments = numSegments;
 		return *this;
 	}
-	
+
 	/**
 	 * Builds the mesh into the given TriangleBuffer
 	 * @param buffer The TriangleBuffer on where to append the mesh.

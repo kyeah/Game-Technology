@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,16 +33,20 @@ THE SOFTWARE.
 
 namespace Procedural
 {
-/// Generates a cone mesh along Y-axis
+/**
+ * \ingroup objgengrp
+ * Generates a cone mesh along Y-axis
+ * \image html primitive_cone.png
+ */
 class _ProceduralExport ConeGenerator : public MeshGenerator<ConeGenerator>
 {
-	int mNumSegBase;
-	int mNumSegHeight;
+	unsigned int mNumSegBase;
+	unsigned int mNumSegHeight;
 	Ogre::Real mRadius;
 	Ogre::Real mHeight;
-public:	
+public:
 	/// Contructor with arguments
-	ConeGenerator(Ogre::Real radius = 1.f, Ogre::Real height = 1.f, int numSegBase = 16, int numSegHeight = 1) :
+	ConeGenerator(Ogre::Real radius = 1.f, Ogre::Real height = 1.f, unsigned int numSegBase = 16, unsigned int numSegHeight = 1) :
 		mNumSegBase(numSegBase),
 		mNumSegHeight(numSegHeight),
 		mRadius(radius),
@@ -55,30 +59,50 @@ public:
 	 */
 	void addToTriangleBuffer(TriangleBuffer& buffer) const;
 
-	/** Sets the number of segments on the side of the base (default=16)*/
-	inline ConeGenerator & setNumSegBase(int numSegBase)
+	/**
+	Sets the number of segments on the side of the base (default=16)
+	\exception Ogre::InvalidParametersException Minimum of numSegBase is 1
+	*/
+	inline ConeGenerator& setNumSegBase(unsigned int numSegBase)
 	{
+		if (numSegBase == 0)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "There must be more than 0 segments", "Procedural::ConeGenerator::setNumSegBase(unsigned int)");
 		mNumSegBase = numSegBase;
 		return *this;
 	}
 
-	/** Sets the number of segments on the height (default=1) */
-	inline ConeGenerator & setNumSegHeight(int numSegHeight)
+	/**
+	Sets the number of segments on the height (default=1)
+	\exception Ogre::InvalidParametersException Minimum of numSegHeight is 1
+	*/
+	inline ConeGenerator& setNumSegHeight(unsigned int numSegHeight)
 	{
+		if (numSegHeight == 0)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "There must be more than 0 segments", "Procedural::ConeGenerator::setNumSegHeight(unsigned int)");
 		mNumSegHeight = numSegHeight;
 		return *this;
 	}
 
-	/** Sets the base radius (default=1)*/
-	inline ConeGenerator & setRadius(Ogre::Real radius)
+	/**
+	Sets the base radius (default=1)
+	\exception Ogre::InvalidParametersException Radius must be larger than 0!
+	*/
+	inline ConeGenerator& setRadius(Ogre::Real radius)
 	{
+		if (radius <= 0.0f)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "Radius must be larger than 0!", "Procedural::ConeGenerator::setRadius(Ogre::Real)");
 		mRadius = radius;
 		return *this;
 	}
 
-	/** Sets the height of the cone (default=1)*/
-	inline ConeGenerator & setHeight(Ogre::Real height)
+	/**
+	Sets the height of the cone (default=1)
+	\exception Ogre::InvalidParametersException Height must be larger than 0!
+	*/
+	inline ConeGenerator& setHeight(Ogre::Real height)
 	{
+		if (height <= 0.0f)
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "Height must be larger than 0!", "Procedural::ConeGenerator::setHeight(Ogre::Real)");
 		mHeight = height;
 		return *this;
 	}

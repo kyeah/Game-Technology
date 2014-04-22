@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,24 +28,31 @@ THE SOFTWARE.
 #ifndef PROCEDURAL_MESH_GENERATOR_INCLUDED
 #define PROCEDURAL_MESH_GENERATOR_INCLUDED
 
-#include "OgreRectangle.h"
-#include "OgreSceneManager.h"
-#include "OgreMesh.h"
-#include "OgreManualObject.h"
-#include "ProceduralRoot.h"
+#include "OgreRoot.h"
 #include "ProceduralPlatform.h"
 #include "ProceduralTriangleBuffer.h"
+#include "OgreException.h"
+#include "OgreMesh.h"
 
 namespace Procedural
 {
-/** Superclass of everything that builds meshes
+/**
+\defgroup objgengrp Object generators
+Elements for procedural mesh generation of various objects.
+@{
+@}
+*/
+
+/**
+\ingroup objgengrp
+Superclass of everything that builds meshes
  */
 template <typename T>
 class MeshGenerator
 {
 protected:
 	/// A pointer to the default scene manager
-	Ogre::SceneManager* mSceneMgr;
+	//Ogre::SceneManager* mSceneMgr;
 
 	/// U tile for texture coords generation
 	Ogre::Real mUTile;
@@ -79,29 +86,20 @@ protected:
 	// Whether a transform has been defined or not
 	bool mTransform;
 
-	// Debug output file
-	std::string mDumpFileName;
-
-	// Enable output to file or not
-	bool mEnableDumpToFile;
-
 public:
 	/// Default constructor
+	/// \exception Ogre::InvalidStateException Scene Manager is not set in OGRE root object
 	MeshGenerator() : mUTile(1.f),
-					  mVTile(1.f),
-					  mEnableNormals(true),
-					  mNumTexCoordSet(1),
-					  mUVOrigin(0,0),
-					  mSwitchUV(false),
-					  mOrientation(Ogre::Quaternion::IDENTITY),
-					  mScale(1,1,1),
-					  mPosition(0,0,0),
-					  mTransform(false),
-					  mDumpFileName(""),
-					  mEnableDumpToFile(false)
+		mVTile(1.f),
+		mEnableNormals(true),
+		mNumTexCoordSet(1),
+		mUVOrigin(0,0),
+		mSwitchUV(false),
+		mOrientation(Ogre::Quaternion::IDENTITY),
+		mScale(1,1,1),
+		mPosition(0,0,0),
+		mTransform(false)
 	{
-		mSceneMgr = Ogre::Root::getSingleton().getSceneManagerIterator().begin()->second;
-		assert(mSceneMgr && "Scene Manager must be set in Root");
 	}
 
 	/**
@@ -110,18 +108,26 @@ public:
 	 * @param group ressource group in which the mesh will be created
 	 */
 	Ogre::MeshPtr realizeMesh(const std::string& name = "",
-		const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+	                          const Ogre::String& group = "General")
 	{
 		TriangleBuffer tbuffer;
 		addToTriangleBuffer(tbuffer);
-		if (mEnableDumpToFile)
-			tbuffer._dumpContentsToFile(mDumpFileName);
 		Ogre::MeshPtr mesh;
 		if (name == "")
 			mesh = tbuffer.transformToMesh(Utils::getName(), group);
 		else
 			mesh = tbuffer.transformToMesh(name, group);
 		return mesh;
+	}
+
+	/**
+	 * Outputs a triangleBuffer
+	 */
+	TriangleBuffer buildTriangleBuffer() const
+	{
+		TriangleBuffer tbuffer;
+		addToTriangleBuffer(tbuffer);
+		return tbuffer;
 	}
 
 	/**
@@ -141,7 +147,7 @@ public:
 	/**
 	 * Sets V Tile, ie the number by which v texture coordinates are multiplied (default=1)
 	 */
-	inline T & setVTile(Ogre::Real vTile)
+	inline T& setVTile(Ogre::Real vTile)
 	{
 		mVTile = vTile;
 		return static_cast<T&>(*this);
@@ -150,7 +156,7 @@ public:
 	/**
 	 * Sets the texture rectangle
 	 */
-	inline T & setTextureRectangle(Ogre::Rectangle textureRectangle)
+	inline T& setTextureRectangle(const Ogre::RealRect& textureRectangle)
 	{
 		mUVOrigin = Ogre::Vector2(textureRectangle.top, textureRectangle.left);
 		mUTile = textureRectangle.right-textureRectangle.left;
@@ -161,7 +167,7 @@ public:
 	/**
 	 * Sets whether normals are enabled or not (default=true)
 	 */
-	inline T & setEnableNormals(bool enableNormals)
+	inline T& setEnableNormals(bool enableNormals)
 	{
 		mEnableNormals = enableNormals;
 		return static_cast<T&>(*this);
@@ -170,7 +176,7 @@ public:
 	/**
 	 * Sets the number of texture coordintate sets (default=1)
 	 */
-	inline T & setNumTexCoordSet(unsigned char numTexCoordSet)
+	inline T& setNumTexCoordSet(unsigned char numTexCoordSet)
 	{
 		mNumTexCoordSet = numTexCoordSet;
 		return static_cast<T&>(*this);
@@ -242,28 +248,12 @@ public:
 		return static_cast<T&>(*this);
 	}
 
-	/// Activate dump to file
-	inline T& _setDumpToFile(const std::string& fileName)
-	{
-		mEnableDumpToFile = true;
-		mDumpFileName = fileName;
-		return static_cast<T&>(*this);
-	}
-
-	/// Disable dump to file
-	inline T& _disableDumpToFile()
-	{
-		mEnableDumpToFile = false;
-		return static_cast<T&>(*this);
-	}
-
-
 protected:
 	/// Adds a new point to a triangle buffer, using the format defined for that MeshGenerator
-	/// @arg buffer the triangle buffer to update
-	/// @arg position the position of the new point
-	/// @arg normal the normal of the new point
-	/// @arg uv the uv texcoord of the new point
+	/// @param buffer the triangle buffer to update
+	/// @param position the position of the new point
+	/// @param normal the normal of the new point
+	/// @param uv the uv texcoord of the new point
 	inline void addPoint(TriangleBuffer& buffer, const Ogre::Vector3& position, const Ogre::Vector3& normal, const Ogre::Vector2& uv) const
 	{
 		if (mTransform)
@@ -271,12 +261,17 @@ protected:
 		else
 			buffer.position(position);
 		if (mEnableNormals)
-			buffer.normal(normal);
+		{
+			if (mTransform)
+				buffer.normal(mOrientation * normal);
+			else
+				buffer.normal(normal);
+		}
 		if (mSwitchUV)
-			for (unsigned char i=0;i<mNumTexCoordSet;i++)
+			for (unsigned char i=0; i<mNumTexCoordSet; i++)
 				buffer.textureCoord(mUVOrigin.x + uv.y*mUTile, mUVOrigin.y+uv.x*mVTile);
 		else
-			for (unsigned char i=0;i<mNumTexCoordSet;i++)
+			for (unsigned char i=0; i<mNumTexCoordSet; i++)
 				buffer.textureCoord(mUVOrigin.x + uv.x*mUTile, mUVOrigin.y+uv.y*mVTile);
 	}
 

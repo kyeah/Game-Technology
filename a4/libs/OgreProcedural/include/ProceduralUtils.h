@@ -4,7 +4,7 @@ This source file is part of ogre-procedural
 
 For the latest info, see http://code.google.com/p/ogre-procedural/
 
-Copyright (c) 2010 Michael Broutin
+Copyright (c) 2010-2013 Michael Broutin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,10 @@ THE SOFTWARE.
 #define PROCEDURAL_UTILS_INCLUDED
 #include "OgreVector3.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreLogManager.h"
 #include "ProceduralPlatform.h"
+#include "OgreStringConverter.h"
+#include "OgreCommon.h"
 
 namespace Procedural
 {
@@ -39,13 +42,7 @@ class _ProceduralExport Utils
 	static int counter;
 public:
 	/// Outputs something to the ogre log, with a [PROCEDURAL] prefix
-	static void log(const Ogre::String& st)
-	{
-		Ogre::LogManager::getSingleton().logMessage("[PROCEDURAL] " + st);
-	#if (PROCEDURAL_PLATFORM == PROCEDURAL_PLATFORM_WIN32)
-		OutputDebugString((st + "\n").c_str());
-	#endif
-	}
+	static void log(const Ogre::String& st);
 
 	/// Gets the min of the coordinates between 2 vectors
 	static Ogre::Vector3 min(const Ogre::Vector3& v1, const Ogre::Vector3& v2)
@@ -79,7 +76,7 @@ public:
 			return aabb;
 		aabb.setMinimum(points[0]);
 		aabb.setMaximum(points[0]);
-		for (std::vector<Ogre::Vector3>::iterator it = points.begin(); it!=points.end();it++)
+		for (std::vector<Ogre::Vector3>::iterator it = points.begin(); it!=points.end(); ++it)
 		{
 			aabb.setMinimum(min(aabb.getMinimum(), *it));
 			aabb.setMaximum(max(aabb.getMaximum(), *it));
@@ -107,9 +104,9 @@ public:
 	static inline Ogre::Vector2 rotateVector2(const Ogre::Vector2& in, Ogre::Radian angle)
 	{
 		return Ogre::Vector2(in.x* Ogre::Math::Cos(angle) - in.y * Ogre::Math::Sin(angle),
-			in.x * Ogre::Math::Sin(angle) + in.y * Ogre::Math::Cos(angle));
+		                     in.x * Ogre::Math::Sin(angle) + in.y * Ogre::Math::Cos(angle));
 	}
-	
+
 	/// Caps n between min and max
 	static int cap(int n, int min, int max)
 	{
@@ -132,29 +129,40 @@ public:
 	 * Equivalent of Ogre::Vector3::angleBetween, applied to Ogre::Vector2
 	 */
 	static inline Ogre::Radian angleBetween(const Ogre::Vector2& v1, const Ogre::Vector2& v2)
-	{		
+	{
 		Ogre::Real lenProduct = v1.length() * v2.length();
 		// Divide by zero check
-		if(lenProduct < 1e-6f)
+		if (lenProduct < 1e-6f)
 			lenProduct = 1e-6f;
-		
+
 		Ogre::Real f = v1.dotProduct(v2) / lenProduct;
-	
+
 		f = Ogre::Math::Clamp(f, (Ogre::Real)-1.0, (Ogre::Real)1.0);
 		return Ogre::Math::ACos(f);
 	}
 
 	/**
-	 * Gives the oriented angle from v1 to v2
+	 * Gives the oriented angle from v1 to v2 in the [0;2PI[ range
 	 */
 	static inline Ogre::Radian angleTo(const Ogre::Vector2& v1, const Ogre::Vector2& v2)
 	{
 		Ogre::Radian angle = angleBetween(v1, v2);
-		
+
 		if (v1.crossProduct(v2)<0)
-		{
 			angle = (Ogre::Radian)Ogre::Math::TWO_PI - angle;
-		}
+
+		return angle;
+	}
+
+	/**
+	 * Gives the oriented angle from v1 to v2 in the ]-PI;PI] range
+	 */
+	static inline Ogre::Radian signedAngleTo(const Ogre::Vector2& v1, const Ogre::Vector2& v2)
+	{
+		Ogre::Radian angle = angleBetween(v1, v2);
+
+		if (v1.crossProduct(v2)<0)
+			angle = - angle;
 
 		return angle;
 	}
@@ -172,7 +180,28 @@ public:
 	{
 		return Ogre::Vector3(pos.x, 0, pos.y);
 	}
-	
+
+	/**
+	 * binomial coefficients (a over b)
+	 */
+	static inline unsigned int binom(unsigned int a, unsigned int b)
+	{
+		int tmpA, tmpB;
+		if (( b == 0 ) || (a == b))
+			return 1;
+		else
+		{
+			tmpA = binom(a - 1, b);
+			tmpB = binom(a - 1, b - 1);
+			return tmpA + tmpB;
+		}
+	}
+
+	/// Transforms an input vector expressed in the 0,0->1,1 rect towards another rect
+	static inline Ogre::Vector2 reframe(const Ogre::RealRect& rect, const Ogre::Vector2& input)
+	{
+		return Ogre::Vector2(rect.left + input.x*rect.width(), rect.top + input.y*rect.height());
+	}
 };
 }
 #endif
