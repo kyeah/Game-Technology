@@ -8,11 +8,12 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, scale, velocity, _mass, _rest, _localInertia, rotation)
 {
 
-  entity = mgr->createEntity(_entName, "cube.mesh");
+  entity = mgr->createEntity(_entName, "sphere.mesh");
   entity->setCastShadows(true);
+  entity->setMaterialName("OgreBall/NotPassed");
 
   node->attachObject(entity);
-  node->scale(5, 10, 1);
+  node->scale(3,3, .01);
 
   node->_update(true,true);
   node->_updateBounds();
@@ -30,6 +31,7 @@ void GoalObject::update(float elapsedTime) {
   if(physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object && dynamic_cast<OgreBall*>(contexts[i]->object)) {
+	entity->setMaterialName("OgreBall/Passed");
         OgreBallApplication::getSingleton()->activity->handleGameEnd();
       }
     }
