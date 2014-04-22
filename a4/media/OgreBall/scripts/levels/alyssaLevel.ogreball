@@ -40,7 +40,7 @@ level alyssaLevel {
 	    scale 1 1 15
 	    rest 0.1
 	    pos {
-		start 0 -325 2750
+		start 0 -350 2750
 	    }
 	    rot {
 	        start 0 10 0
