@@ -60,9 +60,20 @@ level clearPath {
                       interp 500 360 0 0                      
                   }
       }
-      bumper{
+      collidable{
+	meshname cube.mesh
+	rest 10.0
+	soundEffect media/OgreBall/sounds/bumper.wav
    	pos{
-	     start 0 120 -8000
+	     start -300 120 -8000
+	}
+      }   
+      collidable{
+	meshname cube.mesh
+	rest 10.0
+	soundEffect media/OgreBall/sounds/bumper.wav
+   	pos{
+	     start 300 120 -8000
 	}
       }      
 

@@ -75,10 +75,10 @@ class DecorativeObject : public GameObject {
     virtual void update(float elapsedTime);
 };
 
-class Bumper : public GameObject{
+class Collidable : public GameObject{
 
   public:
-    Bumper(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String nodeName,
+    Collidable(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String nodeName,
              Ogre::SceneNode* parentNode, Physics* physics,
              btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
              btVector3 velocity=btVector3(0,0,0),

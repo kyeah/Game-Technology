@@ -32,13 +32,9 @@ void Sounds::playBackground(const char* aFilePath, int aVolume){
   mBackgroundMusic = NULL;
   mBackgroundMusic = Mix_LoadMUS(aFilePath);
   if(mBackgroundMusic != NULL){
-    printf("[SOUNDS::playBackground]: Background music was loaded successfully from file\n");
     Mix_PlayMusic(mBackgroundMusic, -1);
     Mix_VolumeMusic(aVolume); 
     Mix_HookMusicFinished(musicDone); 
-  }
-  else{
-    printf("[SOUNDS::playBackground]: Background music was not loaded successfully from file\n");
   }
 }
 
@@ -60,13 +56,9 @@ void Sounds::playSoundEffect(const char* aFilePath, int aVolume){
     Mix_Volume(channel, aVolume);
     Mix_ChannelFinished(channelDone);
   }
-  else{
-    printf("[SOUNDS::playSoundEffect]: Sound effect was not loaded successfully from file");
-    std::cout << " filePath is: " << aFilePath << std::endl;
-  }
 
 }
 
 void Sounds::channelDone(int aChannel){
-  printf("channel %d finished playing.\n", aChannel);
+  /* NOTE: if later we get sound crashes check this becasue all channles might be taken up and we're not freeing channels*/
 }

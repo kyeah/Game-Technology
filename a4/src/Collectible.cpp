@@ -48,7 +48,7 @@ void Collectible::update(float elapsedTime) {
 
           Activity *a = OgreBallApplication::getSingleton()->activity;
           if (a) a->score++;
-          Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME / 2));
+          Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME));
         }
       }
     }
