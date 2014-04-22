@@ -66,6 +66,9 @@ extrudedmesh <name>:
 String together paths by placing them one after another
 
 Combine shapes by placing them one after another (can change how they combine using the 'combine' option)
+=> The combine and thicken methods produce MULTISHAPES, which cannot be edited on further or used with regular shapes. This is really annoying, so I wouldn't recommend them...
+=> Spline shapes also apparently close paths forcably, which makes them really annoying to use as well.
+=> Moral of story: this library is stupid, stick to splines for paths
 
 Duplicate paths or strings by using type=previous (duplicate last path created) or type=previous-combined (duplicate the entirety of the path created up until that point)
 

@@ -58,7 +58,13 @@ void LevelLoader::loadResources(const string& path) {
 
     } else if (name[0].compare("level") == 0) {
       levels.push_back(it->second);
-      levelNames.push_back(name[1]);
+
+      stringstream ss;
+      ss << name[1];
+      for (int i = 2; i < name.size(); i++) {
+        ss << " " << name[i];
+      }
+      levelNames.push_back(ss.str());
     }
   }
 
@@ -257,6 +263,7 @@ void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<string>& m
   }
 }
 
+// I'm so sorry for the extruded mesh load functions. Godspeed.
 void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>& meshNames) {
   for (int i = 0; i < meshes.size(); i++) {
     cout << "loading Extruded mesh " << meshNames[i] << endl;
@@ -269,7 +276,10 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
 
     Procedural::Path p, lastPath;
     Procedural::Shape s, lastShape;
+    Procedural::MultiShape multishape;
+    bool useMultishape = false;
 
+    s.close();
     vector<ConfigNode*> children = root->getChildren();
     for (int i = 0; i < children.size(); i++) {
       if (children[i]->getName().compare("path") == 0) {
@@ -316,15 +326,20 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         if (mirroraxisNode) sappend.mirrorAroundAxis(Ogre::Vector2(mirrorNode->getValueF(), mirrorNode->getValueF(1)));
 
         ConfigNode *combineType = children[i]->findChild("combine");
-
         if (combineType) {
           string type = combineType->getValue();
           if (type.compare("union")) {
-            s.booleanUnion(sappend);
+            sappend.close();
+            multishape = s.booleanUnion(sappend);
+            useMultishape = true;
           } else if (type.compare("intersection")) {
-            s.booleanIntersect(sappend);
+            sappend.close();        
+            multishape = s.booleanIntersect(sappend);
+            useMultishape = true;
           }  else if (type.compare("difference")) {
-            s.booleanDifference(sappend);
+            sappend.close();
+            multishape = s.booleanDifference(sappend);
+            useMultishape = true;
           } else {
             s.appendShape(sappend);
           }
@@ -352,8 +367,18 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
       vtiles = tileNode->getValueI(1);
     }
 
+    ConfigNode *thickenNode = root->findChild("thicken");
+    if (thickenNode) {
+      multishape = s.thicken(thickenNode->getValueF());
+      useMultishape = true;
+    }
+
     s.close();
-    Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    if (useMultishape) {
+      Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setMultiShapeToExtrude(&multishape).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    } else {
+      Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    }
   }
 }
 
@@ -639,9 +664,6 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
   ConfigNode *outsideNode = path->findChild("outside");
   if (outsideNode && outsideNode->getValue().compare("left") == 0)
     s.setOutSide(Procedural::SIDE_LEFT);
-
-  ConfigNode *thickenNode = path->findChild("thicken");
-  if (thickenNode) s.thicken(thickenNode->getValueF());
 }
 
 Procedural::Track* LevelLoader::parseTrack(ConfigNode *path) {

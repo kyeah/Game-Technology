@@ -52,7 +52,6 @@ OgreBallApplication::OgreBallApplication(void)
   paused = false;
   instance = this;
   activity = NULL;
-
 }
 
 //-------------------------------------------------------------------------------------
@@ -72,6 +71,11 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
   levelRoot = mSceneMgr->getRootSceneNode()->createChildSceneNode("root");
   levelLoader->levelRoot = levelRoot;
   levelLoader->clearKnobs();
+
+  mCameraLookAtNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("lookAt");
+  mCameraNode = mCameraLookAtNode->createChildSceneNode("cam");
+  mCameraNode->attachObject(mCamera);
+  mCameraNode->setFixedYawAxis(true);
 }
 
 //-------------------------------------------------------------------------------------

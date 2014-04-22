@@ -7,18 +7,18 @@ using namespace std;
 
 class CameraObject{
  public:
-  CameraObject(Ogre::Camera* cam);
+  CameraObject(Ogre::SceneNode* lookAtNode, Ogre::SceneNode* camNode, 
+               Ogre::Vector3 playerInitPos, Ogre::Vector3 camInitPos);
+
   void update(Ogre::Vector3 newPosition, Ogre::Real elapsedTime);
-  void setPreviousPosition(Ogre::Vector3 pos);
   void setFixedDistance(Ogre::Vector3 v1, Ogre::Vector3 v2);
 
-  Ogre::Camera *camera;
+  Ogre::SceneNode *cameraNode, *lookAtNode;
   Ogre::Vector3 previousPos;
   Ogre::Vector3 destPos;
+  Ogre::Vector3 lastInterpPos;
   Ogre::Real fixedDist;
-  Ogre::Vector3 cameraStartPosition;
   bool doneFalling;
-  bool previousPosIsSet;
 
   float totalTime;
   float elapsedTime;
