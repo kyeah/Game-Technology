@@ -96,7 +96,8 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if(!mCameraObj->previousPosIsSet)
     mCameraObj->setPreviousPosition((Ogre::Vector3)player->getPosition());
   if(!mCameraObj->fixedDist || (app->levelLoader->cameraStartPos != mCameraObj->cameraStartPosition))
-    mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
+    mCameraObj->setFixedDistance((Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos); 
+  //comment out the line below if you're building a level
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   /*

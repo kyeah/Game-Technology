@@ -33,7 +33,7 @@ void CameraObject::update(Ogre::Vector3 newPosition, Ogre::Real elapsedTime){
     previousPos = newPosition;
     currTiltDelay = 0;
     destPos = newPosition - direction*fixedDist;
-  }
+  
 
   btVector3 btVec1 = btVector3(destPos[0], destPos[1], destPos[2]);
   btVector3 camPos = btVector3(camera->getPosition()[0], camera->getPosition()[1], camera->getPosition()[2]);
@@ -46,9 +46,9 @@ void CameraObject::update(Ogre::Vector3 newPosition, Ogre::Real elapsedTime){
     dir.normalise();
     avgPos = newPosition - dir*fixedDist;
   }
-
   camera->setPosition(avgPos[0], std::max(newPosition[1] + 600, avgPos[1]), avgPos[2]);
   camera->lookAt(newPosition + Ogre::Vector3(0, 220,0));
+  }
 }
 
 void CameraObject::setPreviousPosition(Ogre::Vector3 pos){
