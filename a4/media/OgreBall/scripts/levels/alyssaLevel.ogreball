@@ -18,7 +18,7 @@ level alyssaLevel {
       }
       goal {
            pos {
-               start 0 -1100 4000
+               start 0 -2000 15000
            }
            rot {
                start 0 0 0
@@ -35,13 +35,53 @@ level alyssaLevel {
 		start 0 0 0 
 	    }
       }
- 
+      plane {
+	    meshname upPlane
+	    scale 1 1 15
+	    rest 0.1
+	    pos {
+		start 0 -325 2750
+	    }
+	    rot {
+	        start 0 10 0
+	    }
+      } 
+      plane {
+	    meshname upPlane
+	    scale 1 1 1
+	    rest 0.3
+	    pos {
+		start 0 -1500 10500
+	    }
+	    rot {
+		start 0 -10 0
+	    }
+      }
+	
+      plane {
+	    meshname upPlane
+	    scale 2 2 2 
+	    rest 0.3
+	    pos {
+		start 0 -2000 14000
+	    }
+	    rot {
+		start 0 0 0
+   	    }
+     }
+
       collectible {
                   meshname sphere.mesh
                   pos {
-                      start 0 120 -7000
+                      start -500 -1880 14500
                   }
       }
+      collectible {
+		meshname sphere.mesh
+		pos {
+			start 500 -1880 14500
+		}
+	} 
       decorative {
                   meshname ogrehead.mesh
                   scale 20 20 20
