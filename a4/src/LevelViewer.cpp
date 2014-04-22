@@ -79,6 +79,7 @@ LevelViewer::~LevelViewer(void) {
   mSceneMgr->destroyAllParticleSystems();
   mSceneMgr->destroyAllRibbonTrails();
   mSceneMgr->destroyAllCameras();
+
   mSceneMgr->clearScene();
 
   CEGUI::WindowManager::getSingleton().destroyWindow(window);

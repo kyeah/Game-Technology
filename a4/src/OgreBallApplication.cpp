@@ -140,9 +140,7 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();
 
-  if (mPhysics) mPhysics->stepSimulation(elapsedTime);
-  activity->frameStarted(elapsedTime);
-  
+
   if (!paused) {
     if (mPhysics) mPhysics->stepSimulation(elapsedTime);
     activity->frameStarted(elapsedTime);

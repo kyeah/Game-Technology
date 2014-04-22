@@ -119,9 +119,11 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
                                              currTilt.y(),
                                              currTilt.z());
 
-  app->mCameraLookAtNode->rotate(oq);
-  app->mCameraLookAtNode->rotate(notilt*notilt);
-  app->mCameraLookAtNode->rotate(noq);
+  if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
+    app->mCameraLookAtNode->rotate(oq);
+    app->mCameraLookAtNode->rotate(notilt*notilt);
+    app->mCameraLookAtNode->rotate(noq);
+  }
 
   return true;
 }
