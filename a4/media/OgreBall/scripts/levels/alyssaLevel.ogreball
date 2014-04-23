@@ -9,6 +9,7 @@ level alyssaLevel {
                      pos 0 2000 -5000
                      rot 0 0 0
             }
+	    levelID 3
       }
       lights {
              ambient .5 .5 .5

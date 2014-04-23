@@ -162,6 +162,12 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
         Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
       }
     }
+
+  ConfigNode* pLevelID = root->findChild("levelID");
+
+  if(pLevelID){
+      levelID = pLevelID->getValueI();
+    }
   // Skyboxes and Skydomes
   ConfigNode *skyboxNode = root->findChild("skybox");
   if (skyboxNode) {

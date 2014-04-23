@@ -12,6 +12,7 @@ level clearPath {
 	    Sound{
      		background media/OgreBall/sounds/background.wav
             }
+	    levelID 1
       }
       lights {
              ambient .5 .5 .5

@@ -90,6 +90,11 @@ bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
   CEGUI::MouseCursor::getSingleton().hide();
 
   CEGUI::String levelName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getName();
+  LevelLoader *loader = LevelLoader::getSingleton();
+  for(int i = 0; i < loader->levelNames.size(); i++)
+  {
+    
+  }
   app->switchActivity(new SinglePlayerActivity(app, levelName.c_str()));
   return true;
 }

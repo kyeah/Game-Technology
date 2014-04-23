@@ -24,6 +24,7 @@ class SinglePlayerActivity : public Activity {
   virtual void handleGameEnd();
 
   void loadLevel( const char* name );
+  bool nextLevel( const CEGUI::EventArgs& e );
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();

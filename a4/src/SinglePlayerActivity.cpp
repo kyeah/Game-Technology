@@ -149,6 +149,19 @@ void SinglePlayerActivity::togglePauseMenu( ) {
   }
 }
 
+bool SinglePlayerActivity::nextLevel( const CEGUI::EventArgs& e ) {
+  LevelLoader *loader = LevelLoader::getSingleton();
+  int nextLevel = loader->levelID;
+  std::cout << "currLevelID is: " << nextLevel;
+  nextLevel++;
+  std::cout << "levelID now is: " << nextLevel;
+  std::cout << "levelNames size is: " << loader->levelNames.size() << "levelname is: " << (loader->levelNames[nextLevel]) << std::endl;
+  loadLevel((loader->levelNames[nextLevel]).c_str());
+  CEGUI::MouseCursor::getSingleton().hide();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  return true;
+}
+
 bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
   app->switchActivity(new MenuActivity(app));
   return true;
@@ -162,9 +175,9 @@ void SinglePlayerActivity::handleGameEnd() {
   app->Wmgr->getWindow("GameWon/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-  /*  app->Wmgr->getWindow("GameWon/NextLevel")
+  app->Wmgr->getWindow("GameWon/NextLevel")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
-      CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
+      CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
 }
 
 //-------------------------------------------------------------------------------------
