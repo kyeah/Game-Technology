@@ -145,7 +145,7 @@ extrudedMesh rampMesh {
   }  
 }
 
-extrudedMesh holeMesh {
+extrudedMesh blockMesh {
   path {
      points {
        p 0 0 0

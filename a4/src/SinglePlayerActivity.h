@@ -10,6 +10,7 @@ class SinglePlayerActivity : public Activity {
  public:
   SinglePlayerActivity(OgreBallApplication *app, const char* levelName);
   virtual ~SinglePlayerActivity(void);
+  virtual void close(void);
 
   void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );

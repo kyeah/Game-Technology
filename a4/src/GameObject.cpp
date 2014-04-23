@@ -114,7 +114,10 @@ void GameObject::addToSimulator() {
   motionState = new OgreMotionState(transform, node);
 
   //rigidbody is dynamic if and only if mass is non zero, otherwise static
-  if (mass != 0.0f) collisionShape->calculateLocalInertia(mass, inertia);
+  //  if (mass != 0.0f) collisionShape->calculateLocalInertia(mass, inertia);
+  //  if (mass != 0.0f) collisionShape->calculateLocalInertia(1.0f, inertia);
+  if (mass != 0.0f)
+    inertia = btVector3(1000.0f, 0, 1000.0f);
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, collisionShape, inertia);
   body = new btRigidBody(rbInfo);
   body->setRestitution(rest);

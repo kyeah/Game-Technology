@@ -13,6 +13,7 @@ class LevelViewer {
   ~LevelViewer(void);
   bool frameStarted( Ogre::Real elapsedTime );
 
+  void loadLevel(const char* levelName);
   void setPositionPercent(float x, float y);
 
   Ogre::SceneManager *mSceneMgr;
@@ -20,6 +21,8 @@ class LevelViewer {
   Ogre::Camera *mCamera;
   Physics *mPhysics;
 
+  std::string myCeguiImageName;
+  CEGUI::Imageset *myImageSet;
   CEGUI::Window *window;
 
   // Camera Interpolation Information
