@@ -496,7 +496,7 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
       ConfigNode *roundNode = path->findChild("rounds");
       if (roundNode) spline->setNumRound(roundNode->getValueF());
 
-      p = spline.realizePath();
+      p = spline->realizePath();
     }
   } else {
     ConfigNode *pointsNode = path->findChild("points");
