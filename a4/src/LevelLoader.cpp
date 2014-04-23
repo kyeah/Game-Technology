@@ -162,12 +162,12 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
   ConfigNode* pSound = root->findChild("Sound");
 
   if(pSound){
-      ConfigNode* pBackground = pSound->findChild("background");
-      if(pBackground){
-        Ogre::String backgroundMusic = pBackground->getValue();
-        Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
-      }
+    ConfigNode* pBackground = pSound->findChild("background");
+    if(pBackground){
+      Ogre::String backgroundMusic = pBackground->getValue();
+      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
     }
+  }
   // Skyboxes and Skydomes
   ConfigNode *skyboxNode = root->findChild("skybox");
   if (skyboxNode) {
@@ -333,7 +333,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
             multishape = s.booleanUnion(sappend);
             useMultishape = true;
           } else if (type.compare("intersection")) {
-            sappend.close();        
+            sappend.close();
             multishape = s.booleanIntersect(sappend);
             useMultishape = true;
           }  else if (type.compare("difference")) {
@@ -370,7 +370,10 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     ConfigNode *thickenNode = root->findChild("thicken");
     if (thickenNode) {
       multishape = s.thicken(thickenNode->getValueF());
-      useMultishape = true;
+      if (multishape.getShapeCount() > 1)
+        useMultishape = true;
+      else
+        s = multishape.getShape(0);
     }
 
     s.close();
@@ -477,6 +480,23 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
         spline->close();
 
       p = spline->realizePath();
+    } else if (type.compare("helix") == 0) {
+      Procedural::HelixPath *spline = new Procedural::HelixPath();
+
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSegPath(segments);
+
+      ConfigNode *heightNode = path->findChild("height");
+      if (heightNode) spline->setHeight(heightNode->getValueF());
+
+      ConfigNode *radiusNode = path->findChild("radius");
+      if (radiusNode) spline->setRadius(radiusNode->getValueF());
+
+      ConfigNode *roundNode = path->findChild("rounds");
+      if (roundNode) spline->setNumRound(roundNode->getValueF());
+
+      p = spline.realizePath();
     }
   } else {
     ConfigNode *pointsNode = path->findChild("points");
@@ -789,9 +809,9 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
       }
     }
     else if (name.compare("soundEffect") == 0)
-    {
-      soundEffect = attrs[i]->getValue();
-    } else {
+      {
+        soundEffect = attrs[i]->getValue();
+      } else {
       childObjects.push_back(attrs[i]);
     }
   }

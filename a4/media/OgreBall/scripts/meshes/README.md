@@ -23,12 +23,14 @@ extrudedmesh <name>:
 * scale <x> <y> <z>
 * tiles <utiles> <vtiles>
 * path:
-  * type <typename = default: straight lines | choices: previous, previous-combined, catmullSpline, cubicHermiteSpline, roundedCornerSpline, bezierCurve>
+  * type <typename = default: straight lines | choices: previous, previous-combined, catmullSpline, cubicHermiteSpline, roundedCornerSpline, bezierCurve, helix>
   * scale <x> <y> <z>
   * translate <x> <y> <z>
   * segments <numSegments>
-  * close <true | false = false>  # Connect first and last points on path
-  * radius <radius>  # Only use if roundedCornerSpline
+  * close <true | false = false>  # Connect first and last points on path  
+  * radius <radius>  # Only use if roundedCornerSpline or helix
+  * height <height>  # Only for helix
+  * rounds <numRounds>  # Only for helix
   * points:
     * p <x> <y> <z>
     ...
@@ -76,6 +78,6 @@ Duplicate paths or strings by using type=previous (duplicate last path created) 
 
 Most options are NOT needed, but if you omit an option that IS needed, the program will crash with a segfault...sorry
 
-Do NOT repeat points when making a path, shape, or track, or the extruder will hang and you will be sad. A shape is required to be closed, and will be closed implicitly.
+Do NOT cross lines when making a path, shape, or track, or the extruder will hang and you will be sad. A shape is required to be closed, and will be closed implicitly.
 
 For some reason, updating to the newest version of OgreProcedural broke scaling, so scale all of your points manually for points and shapes.
