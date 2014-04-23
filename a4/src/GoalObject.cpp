@@ -1,10 +1,17 @@
+
+//#include <btBulletDynamicsCommon.h>
 #include "GameObjectDescription.h"
 #include "OgreBallApplication.h"
 #include "Sounds.h"
 
+Ogre::SceneNode* leftFlap;
+Ogre::SceneNode* rightFlap;
+
 Ogre::Entity* leftFlapEntity;
 Ogre::Entity* rightFlapEntity;
-
+int swinging = 0;
+Ogre::Vector3 axis1;
+Ogre::Vector3 axis2;
 
 GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName,
              Ogre::SceneNode* parentNode, Physics* _physics,
@@ -13,8 +20,8 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, scale, velocity, _mass, _rest, _localInertia, rotation)
 {
 
-  Ogre::SceneNode* leftFlap = node->createChildSceneNode("leftFlap", Ogre::Vector3(-125,60,0));
-  Ogre::SceneNode* rightFlap = node->createChildSceneNode("rightFlap", Ogre::Vector3(125,60,0));
+  leftFlap = node->createChildSceneNode("leftFlap", Ogre::Vector3(-125,60,0));
+  rightFlap = node->createChildSceneNode("rightFlap", Ogre::Vector3(125,60,0));
   Ogre::SceneNode* leftProtector = node->createChildSceneNode("leftProtector", Ogre::Vector3(-250,0,0));
   Ogre::SceneNode* rightProtector = node->createChildSceneNode("rightProtector", Ogre::Vector3(250,0,0));
 
@@ -34,6 +41,11 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   rightProtector->attachObject(rightProtectorEntity);
   rightProtector->scale(5,5,.01);
   rightProtector->yaw((Ogre::Radian)3.14159);
+
+  Ogre::Vector3 leftFlapEdge = leftFlap->getPosition();
+  axis1 = Ogre::Vector3(leftFlapEdge[1], -leftFlapEdge[0], 0);
+  Ogre::Vector3 rightFlapEdge = rightFlap->getPosition();
+  axis2 = Ogre::Vector3(rightFlapEdge[1], -rightFlapEdge[0], 0);
 
   leftFlap->_update(true,true);
   rightFlap->_update(true,true);
@@ -56,10 +68,26 @@ void GoalObject::update(float elapsedTime) {
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object && dynamic_cast<OgreBall*>(contexts[i]->object)) {
         Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME / 2));
-	    leftFlapEntity->setMaterialName("OgreBall/Passed");
-            rightFlapEntity->setMaterialName("OgreBall/Passed");
+	leftFlapEntity->setMaterialName("OgreBall/Passed");
+        rightFlapEntity->setMaterialName("OgreBall/Passed");
+ 	swinging = 360;
 	OgreBallApplication::getSingleton()->activity->handleGameEnd();
       }
     }
   }
+
+  Ogre::Radian rad = (Ogre::Radian).0872664626;
+  if(swinging > 0){
+	if(swinging > 180){
+		leftFlap->rotate(axis1, rad);
+		rightFlap->rotate(axis2, -rad);
+	}else {
+		leftFlap->rotate(axis1, -rad);
+		rightFlap->rotate(axis2, rad);
+	}
+	swinging--;
+
+
+  }
+
 }
