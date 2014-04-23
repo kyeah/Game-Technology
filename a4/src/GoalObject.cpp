@@ -2,6 +2,10 @@
 #include "OgreBallApplication.h"
 #include "Sounds.h"
 
+Ogre::Entity* leftFlapEntity;
+Ogre::Entity* rightFlapEntity;
+
+
 GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName,
              Ogre::SceneNode* parentNode, Physics* _physics,
              btVector3 origin, btVector3 scale, btVector3 velocity, btScalar _mass, btScalar _rest,
@@ -9,18 +13,36 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   : GameObject(mgr, _entName, _nodeName, parentNode, _physics, origin, scale, velocity, _mass, _rest, _localInertia, rotation)
 {
 
-  entity = mgr->createEntity(_entName, "sphere.mesh");
-  entity->setCastShadows(true);
-  entity->setMaterialName("OgreBall/NotPassed");
+  Ogre::SceneNode* leftFlap = node->createChildSceneNode("leftFlap", Ogre::Vector3(-125,60,0));
+  Ogre::SceneNode* rightFlap = node->createChildSceneNode("rightFlap", Ogre::Vector3(125,60,0));
+  Ogre::SceneNode* leftProtector = node->createChildSceneNode("leftProtector", Ogre::Vector3(-250,0,0));
+  Ogre::SceneNode* rightProtector = node->createChildSceneNode("rightProtector", Ogre::Vector3(250,0,0));
 
-  node->attachObject(entity);
-  node->scale(3,3, .01);
+  leftFlapEntity = mgr->createEntity(_entName + "leftFlap", "cube.mesh");
+  leftFlapEntity->setMaterialName("OgreBall/NotPassed");
+  rightFlapEntity = mgr->createEntity(_entName + "rightFlap", "cube.mesh");
+  rightFlapEntity->setMaterialName("OgreBall/NotPassed");
+  Ogre::Entity* leftProtectorEntity = mgr->createEntity(_entName + "leftProtector", "robot.mesh");
+  Ogre::Entity* rightProtectorEntity = mgr->createEntity(_entName + "rightProtector", "robot.mesh");
 
-  node->_update(true,true);
-  node->_updateBounds();
-  Ogre::Vector3 s = node->_getWorldAABB().getHalfSize();
+  leftFlap->attachObject(leftFlapEntity);
+  leftFlap->scale(2,1,0.01);
+  rightFlap->attachObject(rightFlapEntity);
+  rightFlap->scale(2,1,0.01);
+  leftProtector->attachObject(leftProtectorEntity);
+  leftProtector->scale(5,5,.01);
+  rightProtector->attachObject(rightProtectorEntity);
+  rightProtector->scale(5,5,.01);
+  rightProtector->yaw((Ogre::Radian)3.14159);
 
-  collisionShape = new btBoxShape(btVector3(s[0], s[1], s[2]));
+  leftFlap->_update(true,true);
+  rightFlap->_update(true,true);
+  leftFlap->_updateBounds();
+  rightFlap->_updateBounds();
+  Ogre::Vector3 ls = leftFlap->_getWorldAABB().getHalfSize();
+  Ogre::Vector3 rs = rightFlap->_getWorldAABB().getHalfSize();
+
+  collisionShape = new btBoxShape(btVector3(ls[0] + rs[0], ls[1], ls[2]));
   addToSimulator(Collisions::CollisionTypes::COL_GOAL,
                  Collisions::goalColliders);
 
@@ -34,8 +56,9 @@ void GoalObject::update(float elapsedTime) {
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object && dynamic_cast<OgreBall*>(contexts[i]->object)) {
         Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME / 2));
-	    entity->setMaterialName("OgreBall/Passed");
-        OgreBallApplication::getSingleton()->activity->handleGameEnd();
+	    leftFlapEntity->setMaterialName("OgreBall/Passed");
+            rightFlapEntity->setMaterialName("OgreBall/Passed");
+	OgreBallApplication::getSingleton()->activity->handleGameEnd();
       }
     }
   }
