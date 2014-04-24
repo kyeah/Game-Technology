@@ -24,10 +24,11 @@
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Timer" >
       <Property Name="Text" Value="TIMER: swag o' clock" />
       <Property Name="Font" Value="Helvetica" />
+      <!--Property Name="TextColours" Value="tl:ffrrggbb tr: bl: br:" /-->
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.4,0},{0.01,0},{0.6,0},{0.07,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.01,0},{0.7,0},{0.1,0}}" />
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
