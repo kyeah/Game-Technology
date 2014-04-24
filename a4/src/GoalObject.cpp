@@ -6,12 +6,15 @@
 
 Ogre::SceneNode* leftFlap;
 Ogre::SceneNode* rightFlap;
+Ogre::SceneNode* tempChildL;
+Ogre::SceneNode* tempChildR;
 
 Ogre::Entity* leftFlapEntity;
 Ogre::Entity* rightFlapEntity;
 int swinging = 0;
 Ogre::Vector3 axis1;
 Ogre::Vector3 axis2;
+
 
 GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _nodeName,
              Ogre::SceneNode* parentNode, Physics* _physics,
@@ -33,6 +36,8 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   leftFlap = node->createChildSceneNode("leftFlap", Ogre::Vector3(-125,60,0));
   rightFlap = node->createChildSceneNode("rightFlap", Ogre::Vector3(125,60,0));
 */
+  tempChildL = node->createChildSceneNode("blehL", Ogre::Vector3(-190, 60, 0));
+  tempChildR = node->createChildSceneNode("blehR", Ogre::Vector3(190, 60, 0));
   Ogre::SceneNode* leftProtector = node->createChildSceneNode("leftProtector", Ogre::Vector3(-250,0,0));
   Ogre::SceneNode* rightProtector = node->createChildSceneNode("rightProtector", Ogre::Vector3(250,0,0));
 
@@ -54,20 +59,39 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
   rightProtector->attachObject(rightProtectorEntity);
   rightProtector->scale(5,5,.01);
   rightProtector->yaw((Ogre::Radian)3.14159);
+  
+  Ogre::Vector3 leftPos = tempChildL->_getDerivedPosition();
+  Ogre::Vector3 rightPos = tempChildR->_getDerivedPosition();
+  leftFlap->setPosition(Ogre::Vector3(leftPos[0], leftPos[1], leftPos[2]));
+  rightFlap->setPosition(Ogre::Vector3(rightPos[0], rightPos[1], rightPos[2]));
 
-/*  Ogre::Vector3 leftFlapEdge = leftFlap->getPosition();
-  axis1 = Ogre::Vector3(0, 5, 5);
-  Ogre::Vector3 rightFlapEdge = rightFlap->getPosition();
-  axis2 = Ogre::Vector3(5, 5, 0);
+// a bunch of shit for fixing the leap level stuff. i don even known manz
+
+/*  Ogre::Vector3 LedgePos = leftProtector->_getDerivedPosition();
+  Ogre::Vector3 RedgePos = rightProtector->_getDerivedPosition(); 
+  Ogre::Vector3 dirReal = LedgePos - RedgePos;
+  dirReal.normalise();
+  printf("direction between robots (%f,%f,%f)\n", dirReal[0], dirReal[1], dirReal[2]);
+  
+  Ogre::AxisAlignedBox bb = leftFlap->_getWorldAABB();
+//  const Ogre::Vector3* corners = bb.getAllCorners();
+  Ogre::Vector3 dirFake = bb.getCorner(Ogre::AxisAlignedBox::NEAR_LEFT_TOP) - bb.getCorner(Ogre::AxisAlignedBox::NEAR_RIGHT_TOP);
+//  Ogre::Vector3 leftFlapPos = leftFlap->_getDerivedPosition();
+//Ogre::Vector3 leftChildPos = leftChild->_getDerivedPosition();
+//  Ogre::Vector3 dirFake = leftFlapPos - leftChildPos;
+  dirFake.normalise();
+  printf("direction between panels (%f,%f,%f)\n", dirFake[0], dirFake[1], dirFake[2]);
+  Ogre::Radian angle = dirReal.angleBetween(dirFake);
+  printf("angle is %f\n", angle);
+  leftFlap->yaw(angle);
+  rightFlap->yaw(angle);
 */
-
-
-  leftFlap->_update(true,true);
-  rightFlap->_update(true,true);
-  leftFlap->_updateBounds();
-  rightFlap->_updateBounds();
-  Ogre::Vector3 ls = leftFlap->_getWorldAABB().getHalfSize();
-  Ogre::Vector3 rs = rightFlap->_getWorldAABB().getHalfSize();
+  leftChild->_update(true,true);
+  rightChild->_update(true,true);
+  leftChild->_updateBounds();
+  rightChild->_updateBounds();
+  Ogre::Vector3 ls = leftChild->_getWorldAABB().getHalfSize();
+  Ogre::Vector3 rs = rightChild->_getWorldAABB().getHalfSize();
 
   collisionShape = new btBoxShape(btVector3(ls[0] + rs[0], ls[1], ls[2]));
   addToSimulator(Collisions::CollisionTypes::COL_GOAL,
@@ -78,6 +102,11 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
 }
 
 void GoalObject::update(float elapsedTime) {
+
+  Ogre::Vector3 leftPos = tempChildL->_getDerivedPosition();
+  Ogre::Vector3 rightPos = tempChildR->_getDerivedPosition();
+  leftFlap->setPosition(Ogre::Vector3(leftPos[0], leftPos[1], leftPos[2]));
+  rightFlap->setPosition(Ogre::Vector3(rightPos[0], rightPos[1], rightPos[2]));
   GameObject::update(elapsedTime);
   if(physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
@@ -91,7 +120,6 @@ void GoalObject::update(float elapsedTime) {
     }
   }
 
-  Ogre::Radian rad = (Ogre::Radian).01745328925;
   if(swinging > 0){
 	if(swinging > 18){	
 		leftFlap->rotate(Ogre::Quaternion(Ogre::Degree(10), Ogre::Vector3(0,1,0)), Ogre::Node::TransformSpace::TS_WORLD);
