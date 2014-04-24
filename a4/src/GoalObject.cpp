@@ -25,19 +25,17 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
 
   Ogre::Vector3 nodeWorldPos = node->_getDerivedPosition();
    
-  leftFlap = mgr->getRootSceneNode()->createChildSceneNode(_entName + "leftFlap");
-  rightFlap = mgr->getRootSceneNode()->createChildSceneNode(_entName + "rightFlap");
-  leftFlap->setPosition(Ogre::Vector3(nodeWorldPos[0] - 190, nodeWorldPos[1] + 60, nodeWorldPos[2]));
-  rightFlap->setPosition(Ogre::Vector3(nodeWorldPos[0] + 190, nodeWorldPos[1] + 60, nodeWorldPos[2]));
-  Ogre::SceneNode* leftChild = leftFlap->createChildSceneNode();
-  Ogre::SceneNode* rightChild = rightFlap->createChildSceneNode();
+  leftFlap = node->createChildSceneNode(_entName + "leftFlap", Ogre::Vector3(-190, 60, 0));
+  rightFlap = node->createChildSceneNode(_entName + "rightFlap", Ogre::Vector3(190, 60, 0));
+  Ogre::SceneNode* leftChild = leftFlap->createChildSceneNode(_entName + "leftFlapChild", Ogre::Vector3(65,0,0));
+  Ogre::SceneNode* rightChild = rightFlap->createChildSceneNode(_entName + "rightChildFlap", Ogre::Vector3(-65, 0,0));
 
 /*
   leftFlap = node->createChildSceneNode("leftFlap", Ogre::Vector3(-125,60,0));
   rightFlap = node->createChildSceneNode("rightFlap", Ogre::Vector3(125,60,0));
 */
-  tempChildL = node->createChildSceneNode("blehL", Ogre::Vector3(-190, 60, 0));
-  tempChildR = node->createChildSceneNode("blehR", Ogre::Vector3(190, 60, 0));
+ // tempChildL = node->createChildSceneNode("blehL", Ogre::Vector3(-190, 60, 0));
+ // tempChildR = node->createChildSceneNode("blehR", Ogre::Vector3(190, 60, 0));
   Ogre::SceneNode* leftProtector = node->createChildSceneNode("leftProtector", Ogre::Vector3(-250,0,0));
   Ogre::SceneNode* rightProtector = node->createChildSceneNode("rightProtector", Ogre::Vector3(250,0,0));
 
@@ -50,21 +48,21 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
 
   leftChild->attachObject(leftFlapEntity);
   leftChild->scale(2,1,0.01);
-  leftChild->translate(65,0,0);
+ // leftChild->translate(65,0,0);
   rightChild->attachObject(rightFlapEntity);
   rightChild->scale(2,1,0.01);
-  rightChild->translate(-65,0,0);
+ // rightChild->translate(-65,0,0);
   leftProtector->attachObject(leftProtectorEntity);
   leftProtector->scale(5,5,.01);
   rightProtector->attachObject(rightProtectorEntity);
   rightProtector->scale(5,5,.01);
   rightProtector->yaw((Ogre::Radian)3.14159);
   
-  Ogre::Vector3 leftPos = tempChildL->_getDerivedPosition();
+/*  Ogre::Vector3 leftPos = tempChildL->_getDerivedPosition();
   Ogre::Vector3 rightPos = tempChildR->_getDerivedPosition();
   leftFlap->setPosition(Ogre::Vector3(leftPos[0], leftPos[1], leftPos[2]));
   rightFlap->setPosition(Ogre::Vector3(rightPos[0], rightPos[1], rightPos[2]));
-
+*/
 // a bunch of shit for fixing the leap level stuff. i don even known manz
 
 /*  Ogre::Vector3 LedgePos = leftProtector->_getDerivedPosition();
@@ -103,10 +101,12 @@ GoalObject::GoalObject(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::Str
 
 void GoalObject::update(float elapsedTime) {
 
-  Ogre::Vector3 leftPos = tempChildL->_getDerivedPosition();
+  /*Ogre::Vector3 leftPos = tempChildL->_getDerivedPosition();
   Ogre::Vector3 rightPos = tempChildR->_getDerivedPosition();
   leftFlap->setPosition(Ogre::Vector3(leftPos[0], leftPos[1], leftPos[2]));
   rightFlap->setPosition(Ogre::Vector3(rightPos[0], rightPos[1], rightPos[2]));
+  */
+
   GameObject::update(elapsedTime);
   if(physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
