@@ -23,6 +23,7 @@ void MenuActivity::close(void) {
 
 void MenuActivity::start(void) {
   app->levelLoader->loadLevel("menuBG");
+  chosenCharacter = 0;
   
   new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0]);
@@ -56,13 +57,37 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
   CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
 
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToLevelSelectMenu, this));
+                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToPlayerSelectMenu, this));
   
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
   
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
+}
+
+bool MenuActivity::SwitchToPlayerSelectMenu( const CEGUI::EventArgs& e) {
+  close();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/Background"));
+
+  CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
+  CEGUI::Window* ogreButton = app->Wmgr->getWindow("Menu/Ogre");
+
+  penguinButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::SelectPenguin, this));
+
+  ogreButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::SelectOgre, this));
+
+
+}
+
+bool MenuActivity::SelectPenguin( const CEGUI::EventArgs& e) {
+  character = 0;
+}
+
+bool MenuActivity::SelectOgre( const CEGUI::EventArgs& e) {
+  character = 1;
 }
 
 bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {

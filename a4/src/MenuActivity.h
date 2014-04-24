@@ -28,7 +28,10 @@ class MenuActivity : public Activity {
 
   bool SwitchToMainMenu(const CEGUI::EventArgs& e);
   bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
+  bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+  bool SelectPenguin( const CEGUI::EventArgs& e);
+  bool SelectOgre( const CEGUI::EventArgs& e);
 
   bool StartSinglePlayer( const CEGUI::EventArgs& e );
 
@@ -36,5 +39,6 @@ class MenuActivity : public Activity {
 
   CEGUI::Window *levelSelectorWindow;
   int selectorStart, selectorRows, selectorColumns;
+  int chosenCharacter;
   std::vector<LevelViewer*> levelViewers;
 };

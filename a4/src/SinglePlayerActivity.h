@@ -8,7 +8,7 @@
 
 class SinglePlayerActivity : public Activity {
  public:
-  SinglePlayerActivity(OgreBallApplication *app, const char* levelName);
+  SinglePlayerActivity(OgreBallApplication *app, const char* levelName, int mCharacter=0);
   virtual ~SinglePlayerActivity(void);
   virtual void close(void);
 
@@ -31,6 +31,10 @@ class SinglePlayerActivity : public Activity {
 
   const char* currentLevelName;
 
+  const static int CHARACTER_PENGUIN = 0;
+
+  const static int CHARACTER_OGRE = 1;
+
   // User Input Variables
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
@@ -50,4 +54,5 @@ class SinglePlayerActivity : public Activity {
   OgreBall *player;
   float timeLeft;  // In millis
   int collectibles, lives;
+  int character;
 };

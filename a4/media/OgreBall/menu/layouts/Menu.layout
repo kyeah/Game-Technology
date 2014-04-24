@@ -48,5 +48,30 @@
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
+
+    <Window Type="OgreBall/TextButton" Name="Menu/Penguin">
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0.0},{0.5,0.0},{0.75,0.0},{0.55,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Penguin" />
+      <Property Name="Tooltip" Value="Play as Penguin"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+
+    <Window Type="OgreBall/TextButton" Name="Menu/Ogre">
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0.0},{0.5,0.0},{0.75,0.0},{0.55,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Ogre" />
+      <Property Name="Tooltip" Value="Play as Ogre"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+
   </Window>
 </GUILayout>
