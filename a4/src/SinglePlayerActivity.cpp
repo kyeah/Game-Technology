@@ -25,7 +25,8 @@ void SinglePlayerActivity::close(void) {
 }
 
 void SinglePlayerActivity::start(void) {
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
+  CEGUI::System::getSingleton().setGUISheet(guiSheet);
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
@@ -59,6 +60,7 @@ void SinglePlayerActivity::loadLevel(const char* name) {
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
+  CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
   return true;
 }
 
@@ -172,6 +174,21 @@ void SinglePlayerActivity::handleGameEnd() {
 
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
+
+  CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+  CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameWon/Goal"));
+  instance->start();
+  
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameWon/NextLevel"));
+  instance->setSpeed(0.5);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameWon/BackToMenu"));
+  instance->setSpeed(0.5);
+  instance->start();
 
   app->Wmgr->getWindow("GameWon/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,

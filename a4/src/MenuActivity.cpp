@@ -23,7 +23,7 @@ void MenuActivity::close(void) {
 
 void MenuActivity::start(void) {
   app->levelLoader->loadLevel("menuBG");
-  
+
   new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0]);
 
@@ -44,7 +44,7 @@ bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
   for (int i = 0; i < levelViewers.size(); i++) {
     levelViewers[i]->frameStarted(elapsedTime);
   }
-  
+
   return true;
 }
 
@@ -57,10 +57,10 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
 
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                      CEGUI::Event::Subscriber(&MenuActivity::SwitchToLevelSelectMenu, this));
-  
+
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
-  
+
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 }
@@ -84,10 +84,10 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
   int selectorEnd = selectorStart + (selectorRows*selectorColumns);
   for (int i = selectorStart; i < selectorEnd && i < loader->levelNames.size(); i++) {
     LevelViewer *v;
-    
+
     if (initViewers) {
       // Recycle your Level Viewers!
-      if (viewerPool.empty()) break;      
+      if (viewerPool.empty()) break;
       v = viewerPool.back();
       viewerPool.pop_back();
       v->loadLevel(loader->levelNames[i].c_str());
@@ -102,7 +102,7 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 
     v->setPositionPercent(0.05 + (i%selectorColumns)*0.9/selectorColumns,
                           0.2 + (i/selectorColumns)*0.6/selectorRows);
-    
+
     levelViewers.push_back(v);
   }
 
@@ -183,4 +183,3 @@ bool MenuActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID
   CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
   return true;
 }
-

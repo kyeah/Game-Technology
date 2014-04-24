@@ -115,6 +115,7 @@ void OgreBallApplication::loadResources(void) {
   CEGUI::Scheme::setDefaultResourceGroup("Schemes");
   CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+  CEGUI::AnimationManager::setDefaultResourceGroup("Animations");
 
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
@@ -130,6 +131,10 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("PauseMenu.layout");
   Wmgr->loadWindowLayout("GameWon.layout");
   Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
+  Wmgr->loadWindowLayout("GameOver.layout");
+
+  CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
+
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
   // CEGUI::System::getSingleton().setGUISheet(sheet);
 }

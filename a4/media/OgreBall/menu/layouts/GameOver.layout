@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout >
+  <Window Type="DefaultWindow" Name="GameOver" >
+    <Property Name="InheritsAlpha" Value="False" />
+    <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+    <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+    <Window Type="TaharezLook/StaticImage" Name="GameOver/Game" >      
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.4,0},{0.25,0},{0.6,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:GameText" />
+    </Window>
+    <Window Type="TaharezLook/StaticImage" Name="GameOver/Over" >      
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.30,0},{0.4,0},{0.54,0},{0.6,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:OverText" />
+    </Window>
+  </Window>
+</GUILayout>
