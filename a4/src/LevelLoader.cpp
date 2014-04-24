@@ -277,7 +277,9 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     Procedural::Path p, lastPath;
     Procedural::Shape s, lastShape;
     Procedural::MultiShape multishape;
-    bool useMultishape = false;
+    Procedural::Track scaleTrack, rotationTrack;
+    bool useMultishape, useScaleTrack, useRotationTrack;
+    useMultishape = useScaleTrack = useRotationTrack = false;
 
     s.close();
     vector<ConfigNode*> children = root->getChildren();
@@ -328,18 +330,24 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         ConfigNode *combineType = children[i]->findChild("combine");
         if (combineType) {
           string type = combineType->getValue();
-          if (type.compare("union")) {
+          if (type.compare("union") == 0) {
             sappend.close();
             multishape = s.booleanUnion(sappend);
             useMultishape = true;
-          } else if (type.compare("intersection")) {
+          } else if (type.compare("intersection") == 0) {
             sappend.close();
             multishape = s.booleanIntersect(sappend);
             useMultishape = true;
-          }  else if (type.compare("difference")) {
+          }  else if (type.compare("difference") == 0) {
             sappend.close();
             multishape = s.booleanDifference(sappend);
             useMultishape = true;
+          } else if (type.compare("scaleTrack") == 0) {
+            useScaleTrack = true;
+            scaleTrack = sappend.convertToTrack(Procedural::Track::AM_RELATIVE_LINEIC);
+          } else if (type.compare("rotationTrack") == 0) {
+            useRotationTrack = true;
+            rotationTrack = sappend.convertToTrack(Procedural::Track::AM_RELATIVE_LINEIC);
           } else {
             s.appendShape(sappend);
           }

@@ -22,6 +22,7 @@ extrudedmesh <name>:
 
 * scale <x> <y> <z>
 * tiles <utiles> <vtiles>
+* thicken <thickness> (thicken the overall shape that you've defined)
 * path:
   * type <typename = default: straight lines | choices: previous, previous-combined, catmullSpline, cubicHermiteSpline, roundedCornerSpline, bezierCurve, helix>
   * scale <x> <y> <z>
@@ -52,9 +53,8 @@ extrudedmesh <name>:
   * points:
     * p <x> <y>
     ...
-  * combine <typename = default: append | choices: union, intersection, difference>  # performs combine op with the shape defined up to that point
+  * combine <typename = default: append | choices: union, intersection, difference, scaleTrack, rotationTrack>  # performs combine op with the shape defined up to that point
   * outside <left | right = right>
-  * thicken <thickness>  # Take line shape and add thickness to it (i.e. like bubble letters)
 ... (i.e. multiple shapes combined by combine functions)
 
 * track
