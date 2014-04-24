@@ -8,10 +8,11 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   lastTilt = btQuaternion(0,0,0);
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
-  currentLevelName = levelName;
+  currentLevelName = std::string(levelName, std::strlen(levelName));
   menuActive = false;
   ceguiActive = false;
-  lives = 10;
+  lives = 4;
+  score = 0;
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -33,19 +34,19 @@ void SinglePlayerActivity::start(void) {
   timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
   levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
 
-  loadLevel(currentLevelName);
+  loadLevel(currentLevelName.c_str());
 }
 
 void SinglePlayerActivity::loadLevel(const char* name) {
+  currentLevelName = std::string(name, std::strlen(name));
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
   app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
 
-  levelDisplay->setText(name);
+  levelDisplay->setText(currentLevelName.c_str());
 
   timeLeft = 60000;  // TODO: Should get timeLeft from level script
   collectibles = 0;  // TODO: Get total number of collectibles when loading level
-  score = 0;
 
   player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
@@ -65,8 +66,22 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
-  if (timeLeft == 0.0f && !gameEnded) {
-    handleGameOver();
+  if (!gameEnded) {
+    if (timeLeft == 0.0f) {
+      handleGameOver();
+    } else if (app->levelLoader->fallCutoff > player->getPosition()[1]) {
+      lives--;
+      if (lives < 0) {
+        handleGameOver();
+      } else {
+        CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+        CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+        instance->setTargetWindow(app->Wmgr->getWindow("SinglePlayerHUD/Lives"));
+        instance->start();
+        loadLevel(currentLevelName.c_str());
+        return true;
+      } 
+    }
   }
 
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
@@ -78,7 +93,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   scoreDisplay->setText(sst.str());
 
   std:: stringstream livesSS;
-  livesSS << lives << " Lives";
+  livesSS << lives << (lives != 1 ? " Lives" : " Life");
   livesDisplay->setText(livesSS.str());
   collectDisplay->setText(std::to_string(collectibles));
 
@@ -154,12 +169,12 @@ void SinglePlayerActivity::togglePauseMenu( ) {
     CEGUI::MouseCursor::getSingleton().show();
     CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
 
-    app->Wmgr->getWindow("PauseMenu/Quit")->removeAllEvents();
+    app->Wmgr->getWindow("PauseMenu/Quit")->removeEvent(CEGUI::PushButton::EventClicked);
     app->Wmgr->getWindow("PauseMenu/Quit")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
 
-    app->Wmgr->getWindow("PauseMenu/Return")->removeAllEvents();
+    app->Wmgr->getWindow("PauseMenu/Return")->removeEvent(CEGUI::PushButton::EventClicked);
     app->Wmgr->getWindow("PauseMenu/Return")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
@@ -197,7 +212,7 @@ void SinglePlayerActivity::handleGameEnd() {
   instance->setSpeed(0.5);
   instance->start();
 
-  app->Wmgr->getWindow("GameWon/BackToMenu")->removeAllEvents();
+  app->Wmgr->getWindow("GameWon/BackToMenu")->removeEvent(CEGUI::PushButton::EventClicked);
   app->Wmgr->getWindow("GameWon/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
@@ -235,7 +250,7 @@ void SinglePlayerActivity::handleGameOver() {
   instance->setSpeed(0.2);
   instance->start();
 
-  app->Wmgr->getWindow("GameOver/BackToMenu")->removeAllEvents();
+  app->Wmgr->getWindow("GameOver/BackToMenu")->removeEvent(CEGUI::PushButton::EventClicked);
   app->Wmgr->getWindow("GameOver/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));

@@ -31,7 +31,7 @@ class SinglePlayerActivity : public Activity {
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
 
-  const char* currentLevelName;
+  std::string currentLevelName;
 
   // User Input Variables
   btScalar MAX_TILT;

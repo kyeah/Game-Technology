@@ -135,6 +135,14 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Yposition Cutoff
+  ConfigNode *cutoffNode = root->findChild("fallCutoff");
+  if (cutoffNode) {
+    fallCutoff = cutoffNode->getValueF();
+  } else {
+    fallCutoff = -40000;
+  }
+
   // Waypoints
   ConfigNode *wpNode = root->findChild("waypoints");
   if (wpNode) {
@@ -159,6 +167,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Sounds
   ConfigNode* pSound = root->findChild("Sound");
 
   if(pSound){
