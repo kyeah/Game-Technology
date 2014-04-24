@@ -5,9 +5,13 @@
 #include "Activity.h"
 
 class MenuActivity : public Activity {
+ private:
+  static std::vector<LevelViewer*> viewerPool;
+
  public:
   MenuActivity(OgreBallApplication *app);
   virtual ~MenuActivity(void);
+  virtual void close(void);
   
   virtual void start(void);
 

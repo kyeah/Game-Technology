@@ -2,8 +2,8 @@ level Leap of Faith {
       start {
             skydome Examples/CloudySky 5 8 20000
             camera {
-                   pos 0 500 1000
-                   lookAt 0 300 0
+                   pos 0 1500 500
+                   lookAt 0 0 -40000
             }
             player1 {
                     pos 0 1000 -500
@@ -48,9 +48,9 @@ level Leap of Faith {
             }
       }
       extrudedObject {
-                     meshname holeMesh
+                     meshname blockMesh
                      material Examples/BeachStones
-                     rest 0.5
+                     rest 0.1
                      pos {
                          start 0 -9500 -45000
                      }

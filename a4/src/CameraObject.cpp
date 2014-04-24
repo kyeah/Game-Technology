@@ -43,22 +43,21 @@ void CameraObject::update(Ogre::Vector3 newPosition, Ogre::Real elapsedTime){
     previousPos = newPosition;
     currTiltDelay = 0;
     destPos = newPosition - direction*fixedDist;
-  
 
-  btVector3 btVec1 = btVector3(destPos[0], destPos[1], destPos[2]);
-  btVector3 camPos = btVector3(lastInterpPos[0], lastInterpPos[1], lastInterpPos[2]);
-  btVector3 btAvgPos = Interpolator::interpV3(currTiltDelay, elapsedTime, 500, camPos, btVec1);
+    btVector3 btVec1 = btVector3(destPos[0], destPos[1], destPos[2]);
+    btVector3 camPos = btVector3(lastInterpPos[0], lastInterpPos[1], lastInterpPos[2]);
+    btVector3 btAvgPos = Interpolator::interpV3(currTiltDelay, elapsedTime, 500, camPos, btVec1);
 
-  Ogre::Vector3 avgPos = Ogre::Vector3(btAvgPos[0], btAvgPos[1], btAvgPos[2]);
+    Ogre::Vector3 avgPos = Ogre::Vector3(btAvgPos[0], btAvgPos[1], btAvgPos[2]);
 
-  if(avgPos.distance(newPosition) > fixedDist || avgPos.distance(newPosition) < fixedDist){
-    Ogre::Vector3 dir = newPosition - avgPos;
-    dir.normalise();
-    avgPos = newPosition - dir*fixedDist;
-  }
+    if(avgPos.distance(newPosition) > fixedDist || avgPos.distance(newPosition) < fixedDist){
+      Ogre::Vector3 dir = newPosition - avgPos;
+      dir.normalise();
+      avgPos = newPosition - dir*fixedDist;
+    }
 
-  lastInterpPos = Ogre::Vector3(avgPos[0], std::max(newPosition[1] + 500, avgPos[1]), avgPos[2]);
-  cameraNode->_setDerivedPosition(lastInterpPos);
+    lastInterpPos = Ogre::Vector3(avgPos[0], std::max(newPosition[1] + 500, avgPos[1]), avgPos[2]);
+    cameraNode->_setDerivedPosition(lastInterpPos);
   }
 }
 

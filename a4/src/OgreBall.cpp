@@ -29,8 +29,8 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   addToSimulator(Collisions::CollisionTypes::COL_PLAYER,
                  Collisions::playerColliders);
 
-  // body->setCcdMotionThreshold(1);
-  // body->setCcdSweptSphereRadius(0.4);
+  body->setCcdMotionThreshold(1);
+  body->setCcdSweptSphereRadius(0.4);
 
   setAmbient(0.5,0.5,0.9);
   setSpecular(0.1,0,0,0.4);

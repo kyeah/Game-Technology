@@ -31,7 +31,7 @@ level clearPath {
       plane {
             meshname upPlane
             scale 1 1 15
-            rest 0.3
+            rest 0
             pos {
                 start 0 0 -7000
             }

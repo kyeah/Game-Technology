@@ -63,7 +63,7 @@ level guidedPath {
       extrudedObject {
             meshname guidedPathMesh
             material Examples/BeachStones
-            rest 0.1
+            rest 0
             rot {
                 start 0 0 0
             }

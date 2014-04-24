@@ -15,8 +15,13 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
+  close();
+}
+
+void SinglePlayerActivity::close(void) {
   delete player;
   delete mCameraObj;
+
 }
 
 void SinglePlayerActivity::start(void) {
@@ -44,7 +49,7 @@ void SinglePlayerActivity::loadLevel(const char* name) {
 
   player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
-                        16000.0f, 1.0f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+                        16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 
   app->mCamera->setPosition(Ogre::Vector3(0,0,0));
   mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
@@ -97,11 +102,13 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   } else {
     player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                   .rotate(currTilt.getAxis(), -currTilt.getAngle())
+                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
+                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
                                   .rotate(q.getAxis(), q.getAngle()));
   }
 
   // Update Camera Position
-  //comment out the lines below if you're building a level
+  //comment out the lines below if you're building a level; also return false in mouseMoved.
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT

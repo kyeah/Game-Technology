@@ -45,7 +45,7 @@ CEGUI::MouseButton OgreBallApplication::convertButton(OIS::MouseButtonID buttonI
 
 OgreBallApplication::OgreBallApplication(void)
 {
-  mPhysics = new Physics(btVector3(0, -19600, 0));
+  mPhysics = new Physics(btVector3(0, -9800, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
   Sounds::init();
@@ -80,12 +80,14 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
 
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::switchActivity(Activity *newActivity) {
-  if (activity && dynamic_cast<MenuActivity*>(activity)) {
-    delete activity;
+  if (activity) {
+    activity->close();
   }
+
   activity = newActivity;
   destroyAllEntitiesAndNodes();
   paused = false;
+  
   activity->start();
 }
 
