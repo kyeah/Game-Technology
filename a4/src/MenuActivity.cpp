@@ -55,12 +55,15 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
   CEGUI::Window* multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
   CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
 
+  singlePlayerButton->removeAllEvents();
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                      CEGUI::Event::Subscriber(&MenuActivity::SwitchToLevelSelectMenu, this));
 
+  multiPlayerButton->removeAllEvents();
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
 
+  quitButton->removeAllEvents();
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 }
@@ -97,6 +100,7 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 
     levelSelectorWindow->addChildWindow(v->window);
 
+    v->window->removeAllEvents();
     v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
                               CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
 
@@ -130,6 +134,8 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
     CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
     clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));*/
+
+  returnButton->removeAllEvents();
   returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
 }

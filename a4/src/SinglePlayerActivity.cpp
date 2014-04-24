@@ -37,7 +37,6 @@ void SinglePlayerActivity::start(void) {
 }
 
 void SinglePlayerActivity::loadLevel(const char* name) {
-
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
   app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
@@ -154,9 +153,13 @@ void SinglePlayerActivity::togglePauseMenu( ) {
     app->paused = true;
     CEGUI::MouseCursor::getSingleton().show();
     CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
+
+    app->Wmgr->getWindow("PauseMenu/Quit")->removeAllEvents();
     app->Wmgr->getWindow("PauseMenu/Quit")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+    app->Wmgr->getWindow("PauseMenu/Return")->removeAllEvents();
     app->Wmgr->getWindow("PauseMenu/Return")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
@@ -194,6 +197,7 @@ void SinglePlayerActivity::handleGameEnd() {
   instance->setSpeed(0.5);
   instance->start();
 
+  app->Wmgr->getWindow("GameWon/BackToMenu")->removeAllEvents();
   app->Wmgr->getWindow("GameWon/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
@@ -231,6 +235,7 @@ void SinglePlayerActivity::handleGameOver() {
   instance->setSpeed(0.2);
   instance->start();
 
+  app->Wmgr->getWindow("GameOver/BackToMenu")->removeAllEvents();
   app->Wmgr->getWindow("GameOver/BackToMenu")
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
