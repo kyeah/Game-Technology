@@ -66,6 +66,10 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
+  if (timeLeft == 0.0f && !gameEnded) {
+    handleGameOver();
+  }
+
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
 
@@ -179,7 +183,7 @@ void SinglePlayerActivity::handleGameEnd() {
   CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
   instance->setTargetWindow(app->Wmgr->getWindow("GameWon/Goal"));
   instance->start();
-  
+
   instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
   instance->setTargetWindow(app->Wmgr->getWindow("GameWon/NextLevel"));
   instance->setSpeed(0.5);
@@ -199,12 +203,45 @@ void SinglePlayerActivity::handleGameEnd() {
       CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
 }
 
+void SinglePlayerActivity::handleGameOver() {
+  ceguiActive = true;
+  gameEnded = true;
+
+  CEGUI::MouseCursor::getSingleton().show();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameOver"));
+
+  CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+  CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameOver/Game"));
+  instance->setSpeed(0.4);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameOver/Over"));
+  instance->setSpeed(0.25);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameOver/Retry"));
+  instance->setSpeed(0.2);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(app->Wmgr->getWindow("GameOver/BackToMenu"));
+  instance->setSpeed(0.2);
+  instance->start();
+
+  app->Wmgr->getWindow("GameOver/BackToMenu")
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+}
+
 //-------------------------------------------------------------------------------------
 
 bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
   if (arg.key == OIS::KC_ESCAPE) {
-    togglePauseMenu();
+    if (!gameEnded) togglePauseMenu();
     return true;
   }
 

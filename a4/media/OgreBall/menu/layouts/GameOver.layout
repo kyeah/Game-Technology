@@ -2,22 +2,47 @@
 
 <GUILayout >
   <Window Type="DefaultWindow" Name="GameOver" >
-    <Property Name="InheritsAlpha" Value="False" />
     <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
     <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-    <Window Type="TaharezLook/StaticImage" Name="GameOver/Game" >      
+    <Property Name="Alpha" Value="0.0" />
+    <Window Type="TaharezLook/StaticImage" Name="GameOver/Game" >
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.01,0},{0.4,0},{0.25,0},{0.6,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0},{0.3,0},{0.49,0},{0.5,0}}" />
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
       <Property Name="Image" Value="set:OgreBall/Buttons image:GameText" />
     </Window>
-    <Window Type="TaharezLook/StaticImage" Name="GameOver/Over" >      
+    <Window Type="TaharezLook/StaticImage" Name="GameOver/Over" >
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.30,0},{0.4,0},{0.54,0},{0.6,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.51,0},{0.3,0},{0.75,0},{0.5,0}}" />
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
       <Property Name="Image" Value="set:OgreBall/Buttons image:OverText" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameOver/Retry" >
+      <Property Name="Text" Value="Retry" />
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.275,0},{0.51,0},{0.465,0},{0.56,0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameOver/BackToMenu" >
+      <Property Name="Text" Value="GO BACK TO PRESCHOOL" />
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.475,0},{0.51,0},{0.725,0},{0.56,0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+
     </Window>
   </Window>
 </GUILayout>
