@@ -24,6 +24,7 @@ using namespace std;
 using namespace sh;
 
 OgreBallApplication *OgreBallApplication::instance;
+bool OgreBallApplication::debug = false;
 
 CEGUI::MouseButton OgreBallApplication::convertButton(OIS::MouseButtonID buttonID)
 {
@@ -172,7 +173,8 @@ bool OgreBallApplication::frameRenderingQueued( const Ogre::FrameEvent &evt ) {
     mCameraMan->frameRenderingQueued(evt);
   }
 
-  activity->frameRenderingQueued(evt);
+  if (!activity->frameRenderingQueued(evt))
+    BaseApplication::frameRenderingQueued(evt);
 
   return true;
 }
@@ -226,6 +228,9 @@ extern "C" {
     int main(int argc, char *argv[])
 #endif
   {
+    if (argc > 1 && strcmp(argv[1], "-d") == 0) 
+      OgreBallApplication::debug = true;
+    
     // Create application object
     OgreBallApplication app;
 

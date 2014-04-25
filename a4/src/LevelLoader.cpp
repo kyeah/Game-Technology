@@ -394,6 +394,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     }
 
     s.close();
+
     if (useMultishape) {
       Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setMultiShapeToExtrude(&multishape).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
     } else {

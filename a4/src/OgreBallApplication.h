@@ -28,12 +28,12 @@
 #include "Physics.h"
 #include "../libs/ConfigLoader.hpp"
 
-
 class Activity;
 
 class OgreBallApplication : public BaseApplication
 {
  public:
+  static bool debug;
   static OgreBallApplication *instance;
   static CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID);
 

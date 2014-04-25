@@ -72,8 +72,6 @@ LevelViewer::~LevelViewer(void) {
 }
 
 void LevelViewer::loadLevel(const char* levelName) {
-
-  // Clear the scene
   mPhysics->removeAllObjects();
   mSceneMgr->destroyAllEntities();
   mSceneMgr->getRootSceneNode()->removeAndDestroyAllChildren();

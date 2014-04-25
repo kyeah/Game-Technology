@@ -6,4 +6,5 @@
   <LookNFeel Filename="OgreBall.looknfeel" />
   <WindowRendererSet Filename="CEGUIFalagardWRBase" />
   <FalagardMapping WindowType="OgreBall/TextButton" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="OgreBall/TextButton" />
+  <FalagardMapping WindowType="OgreBall/StaticText" TargetType="DefaultWindow" Renderer="Falagard/StaticText" LookNFeel="OgreBall/StaticText" />
 </GUIScheme>

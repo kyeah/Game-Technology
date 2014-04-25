@@ -1,0 +1,61 @@
+level Helix-Run {
+      start {
+            skydome Examples/TrippySkyBox 5 8 20000
+            camera {
+                   pos 12346 13273 -15106
+                   lookAt 0 0 0
+            }
+            player1 {
+                   pos 11346 12773 -15106
+                   rot 0 0 0 
+            }
+            waypoints {
+            }
+      }
+      lights {
+             ambient .5 .5 .5
+             light1 {
+                    pos 20 80 50
+             }
+      }
+      goal {
+           pos {
+               start 18684 360 2443
+           }
+      }
+      extrudedObject {
+            meshname helix/helixMesh
+            material Examples/GrassFloor
+            rest 0.1
+            pos {
+                start 0 0 0
+            }
+            rot {
+                start 0 0 0
+            }
+      }
+      collectible {
+            meshname sphere.mesh
+            pos {
+               start 18684 260 2843
+            }
+      }
+      collectible {
+            meshname sphere.mesh
+            pos {
+               start 18684 260 3243
+            }
+      }
+      collectible {
+            meshname sphere.mesh
+            pos {
+                 start 18684 260 3643
+            }
+      }
+      collectible {
+            meshname sphere.mesh
+            pos {
+                 start 18684 260 4043
+            }
+      }
+}

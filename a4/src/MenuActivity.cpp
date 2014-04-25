@@ -16,8 +16,9 @@ MenuActivity::~MenuActivity(void) {
 }
 
 void MenuActivity::close(void) {
-  for (int i = 0; i < levelViewers.size(); i++)
+  for (int i = 0; i < levelViewers.size(); i++) {
     viewerPool.push_back(levelViewers[i]);
+  }
   levelViewers.clear();
 }
 

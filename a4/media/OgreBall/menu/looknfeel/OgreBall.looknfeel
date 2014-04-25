@@ -187,7 +187,7 @@
       </Layer>
     </StateImagery>
     <AnimationDefinition name="StartButtonSwing" duration="0.8" replayMode="loop">
-      <Affector applicationMethod="absolute" interpolator="float" property="YRotation">        
+      <Affector applicationMethod="absolute" interpolator="float" property="YRotation">
         <KeyFrame position="0" value="0" />
         <KeyFrame position="0.2" value="6" />
         <KeyFrame position="0.6" value="-6" />
@@ -208,8 +208,22 @@
   <WidgetLook name="OgreBall/StaticText">
     <PropertyDefinition name="FrameColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
     <PropertyDefinition name="BackgroundColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+    <PropertyDefinition name="ShadowTextColour" initialValue="FF000000" redrawOnWrite="true" />
     <Property name="FrameEnabled" value="True" />
     <Property name="BackgroundEnabled" value="True" />
+    <ImagerySection name="textShadow">
+      <TextComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="2" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="2" /></Dim>
+          <Dim type="Width"><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height"><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <TextProperty name="Text" />
+        <VertFormatProperty name="VertFormatting" />
+        <HorzFormatProperty name="HorzFormatting" />
+      </TextComponent>
+    </ImagerySection>
     <NamedArea name="WithFrameTextRenderArea">
       <Area>
         <Dim type="LeftEdge" ><ImageDim imageset="TaharezLook" image="StaticLeft" dimension="Width" /></Dim>
@@ -369,29 +383,49 @@
     <StateImagery name="EnabledFrame">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="frame" />
+        <Section section="textShadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="DisabledFrame">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="frame" />
+        <Section section="textShadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="WithFrameEnabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background" />
+        <Section section="textShadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="WithFrameDisabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background" />
+        <Section section="textShadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="NoFrameEnabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background_noframe" />
+        <Section section="textShadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="NoFrameDisabledBackground">
+      <Layer>
+        <Section section="textShadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+      </Layer>
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background_noframe" />
       </Layer>
