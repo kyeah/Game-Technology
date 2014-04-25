@@ -44,6 +44,12 @@ class SinglePlayerActivity : public Activity {
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
     *collectDisplay, *livesDisplay, *levelDisplay;
 
+  CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
+  CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu;
+  CEGUI::Window *gameOverSheet, *goGame, *goOver, *goRetry, *goBackToMenu;
+
+  CEGUI::Window* leaderboardWindows[10];
+
   bool menuActive;
   bool ceguiActive;
   bool gameEnded;

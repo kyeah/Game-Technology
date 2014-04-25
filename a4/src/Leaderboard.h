@@ -4,8 +4,51 @@
 #include <boost/serialization/map.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <ctime>
 
 using namespace std;
+
+class LeaderboardEntry {
+ public:
+  LeaderboardEntry() {}
+ LeaderboardEntry(const char* player, double _score, double _timeTaken, time_t _timeEntered)
+   : score(_score), timeTaken(_timeTaken), timeEntered(_timeEntered) {
+    name = string(player, strlen(player));
+  }
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+    ar & name;
+    ar & score;
+    ar & timeTaken;
+    ar & timeEntered;
+  }
+
+  string getTimeTaken() {
+    std::stringstream timess;
+    int seconds = std::round(timeTaken/1000);
+    int millis = std::min(99.0f, (float)std::round(fmod(timeTaken,1000)/10));
+    timess << seconds << ":";
+    if (millis < 10) timess << "0";
+    timess << millis;
+    
+    return timess.str();
+  }
+
+  string getTimeEntered() {
+    struct tm *time = localtime(&timeEntered);
+
+    char buf[25];
+    strftime(buf, 25, "%B %d, %Y\0", time);
+    return string(buf, 25);
+  }
+
+  string name;
+  double score;
+  double timeTaken;
+  time_t timeEntered;
+};
 
 class Leaderboard {
  private:
@@ -27,13 +70,13 @@ class Leaderboard {
 
   string name;
   double minScore;
-  multimap<double, string> highscores;
+  multimap<double, LeaderboardEntry> highscores;
 
  public:
   static Leaderboard& findLeaderboard(const char* level) {
     stringstream ss;
-    ss << level << ".obhs";
-    std::ifstream ifs(ss.str(), std::ios::binary);
+    ss << "data/" << level << ".obhs";
+    ifstream ifs(ss.str(), std::ios::binary);
     if (ifs) {
       boost::archive::binary_iarchive ia(ifs);
       Leaderboard *l = new Leaderboard();
@@ -47,7 +90,7 @@ class Leaderboard {
 
   void saveToFile() {
     stringstream ss;
-    ss << name << ".obhs";
+    ss << "data/" << name << ".obhs";
     std::ofstream ofs(ss.str(), std::ios::binary);
     boost::archive::binary_oarchive oa(ofs);
     oa << *this;
@@ -57,28 +100,33 @@ class Leaderboard {
     return highscores.size() < 10 || score > minScore;
   }
 
-  void addHighscore(const char* player, double score) {
+  void addHighscore(const char* player, double score, double timeTaken) {
+    if (!isHighscore(score)) return;
+
     // Delete minimum element
     if (highscores.size() == 10) {
-      multimap<double, string>::iterator minElem = highscores.find(minScore);
+      multimap<double, LeaderboardEntry>::iterator minElem = highscores.find(minScore);
       auto item = minElem->first;
       minElem++;
       highscores.erase(item);
     }
 
-    highscores.emplace(score, string(player, strlen(player)));
+    highscores.insert(pair<double, LeaderboardEntry>(score, LeaderboardEntry(player,
+                                                                             score,
+                                                                             timeTaken,
+                                                                             time(0))));
 
     // Find new minimum score
     minScore = score;
 
-    multimap<double, string>::iterator iter;
-    for (iter = highscores.begin(); iter != highscores.end();) {
+    multimap<double, LeaderboardEntry>::iterator iter;
+    for (iter = highscores.begin(); iter != highscores.end(); iter++) {
       if (iter->first < minScore)
         minScore = iter->first;
     }
   }
 
-  multimap<double, string> getHighscores() {
+  multimap<double, LeaderboardEntry> getHighscores() {
     return highscores;
   }
 };

@@ -1,7 +1,7 @@
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
-
+#include "Leaderboard.h"
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
@@ -29,11 +29,33 @@ void SinglePlayerActivity::close(void) {
 void SinglePlayerActivity::start(void) {
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   CEGUI::System::getSingleton().setGUISheet(guiSheet);
+
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
   timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
   levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
+
+  pauseMenuSheet = app->Wmgr->getWindow("PauseMenu");
+  pauseQuit = app->Wmgr->getWindow("PauseMenu/Quit");
+  pauseReturn = app->Wmgr->getWindow("PauseMenu/Return");
+
+  gameWonSheet = app->Wmgr->getWindow("GameWon");
+  gwGoal = app->Wmgr->getWindow("GameWon/Goal");
+  gwNextLevel = app->Wmgr->getWindow("GameWon/NextLevel");
+  gwBackToMenu = app->Wmgr->getWindow("GameWon/BackToMenu");
+
+  gameOverSheet = app->Wmgr->getWindow("GameOver");
+  goGame = app->Wmgr->getWindow("GameOver/Game");
+  goOver = app->Wmgr->getWindow("GameOver/Over");
+  goRetry = app->Wmgr->getWindow("GameOver/Retry");
+  goBackToMenu = app->Wmgr->getWindow("GameOver/BackToMenu");
+
+  for (int i = 0; i < 10; i++) {
+    std::stringstream ss;
+    ss << "SPLeaders/" << i;
+    leaderboardWindows[i] = app->Wmgr->getWindow(ss.str());
+  }
 
   loadLevel(currentLevelName.c_str());
 }
@@ -79,7 +101,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
       } else {
         CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
         CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-        instance->setTargetWindow(app->Wmgr->getWindow("SinglePlayerHUD/Lives"));
+        instance->setTargetWindow(livesDisplay);
         instance->start();
         loadLevel(currentLevelName.c_str());
         return true;
@@ -132,250 +154,292 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   // Update Camera Position
   //comment out the lines below if you're building a level; also return false in mouseMoved.
-    mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
+  mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
-    // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
-    app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
-    app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
+  // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
+  app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
+  app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
 
-    // Tilt Camera to simulate level tilt
-    Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
-    Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
+  // Tilt Camera to simulate level tilt
+  Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
+  Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
 
-    Ogre::Real xTilt = currTilt.x();
-    if (xTilt < 0) xTilt /= 3;
-    Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
-                                               xTilt,
-                                               currTilt.y(),
-                                               currTilt.z());
+  Ogre::Real xTilt = currTilt.x();
+  if (xTilt < 0) xTilt /= 3;
+  Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
+                                             xTilt,
+                                             currTilt.y(),
+                                             currTilt.z());
 
-    if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
-      app->mCameraLookAtNode->rotate(oq);
-      app->mCameraLookAtNode->rotate(notilt*notilt);
-      app->mCameraLookAtNode->rotate(noq);
-    }
-   
+  if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
+    app->mCameraLookAtNode->rotate(oq);
+    app->mCameraLookAtNode->rotate(notilt*notilt);
+    app->mCameraLookAtNode->rotate(noq);
+  }
+
   return true;
-  }
+}
 
-  //-------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------
 
-  bool SinglePlayerActivity::togglePauseMenu( const CEGUI::EventArgs& e ) {
-    togglePauseMenu();
-    return true;
-  }
+bool SinglePlayerActivity::togglePauseMenu( const CEGUI::EventArgs& e ) {
+  togglePauseMenu();
+  return true;
+}
 
-  void SinglePlayerActivity::togglePauseMenu( ) {
-    menuActive = !menuActive;
-    if (menuActive) {
-      app->paused = true;
-      CEGUI::MouseCursor::getSingleton().show();
-      CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
-
-      app->Wmgr->getWindow("PauseMenu/Quit")->removeEvent(CEGUI::PushButton::EventClicked);
-      app->Wmgr->getWindow("PauseMenu/Quit")
-        ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                         CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-
-      app->Wmgr->getWindow("PauseMenu/Return")->removeEvent(CEGUI::PushButton::EventClicked);
-      app->Wmgr->getWindow("PauseMenu/Return")
-        ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                         CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
-    } else {
-      app->paused = false;
-      CEGUI::MouseCursor::getSingleton().hide();
-      CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
-    }
-  }
-
-  bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
-    app->switchActivity(new MenuActivity(app));
-    return true;
-  }
-
-  void SinglePlayerActivity::handleGameEnd() {
-    ceguiActive = true;
-    gameEnded = true;
-
+void SinglePlayerActivity::togglePauseMenu( ) {
+  menuActive = !menuActive;
+  if (menuActive) {
+    app->paused = true;
     CEGUI::MouseCursor::getSingleton().show();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
+    CEGUI::System::getSingleton().setGUISheet(pauseMenuSheet);
 
-    CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
-    CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameWon/Goal"));
-    instance->start();
-
-    instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameWon/NextLevel"));
-    instance->setSpeed(0.5);
-    instance->start();
-
-    instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameWon/BackToMenu"));
-    instance->setSpeed(0.5);
-    instance->start();
-
-    app->Wmgr->getWindow("GameWon/BackToMenu")->removeEvent(CEGUI::PushButton::EventClicked);
-    app->Wmgr->getWindow("GameWon/BackToMenu")
+    pauseQuit->removeEvent(CEGUI::PushButton::EventClicked);
+    pauseQuit
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
 
-    /*  app->Wmgr->getWindow("GameWon/NextLevel")
-        ->subscribeEvent(CEGUI::PushButton::EventClicked,
-        CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
-  }
-
-  void SinglePlayerActivity::handleGameOver() {
-    ceguiActive = true;
-    gameEnded = true;
-
-    CEGUI::MouseCursor::getSingleton().show();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameOver"));
-
-    CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
-    CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameOver/Game"));
-    instance->setSpeed(0.4);
-    instance->start();
-
-    instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameOver/Over"));
-    instance->setSpeed(0.25);
-    instance->start();
-
-    instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameOver/Retry"));
-    instance->setSpeed(0.2);
-    instance->start();
-
-    instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
-    instance->setTargetWindow(app->Wmgr->getWindow("GameOver/BackToMenu"));
-    instance->setSpeed(0.2);
-    instance->start();
-
-    app->Wmgr->getWindow("GameOver/BackToMenu")->removeEvent(CEGUI::PushButton::EventClicked);
-    app->Wmgr->getWindow("GameOver/BackToMenu")
+    pauseReturn->removeEvent(CEGUI::PushButton::EventClicked);
+    pauseReturn
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                       CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+                       CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
+  } else {
+    app->paused = false;
+    CEGUI::MouseCursor::getSingleton().hide();
+    CEGUI::System::getSingleton().setGUISheet(guiSheet);
+  }
+}
+
+bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
+  app->switchActivity(new MenuActivity(app));
+  return true;
+}
+
+void SinglePlayerActivity::handleGameEnd() {
+  if (gameEnded) return;
+
+  ceguiActive = true;
+  gameEnded = true;
+
+  CEGUI::MouseCursor::getSingleton().show();
+  CEGUI::System::getSingleton().setGUISheet(gameWonSheet);
+
+  CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+  CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+
+  gwGoal->setAlpha(0.0);
+  gwNextLevel->setAlpha(0.0);
+  gwBackToMenu->setAlpha(0.0);
+
+  instance->setTargetWindow(gwGoal);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(gwNextLevel);
+  instance->setSpeed(0.5);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(gwBackToMenu);
+  instance->setSpeed(0.5);
+  instance->start();
+
+  gwBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  gwBackToMenu
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  // LEADERBOARD
+  for (int i = 0; i < 10; i++)
+    leaderboardWindows[i]->setAlpha(0.0);
+
+  Leaderboard leaderboard = Leaderboard::findLeaderboard(currentLevelName.c_str());
+  leaderboard.addHighscore("KKKKKKK", score, 60000 - timeLeft);
+
+  multimap<double, LeaderboardEntry> highscores = leaderboard.getHighscores();
+  multimap<double, LeaderboardEntry>::iterator iter;
+
+  int i = 0;
+  for (iter = highscores.begin(); iter != highscores.end(); iter++) {
+    LeaderboardEntry entry = iter->second;
+    std::stringstream ss;
+
+    ss << std::left << setw(25) << entry.name <<
+      setw(10) << entry.score <<
+      setw(6) << entry.getTimeTaken() <<
+      setw(20) << entry.getTimeEntered();
+    
+    leaderboardWindows[i]->setText(ss.str());
+    
+    instance = mgr->instantiateAnimation(mgr->getAnimation("FadeInFromLeft"));
+    instance->setTargetWindow(leaderboardWindows[i]);
+    instance->start();
+    i++;
   }
 
-  //-------------------------------------------------------------------------------------
+  leaderboard.saveToFile();
 
-  bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
-  {
-    if (arg.key == OIS::KC_ESCAPE) {
-      if (!gameEnded) togglePauseMenu();
-      return true;
-    }
+  /*  app->Wmgr->getWindow("GameWon/NextLevel")
+      ->subscribeEvent(CEGUI::PushButton::EventClicked,
+      CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));*/
+}
 
-    if (ceguiActive || menuActive) {
-      CEGUI::System::getSingleton().injectKeyDown(arg.key);
-      CEGUI::System::getSingleton().injectChar(arg.text);
-    }
+void SinglePlayerActivity::handleGameOver() {
+  ceguiActive = true;
+  gameEnded = true;
 
-    if (OgreBallApplication::debug) return false;
+  goGame->setAlpha(0.0);
+  goOver->setAlpha(0.0);
+  goRetry->setAlpha(0.0);
+  goBackToMenu->setAlpha(0.0);
 
-    switch(arg.key){
-    case OIS::KC_D:
-      tiltDest *= btQuaternion(0,0,-MAX_TILT);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    case OIS::KC_A:
-      tiltDest *= btQuaternion(0,0,MAX_TILT);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    case OIS::KC_W:
-      tiltDest *= btQuaternion(0,-MAX_TILT,0);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    case OIS::KC_S:
-      tiltDest *= btQuaternion(0,MAX_TILT,0);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    default:
-      return false;
-    }
+  CEGUI::MouseCursor::getSingleton().show();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameOver"));
 
+  CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+  CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goGame);
+  instance->setSpeed(0.4);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goOver);
+  instance->setSpeed(0.25);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goRetry);
+  instance->setSpeed(0.2);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goBackToMenu);
+  instance->setSpeed(0.2);
+  instance->start();
+
+  goBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  goBackToMenu
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+}
+
+//-------------------------------------------------------------------------------------
+
+bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
+{
+  if (arg.key == OIS::KC_ESCAPE) {
+    if (!gameEnded) togglePauseMenu();
     return true;
   }
 
-  //-------------------------------------------------------------------------------------
+  if (ceguiActive || menuActive) {
+    CEGUI::System::getSingleton().injectKeyDown(arg.key);
+    CEGUI::System::getSingleton().injectChar(arg.text);
+  }
 
-  bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
-  {
-    if (menuActive || ceguiActive) {
-      CEGUI::System::getSingleton().injectKeyUp(arg.key);
-    }
+  if (OgreBallApplication::debug) return false;
 
-    if (OgreBallApplication::debug) return false;
+  switch(arg.key){
+  case OIS::KC_D:
+    tiltDest *= btQuaternion(0,0,-MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  case OIS::KC_A:
+    tiltDest *= btQuaternion(0,0,MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  case OIS::KC_W:
+    tiltDest *= btQuaternion(0,-MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  case OIS::KC_S:
+    tiltDest *= btQuaternion(0,MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  default:
+    return false;
+  }
 
-    switch(arg.key){
-    case OIS::KC_D:
-      tiltDest *= btQuaternion(0,0,MAX_TILT);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    case OIS::KC_A:
-      tiltDest *= btQuaternion(0,0,-MAX_TILT);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    case OIS::KC_W:
-      tiltDest *= btQuaternion(0,MAX_TILT,0);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    case OIS::KC_S:
-      tiltDest *= btQuaternion(0,-MAX_TILT,0);
-      lastTilt = currTilt;
-      currTiltDelay = 0;
-      break;
-    default:
-      return false;
-    }
+  return true;
+}
 
+//-------------------------------------------------------------------------------------
+
+bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
+{
+  if (menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  }
+
+  if (OgreBallApplication::debug) return false;
+
+  switch(arg.key){
+  case OIS::KC_D:
+    tiltDest *= btQuaternion(0,0,MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  case OIS::KC_A:
+    tiltDest *= btQuaternion(0,0,-MAX_TILT);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  case OIS::KC_W:
+    tiltDest *= btQuaternion(0,MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  case OIS::KC_S:
+    tiltDest *= btQuaternion(0,-MAX_TILT,0);
+    lastTilt = currTilt;
+    currTiltDelay = 0;
+    break;
+  default:
+    return false;
+  }
+
+  return true;
+}
+
+//-------------------------------------------------------------------------------------
+
+bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
+{
+  if (menuActive || ceguiActive) {
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
+    // Scroll wheel.
+    if (arg.state.Z.rel)
+      sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
     return true;
   }
 
-  //-------------------------------------------------------------------------------------
+  if (OgreBallApplication::debug) return false;
+  else return true;
+}
 
-  bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
-  {
-    if (menuActive || ceguiActive) {
-      CEGUI::System &sys = CEGUI::System::getSingleton();
-      sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
-      // Scroll wheel.
-      if (arg.state.Z.rel)
-        sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
-      return true;
-    }
+//-------------------------------------------------------------------------------------
 
-    if (OgreBallApplication::debug) return false;
-    else return true;
+bool SinglePlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
+{
+  if (menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
+    return true;
   }
+  return false;
+}
 
-  //-------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------
 
-  bool SinglePlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
-  {
-    if (menuActive || ceguiActive) {
-      CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
-      return true;
-    }
-    return false;
+bool SinglePlayerActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
+{
+  if (menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
+    return true;
   }
-
-  //-------------------------------------------------------------------------------------
-
-  bool SinglePlayerActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
-  {
-    if (menuActive || ceguiActive) {
-      CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
-      return true;
-    }
-    return false;
-  }
+  return false;
+}
