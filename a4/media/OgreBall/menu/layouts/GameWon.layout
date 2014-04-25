@@ -12,7 +12,7 @@
       <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="Image" Value="set:OgreBall/Buttons image:GoalText" />
       <Property Name="InheritsAlpha" Value="False" />
-      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Alpha" Value="1.0" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="GameWon/Message" >
       <Property Name="Text" Value="You made it!" />
