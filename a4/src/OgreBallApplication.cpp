@@ -125,6 +125,7 @@ void OgreBallApplication::loadResources(void) {
 
   Wmgr = &CEGUI::WindowManager::getSingleton();
   Wmgr->loadWindowLayout("Menu.layout");
+  Wmgr->loadWindowLayout("HostsMenu.layout");
   Wmgr->loadWindowLayout("MultiSubMenu.layout");
   Wmgr->loadWindowLayout("Chatbox.layout");
   Wmgr->loadWindowLayout("PauseMenu.layout");
