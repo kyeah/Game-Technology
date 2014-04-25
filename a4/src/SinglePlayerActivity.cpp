@@ -1,7 +1,7 @@
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
-#include "Leaderboard.h"
+
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate

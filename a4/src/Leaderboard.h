@@ -1,4 +1,4 @@
-B1;2802;0c#pragma once
+#pragma once
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/map.hpp>
