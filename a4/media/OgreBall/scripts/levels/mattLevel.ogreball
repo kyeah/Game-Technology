@@ -1,4 +1,4 @@
-level clearPath {
+level mattLevel {
       start {
             skydome Examples/CloudySky 5 8 4000
             camera {
@@ -12,7 +12,7 @@ level clearPath {
 	    Sound{
      		background media/OgreBall/sounds/background.wav
             }
-	    levelID 3
+	    levelID 6
       }
       lights {
              ambient .5 .5 .5
@@ -23,7 +23,7 @@ level clearPath {
       goal {
 	   soundEffect media/OgreBall/sounds/hitGoal.wav
            pos {
-               start 0 0 -12000
+               start 1000 -1500 -50000
            }
            rot {
                start 0 0 0
@@ -40,6 +40,39 @@ level clearPath {
                 start 0 0 0
             }
       }
+      plane {
+            meshname upPlane
+            scale 1 1 15
+            rest 0
+            pos {
+                start 1000 -500 -15000
+            }
+            rot {
+                start 0 0 0
+            }
+      }
+      plane {
+            meshname upPlane
+            scale 1 1 15
+            rest 0
+            pos {
+                start 0 -1000 -30000
+            }
+            rot {
+                start 0 0 0
+            }
+      }
+      plane {
+            meshname upPlane
+            scale 1 1 15
+            rest 0
+            pos {
+                start 1000 -1500 -45000
+            }
+            rot {
+                start 0 0 0
+            }
+      }
       collectible {
                   meshname sphere.mesh
 		  soundEffect media/OgreBall/sounds/pickup.wav
@@ -49,9 +82,9 @@ level clearPath {
       }
       decorative {
                   meshname ogrehead.mesh
-                  scale 20 20 20
+                  scale 10 10 10
                   pos {
-                      start 0 600 -14000
+                      start 2000 -1000 -38000
                   }
                   rot {
                       start 0 0 0
@@ -66,17 +99,33 @@ level clearPath {
 	rest 10.0
 	soundEffect media/OgreBall/sounds/bumper.wav
    	pos{
-	     start -300 120 -8000
+	     start 300 0 -8000
 	}
-      }   
+      }  
       collidable{
 	meshname cube.mesh
 	rest 10.0
 	soundEffect media/OgreBall/sounds/bumper.wav
    	pos{
-	     start 300 120 -8000
+	     start 800 -500 -20000
 	}
-      }      
+      }
+      collidable{
+	meshname cube.mesh
+	rest 10.0
+	soundEffect media/OgreBall/sounds/bumper.wav
+   	pos{
+	     start 0 -1000 -35000
+	}
+      }     
+      collidable{
+	meshname cube.mesh
+	rest 10.0
+	soundEffect media/OgreBall/sounds/bumper.wav
+   	pos{
+	     start 800 -1500 -48000
+	}
+      }    
 
 }
 

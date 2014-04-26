@@ -26,6 +26,7 @@ vector<string> LevelLoader::split(const string &s, char delim) {
 
 LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) {
   instance = this;
+  mLevelLoaded = false;
 }
 
 void LevelLoader::setScene(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) {
@@ -58,7 +59,13 @@ void LevelLoader::loadResources(const string& path) {
 
     } else if (name[0].compare("level") == 0) {
       levels.push_back(it->second);
-      levelNames.push_back(name[1]);
+
+      stringstream ss;
+      ss << name[1];
+      for (int i = 2; i < name.size(); i++) {
+        ss << " " << name[i];
+      }
+      levelNames.push_back(ss.str());
     }
   }
 
@@ -90,8 +97,11 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
 }
 
 void LevelLoader::loadLevel(const char* levelName) {
+  mLevelLoaded = true;
+  std::cout << "loading level!" << std::endl;
   for (int i = 0; i < levelNames.size(); i++) {
     if (levelNames[i].compare(levelName) == 0) {
+      mCurrLevelID = i;
       ConfigNode *level = levels[i];
       vector<ConfigNode*> objs = level->getChildren();
 
@@ -156,18 +166,17 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
   ConfigNode* pSound = root->findChild("Sound");
 
   if(pSound){
-      ConfigNode* pBackground = pSound->findChild("background");
-      if(pBackground){
-        Ogre::String backgroundMusic = pBackground->getValue();
-        Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
-      }
+    ConfigNode* pBackground = pSound->findChild("background");
+    if(pBackground){
+      Ogre::String backgroundMusic = pBackground->getValue();
+      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
     }
-
   ConfigNode* pLevelID = root->findChild("levelID");
 
   if(pLevelID){
       levelID = pLevelID->getValueI();
     }
+  }
   // Skyboxes and Skydomes
   ConfigNode *skyboxNode = root->findChild("skybox");
   if (skyboxNode) {
@@ -263,6 +272,7 @@ void LevelLoader::loadPlaneMeshes(vector<ConfigNode*>& meshes, vector<string>& m
   }
 }
 
+// I'm so sorry for the extruded mesh load functions. Godspeed.
 void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>& meshNames) {
   for (int i = 0; i < meshes.size(); i++) {
     cout << "loading Extruded mesh " << meshNames[i] << endl;
@@ -275,7 +285,10 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
 
     Procedural::Path p, lastPath;
     Procedural::Shape s, lastShape;
+    Procedural::MultiShape multishape;
+    bool useMultishape = false;
 
+    s.close();
     vector<ConfigNode*> children = root->getChildren();
     for (int i = 0; i < children.size(); i++) {
       if (children[i]->getName().compare("path") == 0) {
@@ -322,15 +335,20 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         if (mirroraxisNode) sappend.mirrorAroundAxis(Ogre::Vector2(mirrorNode->getValueF(), mirrorNode->getValueF(1)));
 
         ConfigNode *combineType = children[i]->findChild("combine");
-
         if (combineType) {
           string type = combineType->getValue();
           if (type.compare("union")) {
-            s.booleanUnion(sappend);
+            sappend.close();
+            multishape = s.booleanUnion(sappend);
+            useMultishape = true;
           } else if (type.compare("intersection")) {
-            s.booleanIntersect(sappend);
+            sappend.close();
+            multishape = s.booleanIntersect(sappend);
+            useMultishape = true;
           }  else if (type.compare("difference")) {
-            s.booleanDifference(sappend);
+            sappend.close();
+            multishape = s.booleanDifference(sappend);
+            useMultishape = true;
           } else {
             s.appendShape(sappend);
           }
@@ -358,8 +376,21 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
       vtiles = tileNode->getValueI(1);
     }
 
+    ConfigNode *thickenNode = root->findChild("thicken");
+    if (thickenNode) {
+      multishape = s.thicken(thickenNode->getValueF());
+      if (multishape.getShapeCount() > 1)
+        useMultishape = true;
+      else
+        s = multishape.getShape(0);
+    }
+
     s.close();
-    Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    if (useMultishape) {
+      Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setMultiShapeToExtrude(&multishape).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    } else {
+      Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setShapeToExtrude(&s).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
+    }
   }
 }
 
@@ -456,6 +487,23 @@ void LevelLoader::parsePath(ConfigNode *path, Procedural::Path& p) {
       ConfigNode *closeNode = path->findChild("close");
       if (closeNode && closeNode->getValue().compare("true") == 0)
         spline->close();
+
+      p = spline->realizePath();
+    } else if (type.compare("helix") == 0) {
+      Procedural::HelixPath *spline = new Procedural::HelixPath();
+
+      ConfigNode *segNode = path->findChild("segments");
+      if (segNode) segments = segNode->getValueI();
+      spline->setNumSegPath(segments);
+
+      ConfigNode *heightNode = path->findChild("height");
+      if (heightNode) spline->setHeight(heightNode->getValueF());
+
+      ConfigNode *radiusNode = path->findChild("radius");
+      if (radiusNode) spline->setRadius(radiusNode->getValueF());
+
+      ConfigNode *roundNode = path->findChild("rounds");
+      if (roundNode) spline->setNumRound(roundNode->getValueF());
 
       p = spline->realizePath();
     }
@@ -645,9 +693,6 @@ void LevelLoader::parseShape(ConfigNode *path, Procedural::Shape& s) {
   ConfigNode *outsideNode = path->findChild("outside");
   if (outsideNode && outsideNode->getValue().compare("left") == 0)
     s.setOutSide(Procedural::SIDE_LEFT);
-
-  ConfigNode *thickenNode = path->findChild("thicken");
-  if (thickenNode) s.thicken(thickenNode->getValueF());
 }
 
 Procedural::Track* LevelLoader::parseTrack(ConfigNode *path) {
@@ -773,9 +818,9 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
       }
     }
     else if (name.compare("soundEffect") == 0)
-    {
-      soundEffect = attrs[i]->getValue();
-    } else {
+      {
+        soundEffect = attrs[i]->getValue();
+      } else {
       childObjects.push_back(attrs[i]);
     }
   }

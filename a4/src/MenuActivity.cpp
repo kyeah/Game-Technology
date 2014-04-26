@@ -3,6 +3,8 @@
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
 
+std::vector<LevelViewer*> MenuActivity::viewerPool;
+
 MenuActivity::MenuActivity(OgreBallApplication *app) : Activity(app) {
   selectorStart = 0;
   selectorRows = 2;
@@ -10,8 +12,13 @@ MenuActivity::MenuActivity(OgreBallApplication *app) : Activity(app) {
 }
 
 MenuActivity::~MenuActivity(void) {
+  close();
+}
+
+void MenuActivity::close(void) {
   for (int i = 0; i < levelViewers.size(); i++)
-    delete levelViewers[i];
+    viewerPool.push_back(levelViewers[i]);
+  levelViewers.clear();
 }
 
 void MenuActivity::start(void) {
@@ -50,39 +57,56 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
 
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                      CEGUI::Event::Subscriber(&MenuActivity::SwitchToLevelSelectMenu, this));
-
+  
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
-
+  
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 }
 
 bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
   CEGUI::WindowManager *wmgr = CEGUI::WindowManager::getSingletonPtr();
+
   // Find level selector sheet
-  if (wmgr->isWindowPresent("levelSelector"))
+  if (wmgr->isWindowPresent("levelSelector")) {
     levelSelectorWindow = wmgr->getWindow("levelSelector");
-  else
+  } else {
     levelSelectorWindow = wmgr->createWindow("DefaultWindow", "levelSelector");
+  }
 
   LevelLoader *loader = LevelLoader::getSingleton();
 
-  // Load each level in a new level viewer
+  // This variable ensures that viewers are only initiated once, then reused.
+  static bool initViewers = false;
+
+  // Load each level in level viewer
   int selectorEnd = selectorStart + (selectorRows*selectorColumns);
   for (int i = selectorStart; i < selectorEnd && i < loader->levelNames.size(); i++) {
-    LevelViewer *v = new LevelViewer(app->mRenderer, loader->levelNames[i].c_str());
+    LevelViewer *v;
+    
+    if (initViewers) {
+      // Recycle your Level Viewers!
+      if (viewerPool.empty()) break;      
+      v = viewerPool.back();
+      viewerPool.pop_back();
+      v->loadLevel(loader->levelNames[i].c_str());
+    } else {
+      v = new LevelViewer(app->mRenderer, loader->levelNames[i].c_str());
+    }
+
     levelSelectorWindow->addChildWindow(v->window);
 
     v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
                               CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
 
     v->setPositionPercent(0.05 + (i%selectorColumns)*0.9/selectorColumns,
-                          0.2 + (i/selectorColumns)*0.8/selectorRows);
+                          0.2 + (i/selectorColumns)*0.6/selectorRows);
     
     levelViewers.push_back(v);
   }
 
+  initViewers = true;
   CEGUI::System::getSingleton().setGUISheet(levelSelectorWindow);
 }
 

@@ -45,14 +45,13 @@ CEGUI::MouseButton OgreBallApplication::convertButton(OIS::MouseButtonID buttonI
 
 OgreBallApplication::OgreBallApplication(void)
 {
-  mPhysics = new Physics(btVector3(0, -19600, 0));
+  mPhysics = new Physics(btVector3(0, -9800, 0));
   mTimer = OGRE_NEW Ogre::Timer();
   mTimer->reset();
   Sounds::init();
   paused = false;
   instance = this;
   activity = NULL;
-
 }
 
 //-------------------------------------------------------------------------------------
@@ -72,16 +71,23 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
   levelRoot = mSceneMgr->getRootSceneNode()->createChildSceneNode("root");
   levelLoader->levelRoot = levelRoot;
   levelLoader->clearKnobs();
+
+  mCameraLookAtNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("lookAt");
+  mCameraNode = mCameraLookAtNode->createChildSceneNode("cam");
+  mCameraNode->attachObject(mCamera);
+  mCameraNode->setFixedYawAxis(true);
 }
 
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::switchActivity(Activity *newActivity) {
-  if (activity && dynamic_cast<MenuActivity*>(activity)) {
-    delete activity;
+  if (activity) {
+    activity->close();
   }
+
   activity = newActivity;
   destroyAllEntitiesAndNodes();
   paused = false;
+  
   activity->start();
 }
 
@@ -136,9 +142,7 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();
 
-  if (mPhysics) mPhysics->stepSimulation(elapsedTime);
-  activity->frameStarted(elapsedTime);
-  
+
   if (!paused) {
     if (mPhysics) mPhysics->stepSimulation(elapsedTime);
     activity->frameStarted(elapsedTime);

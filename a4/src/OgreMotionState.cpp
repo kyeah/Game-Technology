@@ -34,9 +34,16 @@ void OgreMotionState::setWorldTransform ( const btTransform & worldTrans )
     {
       btQuaternion quaternion = worldTrans.getRotation ( );
       btVector3 position = worldTrans.getOrigin ( );
-      mVisibleNode -> _setDerivedOrientation ( Ogre::Quaternion ( quaternion.getW ( ), quaternion.getX ( ),
-                                                                  quaternion.getY ( ), quaternion.getZ ( ) ) );
-      mVisibleNode -> _setDerivedPosition ( Ogre::Vector3 ( position.x ( ), position.y ( ), position.z ( ) ) );
-      mWorldTransform = worldTrans;
+
+      Ogre::Quaternion q(quaternion.getW ( ), quaternion.getX ( ),
+                         quaternion.getY ( ), quaternion.getZ ( ));
+
+      Ogre::Vector3 v(position.x(), position.y(), position.z());
+
+      if (!q.isNaN() && !v.isNaN()) {
+        mVisibleNode -> _setDerivedOrientation ( q );
+        mVisibleNode -> _setDerivedPosition ( v );
+        mWorldTransform = worldTrans;
+      }
     }
 }

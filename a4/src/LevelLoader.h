@@ -48,7 +48,9 @@ class LevelLoader {
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
 
+  int mCurrLevelID;
   int levelID;
+  bool mLevelLoaded;
 
   // Start Parameters for most recently loaded level
   btVector3 playerStartPositions[4];
