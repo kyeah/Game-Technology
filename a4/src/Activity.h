@@ -24,5 +24,5 @@ class Activity {
 
   virtual void handleGameEnd() { }
   OgreBallApplication *app;
-  int score;
+  int score, collectibles;
 };

@@ -133,6 +133,7 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("GameWon.layout");
   Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
   Wmgr->loadWindowLayout("GameOver.layout");
+  Wmgr->loadWindowLayout("Leaderboard.layout");
 
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 

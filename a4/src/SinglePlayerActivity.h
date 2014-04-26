@@ -27,6 +27,8 @@ class SinglePlayerActivity : public Activity {
   void handleGameOver();
 
   void loadLevel( const char* name );
+
+  bool ShowLeaderboard( const CEGUI::EventArgs& e);
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
@@ -45,9 +47,12 @@ class SinglePlayerActivity : public Activity {
     *collectDisplay, *livesDisplay, *levelDisplay;
 
   CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
-  CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu;
+  CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu,
+    *gwViewLeaderboard, *gwTimeTaken, *gwCollectibles, *gwBonus, *gwScore, *gwHighscore;
+
   CEGUI::Window *gameOverSheet, *goGame, *goOver, *goRetry, *goBackToMenu;
 
+  CEGUI::Window* leaderboardWindow, *leaderboardName, *leaderboardNextLevel, *leaderboardBackToMenu;
   CEGUI::Window* leaderboardWindows[10];
 
   bool menuActive;
@@ -57,5 +62,5 @@ class SinglePlayerActivity : public Activity {
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
-  int collectibles, lives;
+  int lives;
 };

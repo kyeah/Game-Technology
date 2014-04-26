@@ -96,6 +96,7 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
 }
 
 void LevelLoader::loadLevel(const char* levelName) {
+  numCollectibles = 0;
   for (int i = 0; i < levelNames.size(); i++) {
     if (levelNames[i].compare(levelName) == 0) {
       ConfigNode *level = levels[i];
@@ -852,6 +853,7 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   } else if (type.compare("collectible") == 0){
     go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                          btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot, soundEffect);
+    numCollectibles++;
   } else if (type.compare("extrudedObject") == 0) {
     go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
