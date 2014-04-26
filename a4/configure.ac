@@ -32,5 +32,11 @@ SDLMIXER_LIBS="`sdl-config --libs` -lSDL_mixer"
 AC_SUBST(SDLMIXER_CFLAGS)
 AC_SUBST(SDLMIXER_LIBS)
 
+SDLNET_CFLAGS=`sdl-config --cflags`
+SDLNET_LIBS="`sdl-config --libs` -lSDL_net"
+AC_SUBST(SDLNET_CFLAGS)
+AC_SUBST(SDLNET_LIBS)
+
+
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT

@@ -29,8 +29,13 @@ class MenuActivity : public Activity {
   bool SwitchToMainMenu(const CEGUI::EventArgs& e);
   bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+  bool SwitchToHostSelectMenu( const CEGUI::EventArgs& e);
+  bool SinglePlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
+  bool MultiPlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
 
   bool StartSinglePlayer( const CEGUI::EventArgs& e );
+  bool StartMultiPlayerHost( const CEGUI::EventArgs& e);
+  bool StartMultiPlayerClient( const CEGUI::EventArgs& e);
 
   bool quit(const CEGUI::EventArgs& e);
 

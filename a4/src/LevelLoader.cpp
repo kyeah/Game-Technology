@@ -178,7 +178,7 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     ConfigNode* pBackground = pSound->findChild("background");
     if(pBackground){
       Ogre::String backgroundMusic = pBackground->getValue();
-      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
+ //     Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
     }
   ConfigNode* pLevelID = root->findChild("levelID");
 
