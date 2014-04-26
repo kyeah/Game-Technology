@@ -6,7 +6,7 @@ OgreBall_CPPFLAGS= -I$(top_srcdir) -Ilibs/OgreProcedural/include -std=c++0x
 
 OgreBall_SOURCES= libs/ConfigScript.cpp libs/MeshStrider.cpp src/BaseApplication.cpp src/OgreBallApplication.cpp src/Physics.cpp src/OgreMotionState.cpp src/GameObject.cpp src/OgreBall.cpp src/Plane.cpp src/LevelLoader.cpp src/MeshObject.cpp src/MenuActivity.cpp src/SinglePlayerActivity.cpp src/Interpolator.cpp src/Collisions.cpp src/GoalObject.cpp src/Collectible.cpp src/LevelViewer.cpp src/DecorativeObject.cpp src/CameraObject.cpp src/Sounds.cpp src/Collidable.cpp
 
-OgreBall_CXXFLAGS= $(OGRE_CFLAGS) $(OIS_CFLAGS) $(bullet_CFLAGS) $(SDLMIXER_CFLAGS) $(CEGUI_CFLAGS) $(CEGUI_OGRE_CFLAGS) -lboost_system -lboost_filesystem -Llibs/OgreProcedural/lib -lOgreProcedural -Wl,-rpath=libs/OgreProcedural/lib
+OgreBall_CXXFLAGS= $(OGRE_CFLAGS) $(OIS_CFLAGS) $(bullet_CFLAGS) $(SDLMIXER_CFLAGS) $(CEGUI_CFLAGS) $(CEGUI_OGRE_CFLAGS) -lboost_system -lboost_filesystem -Llibs/OgreProcedural/lib -lOgreProcedural -Wl,-rpath=libs/OgreProcedural/lib -lboost_serialization
 OgreBall_LDADD= $(OGRE_LIBS) $(OIS_LIBS) $(bullet_LIBS) $(SDLMIXER_LIBS) $(CEGUI_LIBS) $(CEGUI_OGRE_LIBS)
 
 EXTRA_DIST= buildit makeit

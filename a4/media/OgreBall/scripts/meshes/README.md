@@ -22,6 +22,7 @@ extrudedmesh <name>:
 
 * scale <x> <y> <z>
 * tiles <utiles> <vtiles>
+* thicken <thickness> (thicken the overall shape that you've defined)
 * path:
   * type <typename = default: straight lines | choices: previous, previous-combined, catmullSpline, cubicHermiteSpline, roundedCornerSpline, bezierCurve, helix>
   * scale <x> <y> <z>
@@ -52,9 +53,8 @@ extrudedmesh <name>:
   * points:
     * p <x> <y>
     ...
-  * combine <typename = default: append | choices: union, intersection, difference>  # performs combine op with the shape defined up to that point
+  * combine <typename = default: append | choices: union, intersection, difference, scaleTrack, rotationTrack>  # performs combine op with the shape defined up to that point
   * outside <left | right = right>
-  * thicken <thickness>  # Take line shape and add thickness to it (i.e. like bubble letters)
 ... (i.e. multiple shapes combined by combine functions)
 
 * track
@@ -68,9 +68,7 @@ extrudedmesh <name>:
 String together paths by placing them one after another
 
 Combine shapes by placing them one after another (can change how they combine using the 'combine' option)
-=> The combine and thicken methods produce MULTISHAPES, which cannot be edited on further or used with regular shapes. This is really annoying, so I wouldn't recommend them...
-=> Spline shapes also apparently close paths forcably, which makes them really annoying to use as well.
-=> Moral of story: this library is stupid, stick to splines for paths
+=> The combine and thicken methods produce MULTISHAPES, which cannot be edited on further or used with regular shapes. This is really annoying, so I wouldn't recommend them except for simple combinations.
 
 Duplicate paths or strings by using type=previous (duplicate last path created) or type=previous-combined (duplicate the entirety of the path created up until that point)
 
@@ -81,3 +79,5 @@ Most options are NOT needed, but if you omit an option that IS needed, the progr
 Do NOT cross lines when making a path, shape, or track, or the extruder will hang and you will be sad. A shape is required to be closed, and will be closed implicitly.
 
 For some reason, updating to the newest version of OgreProcedural broke scaling, so scale all of your points manually for points and shapes.
+
+If you find your paths being closed automatically when making changes to shapes, try to close your shapes the "other way" (i.e. if you're tracing a U line by wrapping outside, try to wrap inside instead.)

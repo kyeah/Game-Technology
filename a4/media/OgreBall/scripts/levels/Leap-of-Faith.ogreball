@@ -27,10 +27,10 @@ level leap of faith {
            }
            rot { 
                start 90 0 0
-               interp 1000 90 90 0
-               interp 1000 90 180 0
-               interp 1000 90 270 0
-               interp 1000 90 360 0
+               interp 1000 180 0 0
+               interp 1000 270 0 0
+               interp 1000 360 0 0
+               interp 1000 90 0 0
            }
       }
       collectible {

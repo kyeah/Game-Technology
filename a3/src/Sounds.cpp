@@ -5,10 +5,11 @@ int Sounds::enabled = true;
 
 void Sounds::init(){
   //SETUP MUSIC
-  int audio_rate = 22050;
+  int audio_rate = 44100;
   Uint16 audio_format = AUDIO_S16; /* 16-bit stereo */
   int audio_channels = 2;
   int audio_buffers = 4096;
+  mMusic = NULL;
   SDL_Init(SDL_INIT_AUDIO);
   /* This is where we open up our audio device.  Mix_OpenAudio takes
      as its parameters the audio format we'd /like/ to have. */
@@ -21,6 +22,26 @@ void Sounds::init(){
      in case we'd want to know later. */
   Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
   //Mix_AllocateChannels(5);
+}
+
+void Sounds::playBackground(){
+
+  if(music == NULL){
+    music = Mix_LoadMUS("media/OgreBall/sounds/background.mp3");
+    Mix_PlayMusic(music, 0);
+    Mix_HookMusicFinished(musicDone);
+  }
+  else
+  {
+    musicDone()
+  }
+  
+}
+
+void Sounds::musicDone() {
+  Mix_HaltMusic();
+  Mix_FreeMusic(music);
+  music = NULL;
 }
 
 void Sounds::playSound(int sound_type, int volume){

@@ -1,6 +1,7 @@
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
+#include "Leaderboard.h"
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
@@ -8,10 +9,11 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   lastTilt = btQuaternion(0,0,0);
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
-  currentLevelName = levelName;
+  currentLevelName = std::string(levelName, std::strlen(levelName));
   menuActive = false;
   ceguiActive = false;
-  lives = 10;
+  lives = 4;
+  score = 0;
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -25,27 +27,48 @@ void SinglePlayerActivity::close(void) {
 }
 
 void SinglePlayerActivity::start(void) {
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
+  CEGUI::System::getSingleton().setGUISheet(guiSheet);
+
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
   timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
   levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
 
-  loadLevel(currentLevelName);
+  pauseMenuSheet = app->Wmgr->getWindow("PauseMenu");
+  pauseQuit = app->Wmgr->getWindow("PauseMenu/Quit");
+  pauseReturn = app->Wmgr->getWindow("PauseMenu/Return");
+
+  gameWonSheet = app->Wmgr->getWindow("GameWon");
+  gwGoal = app->Wmgr->getWindow("GameWon/Goal");
+  gwNextLevel = app->Wmgr->getWindow("GameWon/NextLevel");
+  gwBackToMenu = app->Wmgr->getWindow("GameWon/BackToMenu");
+
+  gameOverSheet = app->Wmgr->getWindow("GameOver");
+  goGame = app->Wmgr->getWindow("GameOver/Game");
+  goOver = app->Wmgr->getWindow("GameOver/Over");
+  goRetry = app->Wmgr->getWindow("GameOver/Retry");
+  goBackToMenu = app->Wmgr->getWindow("GameOver/BackToMenu");
+
+  for (int i = 0; i < 10; i++) {
+    std::stringstream ss;
+    ss << "SPLeaders/" << i;
+    leaderboardWindows[i] = app->Wmgr->getWindow(ss.str());
+  }
+
+  loadLevel(currentLevelName.c_str());
 }
 
 void SinglePlayerActivity::loadLevel(const char* name) {
-
+  currentLevelName = std::string(name, std::strlen(name));
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
-  app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
 
-  levelDisplay->setText(name);
+  levelDisplay->setText(currentLevelName.c_str());
 
   timeLeft = 60000;  // TODO: Should get timeLeft from level script
   collectibles = 0;  // TODO: Get total number of collectibles when loading level
-  score = 0;
 
   player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
@@ -59,11 +82,33 @@ void SinglePlayerActivity::loadLevel(const char* name) {
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
+  CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
+  if (OgreBallApplication::debug) return false;
   return true;
 }
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+  if (OgreBallApplication::debug) return true;
+
   timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
+  if (!gameEnded) {
+    if (timeLeft == 0.0f) {
+      handleGameOver();
+    } else if (app->levelLoader->fallCutoff > player->getPosition()[1]) {
+      lives--;
+      if (lives < 0) {
+        handleGameOver();
+      } else {
+        CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+        CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+        instance->setTargetWindow(livesDisplay);
+        instance->start();
+        loadLevel(currentLevelName.c_str());
+        return true;
+      }
+    }
+  }
+
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
 
@@ -73,7 +118,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   scoreDisplay->setText(sst.str());
 
   std:: stringstream livesSS;
-  livesSS << lives << " Lives";
+  livesSS << lives << (lives != 1 ? " Lives" : " Life");
   livesDisplay->setText(livesSS.str());
   collectDisplay->setText(std::to_string(collectibles));
 
@@ -147,17 +192,21 @@ void SinglePlayerActivity::togglePauseMenu( ) {
   if (menuActive) {
     app->paused = true;
     CEGUI::MouseCursor::getSingleton().show();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
-    app->Wmgr->getWindow("PauseMenu/Quit")
+    CEGUI::System::getSingleton().setGUISheet(pauseMenuSheet);
+
+    pauseQuit->removeEvent(CEGUI::PushButton::EventClicked);
+    pauseQuit
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-    app->Wmgr->getWindow("PauseMenu/Return")
+
+    pauseReturn->removeEvent(CEGUI::PushButton::EventClicked);
+    pauseReturn
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
   } else {
     app->paused = false;
     CEGUI::MouseCursor::getSingleton().hide();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+    CEGUI::System::getSingleton().setGUISheet(guiSheet);
   }
 }
 
@@ -193,19 +242,111 @@ bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
 }
 
 void SinglePlayerActivity::handleGameEnd() {
+  if (gameEnded) return;
+
   ceguiActive = true;
   gameEnded = true;
 
   CEGUI::MouseCursor::getSingleton().show();
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
+  CEGUI::System::getSingleton().setGUISheet(gameWonSheet);
 
-  app->Wmgr->getWindow("GameWon/BackToMenu")
+  CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+  CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+
+  gwGoal->setAlpha(0.0);
+  gwNextLevel->setAlpha(0.0);
+  gwBackToMenu->setAlpha(0.0);
+
+  instance->setTargetWindow(gwGoal);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(gwNextLevel);
+  instance->setSpeed(0.5);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(gwBackToMenu);
+  instance->setSpeed(0.5);
+  instance->start();
+
+  gwBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  gwBackToMenu
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  // LEADERBOARD
+  for (int i = 0; i < 10; i++)
+    leaderboardWindows[i]->setAlpha(0.0);
+
+  Leaderboard leaderboard = Leaderboard::findLeaderboard(currentLevelName.c_str());
+  leaderboard.addHighscore("KKKKKKK", score, 60000 - timeLeft);
+
+  multimap<double, LeaderboardEntry> highscores = leaderboard.getHighscores();
+  multimap<double, LeaderboardEntry>::iterator iter;
+
+  int i = 0;
+  for (iter = highscores.begin(); iter != highscores.end(); iter++) {
+    LeaderboardEntry entry = iter->second;
+    std::stringstream ss;
+
+    ss << std::left << setw(25) << entry.name <<
+      setw(10) << entry.score <<
+      setw(6) << entry.getTimeTaken() <<
+      setw(20) << entry.getTimeEntered();
+    
+    leaderboardWindows[i]->setText(ss.str());
+    
+    instance = mgr->instantiateAnimation(mgr->getAnimation("FadeInFromLeft"));
+    instance->setTargetWindow(leaderboardWindows[i]);
+    instance->start();
+    i++;
+  }
+
+  leaderboard.saveToFile();
 
   app->Wmgr->getWindow("GameWon/NextLevel")
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
+}
+
+void SinglePlayerActivity::handleGameOver() {
+  ceguiActive = true;
+  gameEnded = true;
+
+  goGame->setAlpha(0.0);
+  goOver->setAlpha(0.0);
+  goRetry->setAlpha(0.0);
+  goBackToMenu->setAlpha(0.0);
+
+  CEGUI::MouseCursor::getSingleton().show();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameOver"));
+
+  CEGUI::AnimationManager *mgr = CEGUI::AnimationManager::getSingletonPtr();
+  CEGUI::AnimationInstance* instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goGame);
+  instance->setSpeed(0.4);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goOver);
+  instance->setSpeed(0.25);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goRetry);
+  instance->setSpeed(0.2);
+  instance->start();
+
+  instance = mgr->instantiateAnimation(mgr->getAnimation("SpinPopup"));
+  instance->setTargetWindow(goBackToMenu);
+  instance->setSpeed(0.2);
+  instance->start();
+
+  goBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  goBackToMenu
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
 }
 
 //-------------------------------------------------------------------------------------
@@ -213,7 +354,7 @@ void SinglePlayerActivity::handleGameEnd() {
 bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
   if (arg.key == OIS::KC_ESCAPE) {
-    togglePauseMenu();
+    if (!gameEnded) togglePauseMenu();
     return true;
   }
 
@@ -221,6 +362,8 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
     CEGUI::System::getSingleton().injectKeyDown(arg.key);
     CEGUI::System::getSingleton().injectChar(arg.text);
   }
+
+  if (OgreBallApplication::debug) return false;
 
   switch(arg.key){
   case OIS::KC_D:
@@ -257,6 +400,8 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
   if (menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectKeyUp(arg.key);
   }
+
+  if (OgreBallApplication::debug) return false;
 
   switch(arg.key){
   case OIS::KC_D:
@@ -299,7 +444,8 @@ bool SinglePlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
     return true;
   }
 
-  return true;
+  if (OgreBallApplication::debug) return false;
+  else return true;
 }
 
 //-------------------------------------------------------------------------------------

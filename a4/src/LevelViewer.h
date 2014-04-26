@@ -11,9 +11,11 @@ class LevelViewer {
  public:
   LevelViewer( CEGUI::OgreRenderer *mRenderer, const char* levelName );
   ~LevelViewer(void);
+
   bool frameStarted( Ogre::Real elapsedTime );
 
   void loadLevel(const char* levelName);
+
   void setPositionPercent(float x, float y);
 
   Ogre::SceneManager *mSceneMgr;

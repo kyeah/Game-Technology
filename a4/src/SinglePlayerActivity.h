@@ -24,13 +24,15 @@ class SinglePlayerActivity : public Activity {
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual void handleGameEnd();
 
+  void handleGameOver();
+
   void loadLevel( const char* name );
   bool nextLevel( const CEGUI::EventArgs& e );
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
 
-  const char* currentLevelName;
+  std::string currentLevelName;
 
   // User Input Variables
   btScalar MAX_TILT;
@@ -42,6 +44,12 @@ class SinglePlayerActivity : public Activity {
   // Menu Variables
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
     *collectDisplay, *livesDisplay, *levelDisplay;
+
+  CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
+  CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu;
+  CEGUI::Window *gameOverSheet, *goGame, *goOver, *goRetry, *goBackToMenu;
+
+  CEGUI::Window* leaderboardWindows[10];
 
   bool menuActive;
   bool ceguiActive;

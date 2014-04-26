@@ -1,0 +1,38 @@
+extrudedMesh helix/helixMesh {
+  path {
+       type helix
+       radius 20000
+       height 6000
+       rounds 2
+  }
+  shape {
+        outside left
+        type roundedCornerSpline
+        segments 16
+        points {
+               p -3000 50
+               p -3000 0
+               p 3000 0
+               p 3000 50               
+        }
+        radius 100
+  }
+  shape {
+        outside left
+        points {
+               p 2900 50
+               p 2900 10
+               p -2900 10
+               p -2900 50
+        }
+  } 
+  track {
+        addressing relative
+        keyframes {
+                  k 0 0
+                  k .3 .2
+                  k .6 .8
+                  k 1 1
+        }
+  }  
+}
