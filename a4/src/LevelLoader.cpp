@@ -135,6 +135,14 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Yposition Cutoff
+  ConfigNode *cutoffNode = root->findChild("fallCutoff");
+  if (cutoffNode) {
+    fallCutoff = cutoffNode->getValueF();
+  } else {
+    fallCutoff = -40000;
+  }
+
   // Waypoints
   ConfigNode *wpNode = root->findChild("waypoints");
   if (wpNode) {
@@ -159,13 +167,14 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Sounds
   ConfigNode* pSound = root->findChild("Sound");
 
   if(pSound){
     ConfigNode* pBackground = pSound->findChild("background");
     if(pBackground){
       Ogre::String backgroundMusic = pBackground->getValue();
-      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
+ //     Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
     }
   }
   // Skyboxes and Skydomes
@@ -277,7 +286,9 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     Procedural::Path p, lastPath;
     Procedural::Shape s, lastShape;
     Procedural::MultiShape multishape;
-    bool useMultishape = false;
+    Procedural::Track scaleTrack, rotationTrack;
+    bool useMultishape, useScaleTrack, useRotationTrack;
+    useMultishape = useScaleTrack = useRotationTrack = false;
 
     s.close();
     vector<ConfigNode*> children = root->getChildren();
@@ -328,18 +339,24 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         ConfigNode *combineType = children[i]->findChild("combine");
         if (combineType) {
           string type = combineType->getValue();
-          if (type.compare("union")) {
+          if (type.compare("union") == 0) {
             sappend.close();
             multishape = s.booleanUnion(sappend);
             useMultishape = true;
-          } else if (type.compare("intersection")) {
+          } else if (type.compare("intersection") == 0) {
             sappend.close();
             multishape = s.booleanIntersect(sappend);
             useMultishape = true;
-          }  else if (type.compare("difference")) {
+          }  else if (type.compare("difference") == 0) {
             sappend.close();
             multishape = s.booleanDifference(sappend);
             useMultishape = true;
+          } else if (type.compare("scaleTrack") == 0) {
+            useScaleTrack = true;
+            scaleTrack = sappend.convertToTrack(Procedural::Track::AM_RELATIVE_LINEIC);
+          } else if (type.compare("rotationTrack") == 0) {
+            useRotationTrack = true;
+            rotationTrack = sappend.convertToTrack(Procedural::Track::AM_RELATIVE_LINEIC);
           } else {
             s.appendShape(sappend);
           }
@@ -377,6 +394,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     }
 
     s.close();
+
     if (useMultishape) {
       Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setMultiShapeToExtrude(&multishape).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
     } else {

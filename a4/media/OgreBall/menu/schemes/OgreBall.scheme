@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <GUIScheme Name="OgreBall">
+  <Font Filename="helvetica.font" />
   <Imageset Filename="OgreBall.imageset" />
   <Imageset Filename="OgreBallButtons.imageset" />
   <LookNFeel Filename="OgreBall.looknfeel" />

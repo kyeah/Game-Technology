@@ -25,14 +25,15 @@ MenuActivity::~MenuActivity(void) {
 }
 
 void MenuActivity::close(void) {
-  for (int i = 0; i < levelViewers.size(); i++)
+  for (int i = 0; i < levelViewers.size(); i++) {
     viewerPool.push_back(levelViewers[i]);
+  }
   levelViewers.clear();
 }
 
 void MenuActivity::start(void) {
   app->levelLoader->loadLevel("menuBG");
-  
+
   new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0]);
 
@@ -53,7 +54,7 @@ bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
   for (int i = 0; i < levelViewers.size(); i++) {
     levelViewers[i]->frameStarted(elapsedTime);
   }
-  
+
   return true;
 }
 
@@ -65,12 +66,15 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
   CEGUI::Window* multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
   CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
 
+  singlePlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                      CEGUI::Event::Subscriber(&MenuActivity::SinglePlayerLevelSelectWrapper, this));
-  
+
+  multiPlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
-  
+
+  quitButton->removeEvent(CEGUI::PushButton::EventClicked);
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 }
@@ -121,10 +125,10 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
   int selectorEnd = selectorStart + (selectorRows*selectorColumns);
   for (int i = selectorStart; i < selectorEnd && i < loader->levelNames.size(); i++) {
     LevelViewer *v;
-    
+
     if (initViewers) {
       // Recycle your Level Viewers!
-      if (viewerPool.empty()) break;      
+      if (viewerPool.empty()) break;
       v = viewerPool.back();
       viewerPool.pop_back();
       v->loadLevel(loader->levelNames[i].c_str());
@@ -134,16 +138,19 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 
     levelSelectorWindow->addChildWindow(v->window);
 
-    if(type_flag == SINGLE_PLAYER)
+    if(type_flag == SINGLE_PLAYER){
+	v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
     	v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
                               CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
-    else if (type_flag == MULTI_HOST)
+    }
+    else if (type_flag == MULTI_HOST){
+	v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
 	v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick, 
 			      CEGUI::Event::Subscriber(&MenuActivity::StartMultiPlayerHost, this));
-
+    }
     v->setPositionPercent(0.05 + (i%selectorColumns)*0.9/selectorColumns,
                           0.2 + (i/selectorColumns)*0.6/selectorRows);
-    
+
     levelViewers.push_back(v);
   }
 
@@ -193,11 +200,17 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
   CEGUI::Window* clientButton = app->Wmgr->getWindow("Menu/Client");
   CEGUI::Window* returnButton = app->Wmgr->getWindow("Menu/Return");
 
-  
   hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
     	CEGUI::Event::Subscriber(&MenuActivity::MultiPlayerLevelSelectWrapper,this));
   clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
     	CEGUI::Event::Subscriber(&MenuActivity::SwitchToHostSelectMenu,this));
+  /*
+    hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
+    clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));*/
+
+  returnButton->removeEvent(CEGUI::PushButton::EventClicked);
   returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
 }
@@ -251,4 +264,3 @@ bool MenuActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID
   CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
   return true;
 }
-

@@ -17,16 +17,18 @@
       <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.03,0},{0.01,0},{0.25,0},{0.07,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.06,0},{0.01,0},{0.25,0},{0.055,0}}" />
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Timer" >
       <Property Name="Text" Value="TIMER: swag o' clock" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="TextColours" Value="tl:ff770000 tr:ff770000 bl:ff770000 br:ff770000" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.4,0},{0.01,0},{0.6,0},{0.07,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.01,0},{0.7,0},{0.1,0}}" />
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
@@ -37,7 +39,6 @@
       <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="Image" Value="set:OgreBall/Buttons image:playerBG" />
       <Property Name="InheritsAlpha" Value="False" />
-      <Property Name="Alpha" Value="0.75" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Collectibles" >
       <Property Name="Text" Value="COLLECTIBLES" />
@@ -69,7 +70,7 @@
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
-      <Property Name="UnifiedAreaRect" Value="{{0.7,0},{0.93,0},{0.99,0},{0.99,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.7,0},{0.935,0},{0.99,0},{0.97,0}}" />
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
