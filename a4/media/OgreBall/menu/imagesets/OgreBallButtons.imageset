@@ -5,13 +5,13 @@
   <Image Name="ButtonUp" XPos="0" YPos="50" Width="500" Height="44" />
   <!--Image Name="ScoreBG" XPos="0" YPos="94" Width="575" Height="89" /-->
   <!--Image Name="LevelnameBG" XPos="0" YPos="200" Width="575" Height="89" /-->
-  <Image Name="ScoreBG" XPos="0" YPos="1123" Width="515" Height="60" />
+  <Image Name="ScoreBG" XPos="0" YPos="1123" Width="515" Height="50" />
   <Image Name="LevelnameBG" XPos="0" YPos="1062" Width="515" Height="60" />
   <Image Name="playerBG" XPos="5" YPos="293" Width="1007" Height="505" />
   <Image Name="GoalText" XPos="5" YPos="798" Width="333" Height="120" />
   <Image Name="GameText" XPos="5" YPos="933" Width="333" Height="115" />
   <Image Name="OverText" XPos="387" YPos="933" Width="297" Height="115" />
-
+  <Image Name="HighscoreText" XPos="5" YPos="1177" Width="747" Height="120" />
   <!--Image Name="ButtonDown" XPos="0.0" YPos="128.0" Width="512" Height="128" /-->
   <!--Image Name="ButtonDisabled" XPos="0.0" YPos="256.0" Width="512" Height="128" /-->
   <!--Image Name="ButtonHighlighted" XPos="0.0" YPos="384.14" Width="512" Height="128" /-->

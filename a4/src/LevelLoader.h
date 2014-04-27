@@ -55,6 +55,7 @@ class LevelLoader {
   // Start Parameters for most recently loaded level
   btVector3 playerStartPositions[4];
   btQuaternion playerStartRotations[4];
+  int numCollectibles;
   float fallCutoff;
 
   // Camera Interpolations when level is the menu background

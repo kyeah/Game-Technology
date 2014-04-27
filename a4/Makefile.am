@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS= -I m4
-noinst_HEADERS= libs/ConfigLoader.hpp libs/MeshStrider.h src/LevelLoader.h src/BaseApplication.h src/OgreBallApplication.h src/Physics.h src/OgreMotionState.h src/GameObject.h src/Collisions.h src/Activity.h src/MenuActivity.h src/SinglePlayerActivity.h src/Interpolator.h src/LevelViewer.h src/CameraObject.h src/Sounds.h src/ClientPlayerActivity.h src/HostPlayerActivity.h src/Networking.h src/common.h
+noinst_HEADERS= libs/ConfigLoader.hpp libs/MeshStrider.h src/LevelLoader.h src/BaseApplication.h src/OgreBallApplication.h src/Physics.h src/OgreMotionState.h src/GameObject.h src/Collisions.h src/Activity.h src/MenuActivity.h src/SinglePlayerActivity.h src/Interpolator.h src/LevelViewer.h src/CameraObject.h src/Sounds.h src/ClientPlayerActivity.h src/HostPlayerActivity.h src/Networking.h src/common.h src/Leaderboard.h src/OBAnimationManager.h
 
 bin_PROGRAMS= OgreBall 
 OgreBall_CPPFLAGS= -I$(top_srcdir) -Ilibs/OgreProcedural/include -std=c++0x

@@ -14,7 +14,7 @@
   <AnimationDefinition name="StartButtonPulsating" duration="1.4" replayMode="loop">
     <Affector applicationMethod="absolute" interpolator="float" property="Alpha">
       <KeyFrame position="0" progression="linear" value="1.0" />
-      <KeyFrame position="0.7" progression="quadratic decelerating" value="0.5" />
+      <KeyFrame position="0.7" progression="quadratic decelerating" value="0.6" />
       <KeyFrame position="1.4" progression="quadratic accelerating" value="1.0" />
     </Affector>
     <Subscription event="MouseEntersArea" action="Start" />
@@ -32,4 +32,11 @@
     </Affector>
   </AnimationDefinition>
 
+  <AnimationDefinition name="Hide" duration="0.5" replayMode="once">
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.5" value="0.0" />
+    </Affector>
+  </AnimationDefinition>
+  
 </Animations>

@@ -40,7 +40,8 @@ class LeaderboardEntry {
     struct tm *time = localtime(&timeEntered);
 
     char buf[25];
-    strftime(buf, 25, "%B %d, %Y\0", time);
+    bzero(buf, 25);
+    strftime(buf, 25, "%B %d, %Y", time);
     return string(buf, 25);
   }
 
@@ -70,7 +71,7 @@ class Leaderboard {
 
   string name;
   double minScore;
-  multimap<double, LeaderboardEntry> highscores;
+  multimap<double, LeaderboardEntry, greater<double> > highscores;
 
  public:
   static Leaderboard& findLeaderboard(const char* level) {
@@ -105,7 +106,7 @@ class Leaderboard {
 
     // Delete minimum element
     if (highscores.size() == 10) {
-      multimap<double, LeaderboardEntry>::iterator minElem = highscores.find(minScore);
+      multimap<double, LeaderboardEntry, greater<double> >::iterator minElem = highscores.find(minScore);
       auto item = minElem->first;
       minElem++;
       highscores.erase(item);
@@ -126,7 +127,7 @@ class Leaderboard {
     }
   }
 
-  multimap<double, LeaderboardEntry> getHighscores() {
+  multimap<double, LeaderboardEntry, greater<double> > getHighscores() {
     return highscores;
   }
 };
