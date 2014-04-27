@@ -316,8 +316,8 @@ void SinglePlayerActivity::handleGameEnd() {
   //  leaderboard.addHighscore("KKKKKKK", totalScore, 60000 - timeLeft);
 
   std::stringstream timess;
-  int seconds = std::round(timeLeft/1000);
-  int millis = std::min((float)99.0, (float)std::round(fmod(timeLeft,1000)/10));
+  int seconds = std::round((60000-timeLeft)/1000);
+  int millis = std::min((float)99.0, (float)std::round(fmod((60000-timeLeft),1000)/10));
 
   timess << std::left << setw(20) << "Time Taken: " << std::left << seconds << ":";
   if (millis < 10) timess << "0";
