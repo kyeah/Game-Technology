@@ -15,7 +15,6 @@ level baseLevel {
      		background media/OgreBall/sounds/background.wav
 		winMusic media/OgreBall/sounds/hitGoal.wav
             }
-            levelID 1
       }
       lights {
              ambient .5 .5 .5

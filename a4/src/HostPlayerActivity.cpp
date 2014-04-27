@@ -94,7 +94,7 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
-
+  std::cout << "HEY THERE" << std::endl;
   // Update HUD
   std::stringstream sst;
   sst << "SCORE: " << score;

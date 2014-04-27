@@ -26,7 +26,6 @@ vector<string> LevelLoader::split(const string &s, char delim) {
 
 LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) {
   instance = this;
-  mLevelLoaded = false;
 }
 
 void LevelLoader::setScene(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) {
@@ -98,7 +97,6 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
 
 void LevelLoader::loadLevel(const char* levelName) {
 
-  mLevelLoaded = true;
   std::cout << "loading level!" << std::endl;
   numCollectibles = 0;
 
@@ -182,11 +180,6 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     if(pBackground){
       Ogre::String backgroundMusic = pBackground->getValue();
  //     Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
-    }
-  ConfigNode* pLevelID = root->findChild("levelID");
-
-  if(pLevelID){
-      levelID = pLevelID->getValueI();
     }
   }
   // Skyboxes and Skydomes

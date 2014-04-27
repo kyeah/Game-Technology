@@ -12,7 +12,6 @@ level mattLevel {
 	    Sound{
      		background media/OgreBall/sounds/background.wav
             }
-	    levelID 6
       }
       lights {
              ambient .5 .5 .5

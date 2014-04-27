@@ -223,28 +223,17 @@ void SinglePlayerActivity::togglePauseMenu( ) {
 }
 
 bool SinglePlayerActivity::nextLevel( const CEGUI::EventArgs& e ) {
-  CEGUI::Window* win = ((CEGUI::WindowEventArgs&)e).window;
-  std::cout << "timeleft: " << timeLeft << "gameEnded: " << gameEnded << std::endl;
-  std::cout << "window id: " << win->getID() << std::endl;
   LevelLoader *loader = LevelLoader::getSingleton();
-  if(loader->mLevelLoaded = false)
-    return true;
   int nextLevel = loader->mCurrLevelID;
-  std::cout << "currLevelID is: " << nextLevel;
+  
   nextLevel++;
   if(nextLevel >= loader->levelNames.size())
     nextLevel = 0;
-  std::cout << "levelNames list: ";
-  for(int i = 0; i < loader->levelNames.size(); i++){
-    std::cout << loader->levelNames[i] << " ";
-  }
-  std::cout << std::endl;
-  std::cout << "levelID now is: " << nextLevel;
-  std::cout << "levelNames size is: " << loader->levelNames.size() << "levelname is: " << (loader->levelNames[nextLevel]) << std::endl;
+
   loadLevel((loader->levelNames[nextLevel]).c_str());
   CEGUI::MouseCursor::getSingleton().hide();
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
-  loader->mLevelLoaded = false;
+
   return true;
 }
 
