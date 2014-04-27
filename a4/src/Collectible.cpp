@@ -52,6 +52,7 @@ void Collectible::update(float elapsedTime) {
             a->collectibles++;
           }
           Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME));
+          // TODO: Send sound notification to clients if is Host
         }
       }
     }
