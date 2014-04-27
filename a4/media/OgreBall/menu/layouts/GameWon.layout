@@ -89,6 +89,20 @@
       <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
+    <Window Type="TaharezLook/Editbox" Name="GameWon/EnterName" >
+      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.8,0},{0.5,0},{0.84,0}}" />
+      <Property Name="MaxTextLength" Value="24" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="0.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameWon/SubmitHighscore">
+      <Property Name="UnifiedAreaRect" Value="{{0.51,0},{0.8,0},{0.7,0},{0.84,0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Text" Value="Add to Leaderboard" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
     <Window Type="TaharezLook/StaticImage" Name="GameWon/Highscore" >
       <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
       <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.3,0},{0.8,0},{0.5,0}}" />

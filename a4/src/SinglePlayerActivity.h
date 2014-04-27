@@ -25,6 +25,7 @@ class SinglePlayerActivity : public Activity {
   virtual void handleGameEnd();
 
   void handleGameOver();
+  bool HandleHighscoreSubmitted( const CEGUI::EventArgs& e );
 
   void loadLevel( const char* name );
   bool nextLevel( const CEGUI::EventArgs& e );
@@ -48,7 +49,8 @@ class SinglePlayerActivity : public Activity {
 
   CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
   CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu,
-    *gwViewLeaderboard, *gwTimeTaken, *gwCollectibles, *gwBonus, *gwScore, *gwHighscore;
+    *gwViewLeaderboard, *gwTimeTaken, *gwCollectibles, *gwBonus, *gwScore, *gwHighscore,
+    *gwNameEditText, *gwSubmitHighscore;
 
   CEGUI::Window *gameOverSheet, *goGame, *goOver, *goRetry, *goBackToMenu;
 

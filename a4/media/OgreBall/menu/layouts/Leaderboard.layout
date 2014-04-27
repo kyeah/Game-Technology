@@ -51,8 +51,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="Leaderboard/4">
@@ -61,8 +61,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="Leaderboard/5">
@@ -71,8 +71,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="Leaderboard/6">
@@ -81,8 +81,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="Leaderboard/7">
@@ -91,8 +91,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="Leaderboard/8">
@@ -101,8 +101,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="TaharezLook/StaticText" Name="Leaderboard/9">
@@ -111,8 +111,8 @@
       <Property Name="Alpha" Value="0.0" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="FrameEnabled" Value="False" />
-      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="VertFormatting" Value="VertCentred" />
     </Window>
     <Window Type="OgreBall/TextButton" Name="Leaderboard/NextLevel" >

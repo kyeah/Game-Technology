@@ -50,6 +50,8 @@ void SinglePlayerActivity::start(void) {
   gwBonus = app->Wmgr->getWindow("GameWon/Bonus");
   gwScore = app->Wmgr->getWindow("GameWon/Score");
   gwHighscore = app->Wmgr->getWindow("GameWon/Highscore");
+  gwNameEditText = app->Wmgr->getWindow("GameWon/EnterName");
+  gwSubmitHighscore = app->Wmgr->getWindow("GameWon/SubmitHighscore");
 
   gameOverSheet = app->Wmgr->getWindow("GameOver");
   goGame = app->Wmgr->getWindow("GameOver/Game");
@@ -102,8 +104,9 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (OgreBallApplication::debug) return true;
 
-  timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
   if (!gameEnded) {
+    timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
+
     if (timeLeft == 0.0f) {
       handleGameOver();
     } else if (app->levelLoader->fallCutoff > player->getPosition()[1]) {
@@ -225,7 +228,7 @@ void SinglePlayerActivity::togglePauseMenu( ) {
 bool SinglePlayerActivity::nextLevel( const CEGUI::EventArgs& e ) {
   LevelLoader *loader = LevelLoader::getSingleton();
   int nextLevel = loader->mCurrLevelID;
-  
+
   nextLevel++;
   if(nextLevel >= loader->levelNames.size())
     nextLevel = 0;
@@ -245,12 +248,11 @@ bool SinglePlayerActivity::ShowLeaderboard( const CEGUI::EventArgs& e ) {
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
 
-  /*
   leaderboardNextLevel->removeEvent(CEGUI::PushButton::EventClicked);
   leaderboardNextLevel
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::SOMETINH, this));
-  */
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
+
   for (int i = 0; i < 10; i++)
     leaderboardWindows[i]->setAlpha(0.0);
 
@@ -260,9 +262,6 @@ bool SinglePlayerActivity::ShowLeaderboard( const CEGUI::EventArgs& e ) {
   OBAnimationManager::startAnimation("SpinPopup", leaderboardNextLevel, 0.5);
   OBAnimationManager::startAnimation("SpinPopup", leaderboardBackToMenu, 0.5);
 
-  //int totalScore = score + timeLeft + (collectibles == app->levelLoader->numCollectibles ? 10000 : 0);
-  //  leaderboard.addHighscore("KKKKKKK", totalScore, 60000 - timeLeft);
-
   multimap<double, LeaderboardEntry, greater<double> > highscores = leaderboard.getHighscores();
   multimap<double, LeaderboardEntry>::iterator iter;
 
@@ -271,7 +270,8 @@ bool SinglePlayerActivity::ShowLeaderboard( const CEGUI::EventArgs& e ) {
     LeaderboardEntry entry = iter->second;
     std::stringstream ss;
 
-    ss << std::left << setw(30) << entry.name <<
+    size_t namelen = entry.name.length();
+    ss << std::left << setw(55-namelen) << entry.name <<
       setw(15) << entry.score <<
       setw(15) << entry.getTimeTaken() <<
       setw(25) << entry.getTimeEntered();
@@ -296,7 +296,7 @@ void SinglePlayerActivity::handleGameEnd() {
   static CEGUI::AnimationInstance *pulsatingAnim = 0;
   if (pulsatingAnim) {
     pulsatingAnim->stop();
-    CEGUI::AnimationManager::getSingleton().destroyAnimationInstance(pulsatingAnim);    
+    CEGUI::AnimationManager::getSingleton().destroyAnimationInstance(pulsatingAnim);
     pulsatingAnim = 0;
   }
 
@@ -311,6 +311,8 @@ void SinglePlayerActivity::handleGameEnd() {
   gwBackToMenu->setAlpha(0.0);
   gwViewLeaderboard->setAlpha(0.0);
   gwHighscore->setAlpha(0.0);
+  gwNameEditText->setAlpha(0.0);
+  gwSubmitHighscore->setAlpha(0.0);
 
   OBAnimationManager::startAnimation("SpinPopup", gwGoal);
   OBAnimationManager::startAnimation("SpinPopup", gwNextLevel, 0.5);
@@ -328,7 +330,6 @@ void SinglePlayerActivity::handleGameEnd() {
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ShowLeaderboard, this));
 
   int totalScore = score + timeLeft + (collectibles == app->levelLoader->numCollectibles ? 10000 : 0);
-  //  leaderboard.addHighscore("KKKKKKK", totalScore, 60000 - timeLeft);
 
   std::stringstream timess;
   int seconds = std::round((60000-timeLeft)/1000);
@@ -339,12 +340,12 @@ void SinglePlayerActivity::handleGameEnd() {
   timess << millis;
 
   gwTimeTaken->setText(timess.str());
-  
+
   std::stringstream css;
   css << std::left << setw(21) << "Collectibles: " << collectibles << "/" << app->levelLoader->numCollectibles;
 
   gwCollectibles->setText(css.str());
-  
+
   std::stringstream bss;
   bss << std::left << setw(25) << "Bonus: " << setw(30) <<
     (collectibles == app->levelLoader->numCollectibles
@@ -370,18 +371,24 @@ void SinglePlayerActivity::handleGameEnd() {
 
   Leaderboard leaderboard = Leaderboard::findLeaderboard(currentLevelName.c_str());
   if (leaderboard.isHighscore(totalScore)) {
-    OBAnimationManager::startAnimation("SpinPopup", gwHighscore, 1.0, 2.0f);
-    pulsatingAnim = OBAnimationManager::startAnimation("StartButtonPulsating", gwHighscore, 0.7, 3.4f);
+    OBAnimationManager::startAnimation("SpinPopup", gwHighscore, 1.0, 2.2f);
+    pulsatingAnim = OBAnimationManager::startAnimation("StartButtonPulsating", gwHighscore, 0.7, 3.6f);
     OBAnimationManager::startAnimation("Hide", gwGoal, 1.0, 2.0f);
 
-    // TODO: Show window asking for name w/ add to leaderboard button to save
-    leaderboard.addHighscore("KKKKKKK", totalScore, 60000 - timeLeft);
-    leaderboard.saveToFile();
+    // Show window asking for name w/ add to leaderboard button to save
+    OBAnimationManager::startAnimation("FadeInFromLeft", gwNameEditText, 1.0, 3.2f);
+    OBAnimationManager::startAnimation("FadeInFromLeft", gwSubmitHighscore, 1.0, 3.2f);
+
+    gwSubmitHighscore->setText("Add to Leaderboards");
+    gwSubmitHighscore->removeEvent(CEGUI::PushButton::EventClicked);
+    gwSubmitHighscore
+      ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                       CEGUI::Event::Subscriber(&SinglePlayerActivity::HandleHighscoreSubmitted, this));
   }
 
   app->Wmgr->getWindow("GameWon/NextLevel")
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-      CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
 }
 
 void SinglePlayerActivity::handleGameOver() {
@@ -405,6 +412,22 @@ void SinglePlayerActivity::handleGameOver() {
   goBackToMenu
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+}
+
+bool SinglePlayerActivity::HandleHighscoreSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String name = gwNameEditText->getText();
+  if (name.length() == 0) return true;
+
+  int totalScore = score + timeLeft + (collectibles == app->levelLoader->numCollectibles ? 10000 : 0);
+
+  Leaderboard leaderboard = Leaderboard::findLeaderboard(currentLevelName.c_str());
+  leaderboard.addHighscore(name.c_str(), totalScore, 60000 - timeLeft);
+  leaderboard.saveToFile();
+
+  gwNameEditText->setAlpha(0.0);
+  gwSubmitHighscore->setText("Submitted!");
+  OBAnimationManager::startAnimation("SpinPopup", gwSubmitHighscore);
+  gwSubmitHighscore->removeEvent(CEGUI::PushButton::EventClicked);
 }
 
 //-------------------------------------------------------------------------------------

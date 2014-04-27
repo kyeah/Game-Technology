@@ -89,7 +89,6 @@ bool MenuActivity::SwitchToHostSelectMenu( const CEGUI::EventArgs& e){
 	panel->addChildWindow(scrollbarVertical);
 	CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/ExitGame");
 
-
 	//string x = temp->getText();
 	CEGUI::Window* temp;
 	for(int i = 0; i < 184; i++){

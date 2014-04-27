@@ -88,7 +88,7 @@ void LevelViewer::loadLevel(const char* levelName) {
   if (wmgr->isWindowPresent(levelName))
     window = wmgr->getWindow(levelName);
   else
-    window = wmgr->createWindow("TaharezLook/StaticImage", levelName);
+    window = wmgr->createWindow("OgreBall/SelectorImage", levelName);
 
   window->setSize(CEGUI::UVector2(CEGUI::UDim(0.21f, 0),
                                   CEGUI::UDim(0.15f, 0)));
