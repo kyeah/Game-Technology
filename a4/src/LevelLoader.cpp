@@ -853,18 +853,30 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     go = new Plane(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                    btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("collectible") == 0){
-    go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
-                         btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot, soundEffect);
+    if (soundEffect.length()) 
+      go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                           btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot, soundEffect);
+    else
+      go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                           btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
     numCollectibles++;
   } else if (type.compare("extrudedObject") == 0) {
     go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("goal") == 0) {
-    go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
-                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    if (soundEffect.length())
+      go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    else 
+      go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("collidable") == 0){
-    go = new Collidable(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
-                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    if (soundEffect.length())
+      go = new Collidable(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    else 
+      go = new Collidable(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else {
     go = new DecorativeObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                               btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);

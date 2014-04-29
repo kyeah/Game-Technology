@@ -74,5 +74,19 @@
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
+    <Window Type="TaharezLook/StaticImage" Name="SPHUD/Ready" >
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.4,0},{0.45,0},{0.6,0},{0.55,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:ReadyText" />
+    </Window>
+    <Window Type="TaharezLook/StaticImage" Name="SPHUD/Go" >
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.4,0},{0.45,0},{0.6,0},{0.55,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall/Buttons image:GoText" />
+    </Window>
   </Window>
 </GUILayout>

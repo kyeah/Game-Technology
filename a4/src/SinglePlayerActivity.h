@@ -48,6 +48,8 @@ class SinglePlayerActivity : public Activity {
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
     *collectDisplay, *livesDisplay, *levelDisplay;
 
+  CEGUI::Window *readyWindow, *goWindow;
+
   CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
   CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu,
     *gwViewLeaderboard, *gwTimeTaken, *gwCollectibles, *gwBonus, *gwScore, *gwHighscore,
@@ -65,5 +67,5 @@ class SinglePlayerActivity : public Activity {
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
-  int lives;
+  int lives, countdown;
 };

@@ -3,6 +3,7 @@
 #include "SinglePlayerActivity.h"
 #include "Leaderboard.h"
 #include "OBAnimationManager.h"
+#include "Sounds.h"
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
@@ -37,6 +38,8 @@ bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
 }
 
 void SinglePlayerActivity::start(void) {
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", 64);
+  
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   CEGUI::System::getSingleton().setGUISheet(guiSheet);
 
@@ -45,6 +48,9 @@ void SinglePlayerActivity::start(void) {
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
   timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
   levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
+
+  readyWindow = app->Wmgr->getWindow("SPHUD/Ready");
+  goWindow = app->Wmgr->getWindow("SPHUD/Go");
 
   pauseMenuSheet = app->Wmgr->getWindow("PauseMenu");
   pauseQuit = app->Wmgr->getWindow("PauseMenu/Quit");
@@ -149,6 +155,12 @@ void SinglePlayerActivity::loadLevel(const char* name) {
                                 (Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
 
   gameEnded = false;
+  countdown = 2000;
+  readyWindow->setAlpha(0.0);
+  goWindow->setAlpha(0.0);
+
+  menuActive = false;
+  ceguiActive = false;
 }
 
 bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
@@ -160,7 +172,17 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (OgreBallApplication::debug) return true;
 
-  if (!gameEnded) {
+  if (countdown != -1 && !menuActive && !ceguiActive) {
+    int lastcountdown = countdown;
+    countdown = std::max((int)(countdown - elapsedTime), -1);
+    if (lastcountdown > 1750 && countdown <= 1750) {
+      OBAnimationManager::startAnimation("SpinPopin", readyWindow, 0.8);
+    } else if (lastcountdown > 0 && countdown <= 0) {
+      OBAnimationManager::startAnimation("Popin", goWindow);
+    }
+  }
+
+  if (!gameEnded  && countdown == -1) {
     timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
 
     if (timeLeft == 0.0f) {
@@ -215,7 +237,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   if (gameEnded) {
     player->getBody()->setGravity(btVector3(0, 1000, 0));
-  } else {
+  } else if (countdown == -1) {
     player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
                                   .rotate(currTilt.getAxis(), -currTilt.getAngle())
                                   .rotate(currTilt.getAxis(), -currTilt.getAngle())
@@ -232,22 +254,23 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
 
   // Tilt Camera to simulate level tilt
-  Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
-  Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
+  if (countdown == -1) {
+    Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
+    Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
 
-  Ogre::Real xTilt = currTilt.x();
-  if (xTilt < 0) xTilt /= 3;
-  Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
-                                             xTilt,
-                                             currTilt.y(),
-                                             currTilt.z());
+    Ogre::Real xTilt = currTilt.x();
+    if (xTilt < 0) xTilt /= 3;
+    Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
+                                               xTilt,
+                                               currTilt.y(),
+                                               currTilt.z());
 
-  if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
-    app->mCameraLookAtNode->rotate(oq);
-    app->mCameraLookAtNode->rotate(notilt*notilt);
-    app->mCameraLookAtNode->rotate(noq);
+    if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
+      app->mCameraLookAtNode->rotate(oq);
+      app->mCameraLookAtNode->rotate(notilt*notilt);
+      app->mCameraLookAtNode->rotate(noq);
+    }
   }
-
   return true;
 }
 
@@ -523,12 +546,12 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
     currTiltDelay = 0;
     break;
   case OIS::KC_R:
-    if (lives > 0 && !gameEnded) {
+    if (lives > 0 && !gameEnded && countdown == -1) {
       lives--;
       OBAnimationManager::startAnimation("SpinPopup", livesDisplay);
       loadLevel(currentLevelName.c_str());
+      break;
     }
-    break;
   default:
     return false;
   }

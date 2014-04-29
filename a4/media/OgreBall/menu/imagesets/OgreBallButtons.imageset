@@ -12,6 +12,8 @@
   <Image Name="GameText" XPos="5" YPos="933" Width="333" Height="115" />
   <Image Name="OverText" XPos="387" YPos="933" Width="297" Height="115" />
   <Image Name="HighscoreText" XPos="5" YPos="1177" Width="747" Height="120" />
+  <Image Name="ReadyText" XPos="594" YPos="0" Width="454" Height="120" />
+  <Image Name="GoText" XPos="675" YPos="120" Width="197" Height="130" />
   <!--Image Name="ButtonDown" XPos="0.0" YPos="128.0" Width="512" Height="128" /-->
   <!--Image Name="ButtonDisabled" XPos="0.0" YPos="256.0" Width="512" Height="128" /-->
   <!--Image Name="ButtonHighlighted" XPos="0.0" YPos="384.14" Width="512" Height="128" /-->

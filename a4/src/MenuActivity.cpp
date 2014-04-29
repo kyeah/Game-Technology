@@ -6,6 +6,7 @@
 #include "HostPlayerActivity.h"
 #include "Leaderboard.h"
 #include "OBAnimationManager.h"
+#include "Sounds.h"
 
 #define NOT_SELECTED -1
 #define SINGLE_PLAYER 0
@@ -38,6 +39,8 @@ bool MenuActivity::quit( const CEGUI::EventArgs& e ) {
 }
 
 void MenuActivity::start(void) {
+  Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", 64);
+  
   // Load a background
   app->levelLoader->loadLevel("menuBG");
 

@@ -32,7 +32,7 @@ class Collectible : public GameObject {
                    Physics* physics, 
                    btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
                    btVector3 velocity=btVector3(0,0,0), btScalar mass=0.0f, btScalar rest=.9f,
-                   btVector3 localInertia=btVector3(0,0,0), btQuaternion *rotation=0, Ogre::String hitSound = "");
+                   btVector3 localInertia=btVector3(0,0,0), btQuaternion *rotation=0, Ogre::String hitSound = "media/OgreBall/sounds/pickup.wav");
 
     virtual void update(float elapsedTime);
     bool isHit;
@@ -59,7 +59,7 @@ class GoalObject : public GameObject {
              btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
              btVector3 velocity=btVector3(0,0,0),
              btScalar mass=0.0f, btScalar rest=0.1f,
-             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0, Ogre::String hitSound = "");
+             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0, Ogre::String hitSound = "media/OgreBall/sounds/hitGoal.wav");
   Ogre::String mHitSound;
   virtual void update(float elapsedTime);
 };
@@ -83,7 +83,7 @@ class Collidable : public GameObject{
              btVector3 origin=btVector3(0,0,0), btVector3 scale=btVector3(1,1,1),
              btVector3 velocity=btVector3(0,0,0),
              btScalar mass=0.0f, btScalar rest=0.0f,
-             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0, Ogre::String hitSound = "");
+             btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0, Ogre::String hitSound = "bumper.wav");
 
     virtual void update(float elapsedTime);
     Ogre::String mHitSound;
