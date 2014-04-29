@@ -47,7 +47,6 @@ void MenuActivity::start(void) {
   
   // Load a background
   app->levelLoader->loadLevelRand();
-  //  app->levelLoader->loadLevel("menuBG");
 
   new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0]);
@@ -193,7 +192,7 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
  = Player Select Menu
  ====================================================
  */
- bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
+bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
     CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/PlayerSelect"));
 
     CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
@@ -217,9 +216,6 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
 
  }
 
-
-
-
 /*
   ==========================================================
   = Level Selection Menu
@@ -227,6 +223,7 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
  */
 
 bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
+  close();
   if (CEGUI::System::getSingleton().getGUISheet()->getName().compare("Leaderboard") == 0) {
     CEGUI::System::getSingleton().setGUISheet(levelSelectorWindow);
     return true;
@@ -291,7 +288,6 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 bool MenuActivity::handleLSPrev( const CEGUI::EventArgs& evt ) {
   if (selectorStart > 0) {
     selectorStart -= 8;    
-    close();
     SwitchToLevelSelectMenu(evt);
   }
 }
@@ -299,7 +295,6 @@ bool MenuActivity::handleLSPrev( const CEGUI::EventArgs& evt ) {
 bool MenuActivity::handleLSNext( const CEGUI::EventArgs& evt ) {
   if (selectorStart < app->levelLoader->levelNames.size() - 8) {
     selectorStart += 8;    
-    close();
     SwitchToLevelSelectMenu(evt);
   }
 }
