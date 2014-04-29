@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout >
+  <Window Type="DefaultWindow" Name="Leaderboard" >
+    <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+    <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+    <Property Name="Alpha" Value="0.0" />
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/LevelName">
+      <Property Name="UnifiedAreaRect" Value="{{0,0},{0.1,0},{1,0},{0.25,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica32" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/0">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.32,0},{0.8,0},{0.36,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/1">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.36,0},{0.8,0},{0.40,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/2">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.40,0},{0.8,0},{0.44,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/3">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.44,0},{0.8,0},{0.48,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/4">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.48,0},{0.8,0},{0.52,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/5">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.52,0},{0.8,0},{0.56,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/6">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.56,0},{0.8,0},{0.60,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/7">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.60,0},{0.8,0},{0.64,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/8">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.64,0},{0.8,0},{0.68,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="Leaderboard/9">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.68,0},{0.8,0},{0.72,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="Font" Value="Helvetica" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="HorzFormatting" Value="WordWrapCentred" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="VertFormatting" Value="VertCentred" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="Leaderboard/NextLevel" >
+      <Property Name="Text" Value="Continue" />
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.73,0},{0.49,0},{0.78,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="Leaderboard/BackToMenu" >
+      <Property Name="Text" Value="Quit" />
+      <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.51,0},{0.73,0},{0.7,0},{0.78,0}}" />
+      <Property Name="InheritsAlpha" Value="False" />
+      <Property Name="Alpha" Value="0.0" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+    </Window>
+  </Window>
+</GUILayout>

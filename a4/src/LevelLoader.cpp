@@ -96,8 +96,11 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
 }
 
 void LevelLoader::loadLevel(const char* levelName) {
+  numCollectibles = 0;
+
   for (int i = 0; i < levelNames.size(); i++) {
     if (levelNames[i].compare(levelName) == 0) {
+      mCurrLevelID = i;
       ConfigNode *level = levels[i];
       vector<ConfigNode*> objs = level->getChildren();
 
@@ -135,6 +138,14 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Yposition Cutoff
+  ConfigNode *cutoffNode = root->findChild("fallCutoff");
+  if (cutoffNode) {
+    fallCutoff = cutoffNode->getValueF();
+  } else {
+    fallCutoff = -40000;
+  }
+
   // Waypoints
   ConfigNode *wpNode = root->findChild("waypoints");
   if (wpNode) {
@@ -159,13 +170,14 @@ void LevelLoader::loadStartParameters(ConfigNode *root) {
     }
   }
 
+  // Sounds
   ConfigNode* pSound = root->findChild("Sound");
 
   if(pSound){
     ConfigNode* pBackground = pSound->findChild("background");
     if(pBackground){
       Ogre::String backgroundMusic = pBackground->getValue();
-      Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
+ //     Sounds::playBackground(backgroundMusic.c_str(), Sounds::MAX_VOLUME);
     }
   }
   // Skyboxes and Skydomes
@@ -277,7 +289,9 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     Procedural::Path p, lastPath;
     Procedural::Shape s, lastShape;
     Procedural::MultiShape multishape;
-    bool useMultishape = false;
+    Procedural::Track scaleTrack, rotationTrack;
+    bool useMultishape, useScaleTrack, useRotationTrack;
+    useMultishape = useScaleTrack = useRotationTrack = false;
 
     s.close();
     vector<ConfigNode*> children = root->getChildren();
@@ -328,18 +342,24 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
         ConfigNode *combineType = children[i]->findChild("combine");
         if (combineType) {
           string type = combineType->getValue();
-          if (type.compare("union")) {
+          if (type.compare("union") == 0) {
             sappend.close();
             multishape = s.booleanUnion(sappend);
             useMultishape = true;
-          } else if (type.compare("intersection")) {
+          } else if (type.compare("intersection") == 0) {
             sappend.close();
             multishape = s.booleanIntersect(sappend);
             useMultishape = true;
-          }  else if (type.compare("difference")) {
+          }  else if (type.compare("difference") == 0) {
             sappend.close();
             multishape = s.booleanDifference(sappend);
             useMultishape = true;
+          } else if (type.compare("scaleTrack") == 0) {
+            useScaleTrack = true;
+            scaleTrack = sappend.convertToTrack(Procedural::Track::AM_RELATIVE_LINEIC);
+          } else if (type.compare("rotationTrack") == 0) {
+            useRotationTrack = true;
+            rotationTrack = sappend.convertToTrack(Procedural::Track::AM_RELATIVE_LINEIC);
           } else {
             s.appendShape(sappend);
           }
@@ -377,6 +397,7 @@ void LevelLoader::loadExtrudedMeshes(vector<ConfigNode*>& meshes, vector<string>
     }
 
     s.close();
+
     if (useMultishape) {
       Procedural::Extruder().setExtrusionPath(&p).setScale(scale).setMultiShapeToExtrude(&multishape).setShapeTextureTrack(t).setUTile(utiles).setVTile(vtiles).realizeMesh(meshNames[i]);
     } else {
@@ -832,17 +853,30 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     go = new Plane(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                    btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("collectible") == 0){
-    go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
-                         btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot, soundEffect);
+    if (soundEffect.length()) 
+      go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                           btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot, soundEffect);
+    else
+      go = new Collectible(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                           btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);
+    numCollectibles++;
   } else if (type.compare("extrudedObject") == 0) {
     go = new MeshObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                         btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("goal") == 0) {
-    go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
-                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    if (soundEffect.length())
+      go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    else 
+      go = new GoalObject(mSceneMgr, name, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else if (type.compare("collidable") == 0){
-    go = new Collidable(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
-                        btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    if (soundEffect.length())
+      go = new Collidable(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot, soundEffect);
+    else 
+      go = new Collidable(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
+                          btVector3(0,0,0), mass, rest, btVector3(0,0,0), &startRot);
   } else {
     go = new DecorativeObject(mSceneMgr, name, meshName, name, parentNode, mPhysics, startPos, scale,
                               btVector3(0,0,0), mass, rest, btVector3(0, 0, 0), &startRot);

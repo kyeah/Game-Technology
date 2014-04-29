@@ -30,14 +30,27 @@ class MenuActivity : public Activity {
   bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+
   bool SelectPenguin( const CEGUI::EventArgs& e);
   bool SelectOgre( const CEGUI::EventArgs& e);
 
+  bool SwitchToHostSelectMenu( const CEGUI::EventArgs& e);
+  bool SinglePlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
+  bool MultiPlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
+
   bool StartSinglePlayer( const CEGUI::EventArgs& e );
+  bool StartMultiPlayerHost( const CEGUI::EventArgs& e);
+  bool StartMultiPlayerClient( const CEGUI::EventArgs& e);
+
+  bool ShowLeaderboard( const CEGUI::EventArgs& e );
+  bool handleLSPrev( const CEGUI::EventArgs& e );
+  bool handleLSNext( const CEGUI::EventArgs& e );
 
   bool quit(const CEGUI::EventArgs& e);
 
-  CEGUI::Window *levelSelectorWindow;
+  CEGUI::Window *levelSelectorWindow, *lsBack, *lsPrev, *lsNext;
+  CEGUI::Window *lsButtons[8];
+
   int selectorStart, selectorRows, selectorColumns;
   int chosenCharacter;
   std::vector<LevelViewer*> levelViewers;

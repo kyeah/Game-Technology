@@ -19,7 +19,7 @@ void Sounds::init(){
     printf("Unable to open audio!\n");
     exit(1);
   }
-  
+
   Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
 
 }
@@ -29,12 +29,16 @@ void Sounds::playBackground(const char* aFilePath, int aVolume){
   if(aVolume > MAX_VOLUME) aVolume = 128;
   if(aVolume < MIN_VOLUME) aVolume = 0;
 
+  if (mBackgroundMusic) {
+    Mix_FreeMusic(mBackgroundMusic);
+  }
+
   mBackgroundMusic = NULL;
   mBackgroundMusic = Mix_LoadMUS(aFilePath);
   if(mBackgroundMusic != NULL){
-    Mix_PlayMusic(mBackgroundMusic, -1);
-    Mix_VolumeMusic(aVolume); 
-    Mix_HookMusicFinished(musicDone); 
+    Mix_FadeInMusic(mBackgroundMusic, -1, 1500);
+    Mix_VolumeMusic(aVolume);
+    //    Mix_HookMusicFinished(musicDone);
   }
 }
 

@@ -24,12 +24,18 @@ class SinglePlayerActivity : public Activity {
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual void handleGameEnd();
 
+  void handleGameOver();
+  bool HandleHighscoreSubmitted( const CEGUI::EventArgs& e );
+
   void loadLevel( const char* name );
+  bool nextLevel( const CEGUI::EventArgs& e );
+  bool Retry( const CEGUI::EventArgs& e );
+  bool ShowLeaderboard( const CEGUI::EventArgs& e);
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
 
-  const char* currentLevelName;
+  std::string currentLevelName;
 
   const static int CHARACTER_PENGUIN = 0;
 
@@ -46,6 +52,18 @@ class SinglePlayerActivity : public Activity {
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
     *collectDisplay, *livesDisplay, *levelDisplay;
 
+  CEGUI::Window *readyWindow, *goWindow;
+
+  CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
+  CEGUI::Window *gameWonSheet, *gwGoal, *gwNextLevel, *gwBackToMenu,
+    *gwViewLeaderboard, *gwTimeTaken, *gwCollectibles, *gwBonus, *gwScore, *gwHighscore,
+    *gwNameEditText, *gwSubmitHighscore;
+
+  CEGUI::Window *gameOverSheet, *goGame, *goOver, *goRetry, *goBackToMenu;
+
+  CEGUI::Window* leaderboardWindow, *leaderboardName, *leaderboardNextLevel, *leaderboardBackToMenu;
+  CEGUI::Window* leaderboardWindows[10];
+
   bool menuActive;
   bool ceguiActive;
   bool gameEnded;
@@ -55,4 +73,6 @@ class SinglePlayerActivity : public Activity {
   float timeLeft;  // In millis
   int collectibles, lives;
   int character;
+  int countdown;
+
 };

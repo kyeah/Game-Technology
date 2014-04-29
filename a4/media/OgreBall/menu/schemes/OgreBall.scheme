@@ -1,8 +1,11 @@
 <?xml version="1.0" ?>
 <GUIScheme Name="OgreBall">
+  <Font Filename="helvetica.font" />
+  <Font Filename="helvetica-32.font" />
   <Imageset Filename="OgreBall.imageset" />
   <Imageset Filename="OgreBallButtons.imageset" />
   <LookNFeel Filename="OgreBall.looknfeel" />
   <WindowRendererSet Filename="CEGUIFalagardWRBase" />
   <FalagardMapping WindowType="OgreBall/TextButton" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="OgreBall/TextButton" />
+  <FalagardMapping WindowType="OgreBall/SelectorImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="OgreBall/SelectorImage" />
 </GUIScheme>

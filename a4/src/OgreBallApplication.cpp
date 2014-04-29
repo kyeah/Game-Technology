@@ -24,6 +24,7 @@ using namespace std;
 using namespace sh;
 
 OgreBallApplication *OgreBallApplication::instance;
+bool OgreBallApplication::debug = false;
 
 CEGUI::MouseButton OgreBallApplication::convertButton(OIS::MouseButtonID buttonID)
 {
@@ -98,7 +99,6 @@ void OgreBallApplication::createScene(void)
   levelLoader->loadResources("media/OgreBall/scripts");
 
   switchActivity(new MenuActivity(this));
-  mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
 void OgreBallApplication::createCamera(void) {
@@ -115,6 +115,7 @@ void OgreBallApplication::loadResources(void) {
   CEGUI::Scheme::setDefaultResourceGroup("Schemes");
   CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+  CEGUI::AnimationManager::setDefaultResourceGroup("Animations");
 
   mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
@@ -125,11 +126,18 @@ void OgreBallApplication::loadResources(void) {
 
   Wmgr = &CEGUI::WindowManager::getSingleton();
   Wmgr->loadWindowLayout("Menu.layout");
+  Wmgr->loadWindowLayout("HostsMenu.layout");
   Wmgr->loadWindowLayout("MultiSubMenu.layout");
   Wmgr->loadWindowLayout("Chatbox.layout");
   Wmgr->loadWindowLayout("PauseMenu.layout");
   Wmgr->loadWindowLayout("GameWon.layout");
   Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
+  Wmgr->loadWindowLayout("GameOver.layout");
+  Wmgr->loadWindowLayout("Leaderboard.layout");
+  Wmgr->loadWindowLayout("LevelSelector.layout");
+
+  CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
+
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
   // CEGUI::System::getSingleton().setGUISheet(sheet);
 }
@@ -167,7 +175,8 @@ bool OgreBallApplication::frameRenderingQueued( const Ogre::FrameEvent &evt ) {
     mCameraMan->frameRenderingQueued(evt);
   }
 
-  activity->frameRenderingQueued(evt);
+  if (!activity->frameRenderingQueued(evt))
+    BaseApplication::frameRenderingQueued(evt);
 
   return true;
 }
@@ -221,6 +230,9 @@ extern "C" {
     int main(int argc, char *argv[])
 #endif
   {
+    if (argc > 1 && strcmp(argv[1], "-d") == 0) 
+      OgreBallApplication::debug = true;
+    
     // Create application object
     OgreBallApplication app;
 

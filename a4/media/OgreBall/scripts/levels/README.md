@@ -70,3 +70,9 @@ goal:
 ## Advanced Features
 
 Nest object definitions within other object definitions to create parent-child relations.
+
+### Notes
+
+CAMERA POSITIONING!!! Please position the camera 500 units above the player init pos, and 1000 units away in either the +-x or +-z direction. We were too lazy to do automatic positioning in code, so plz thanks ok
+
+Camera LookAt is only for the levelViewer.

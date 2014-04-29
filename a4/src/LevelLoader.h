@@ -48,9 +48,13 @@ class LevelLoader {
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
 
+  int mCurrLevelID;
+
   // Start Parameters for most recently loaded level
   btVector3 playerStartPositions[4];
   btQuaternion playerStartRotations[4];
+  int numCollectibles;
+  float fallCutoff;
 
   // Camera Interpolations when level is the menu background
   std::vector<btVector3> camPosKnobs;

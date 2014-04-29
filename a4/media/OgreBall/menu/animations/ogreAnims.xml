@@ -1,0 +1,72 @@
+<Animations>
+  <AnimationDefinition name="SpinPopup" duration="0.5" replayMode="once">
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.5" value="1.0" />
+    </Affector>
+    <Affector property="YRotation" interpolator="float" applicationMethod="relative">
+      <KeyFrame position="0.0" value="0" />
+      <KeyFrame position="0.25" value="180" />
+      <KeyFrame position="0.5" value="360" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="SpinPopin" duration="1.0" replayMode="once">
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.5" value="1.0" />
+      <KeyFrame position="1.0" value="0.0" />
+    </Affector>
+    <Affector property="YRotation" interpolator="float" applicationMethod="relative">
+      <KeyFrame position="0.0" value="0" />
+      <KeyFrame position="0.25" value="320" />
+      <KeyFrame position="0.5" value="360" />
+      <KeyFrame position="0.75" value="400" />
+      <KeyFrame position="1.0" value="720" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="Popin" duration="1.1" replayMode="once">
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.2" value="1.0" />
+      <KeyFrame position="0.8" value="1.0" />
+      <KeyFrame position="1.0" value="0.0" />
+    </Affector>
+    <Affector applicationMethod="relative" interpolator="UDim" property="UnifiedXPosition">
+      <KeyFrame position="0.0" value="{-0.03,0}" />
+      <KeyFrame position="0.5" progression="quadratic decelerating" value="{0.03,0}" />
+      <KeyFrame position="1.0" progression="quadratic accelerating" value="{-0.03,0}" />
+      <KeyFrame position="1.1" value="{0,0}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="StartButtonPulsating" duration="1.4" replayMode="loop">
+    <Affector applicationMethod="absolute" interpolator="float" property="Alpha">
+      <KeyFrame position="0" progression="linear" value="1.0" />
+      <KeyFrame position="0.7" progression="quadratic decelerating" value="0.6" />
+      <KeyFrame position="1.4" progression="quadratic accelerating" value="1.0" />
+    </Affector>
+    <Subscription event="MouseEntersArea" action="Start" />
+    <Subscription event="MouseLeavesArea" action="Stop" />
+  </AnimationDefinition>
+
+  <AnimationDefinition name="FadeInFromLeft" duration="0.4" replayMode="once">
+    <Affector applicationMethod="relative" interpolator="UDim" property="UnifiedXPosition">
+      <KeyFrame position="0.0" value="{-0.1,0}" />
+      <KeyFrame position="0.4" value="{0,0}" />
+    </Affector>
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.4" value="1.0" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="Hide" duration="0.5" replayMode="once">
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.5" value="0.0" />
+    </Affector>
+  </AnimationDefinition>
+
+</Animations>

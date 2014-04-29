@@ -47,8 +47,12 @@ void Collectible::update(float elapsedTime) {
           removeFromSimulator();
 
           Activity *a = OgreBallApplication::getSingleton()->activity;
-          if (a) a->score++;
+          if (a) {
+            a->score += 8000;
+            a->collectibles++;
+          }
           Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME));
+          // TODO: Send sound notification to clients if is Host
         }
       }
     }
