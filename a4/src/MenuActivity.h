@@ -28,7 +28,12 @@ class MenuActivity : public Activity {
 
   bool SwitchToMainMenu(const CEGUI::EventArgs& e);
   bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
+  bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+
+  bool SelectPenguin( const CEGUI::EventArgs& e);
+  bool SelectOgre( const CEGUI::EventArgs& e);
+
   bool SwitchToHostSelectMenu( const CEGUI::EventArgs& e);
   bool SinglePlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
   bool MultiPlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
@@ -47,5 +52,6 @@ class MenuActivity : public Activity {
   CEGUI::Window *lsButtons[8];
 
   int selectorStart, selectorRows, selectorColumns;
+  int chosenCharacter;
   std::vector<LevelViewer*> levelViewers;
 };

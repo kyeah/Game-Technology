@@ -8,7 +8,7 @@
 
 class SinglePlayerActivity : public Activity {
  public:
-  SinglePlayerActivity(OgreBallApplication *app, const char* levelName);
+  SinglePlayerActivity(OgreBallApplication *app, const char* levelName, int mCharacter=0);
   virtual ~SinglePlayerActivity(void);
   virtual void close(void);
 
@@ -36,6 +36,10 @@ class SinglePlayerActivity : public Activity {
   void togglePauseMenu();
 
   std::string currentLevelName;
+
+  const static int CHARACTER_PENGUIN = 0;
+
+  const static int CHARACTER_OGRE = 1;
 
   // User Input Variables
   btScalar MAX_TILT;
@@ -67,5 +71,8 @@ class SinglePlayerActivity : public Activity {
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
-  int lives, countdown;
+  int collectibles, lives;
+  int character;
+  int countdown;
+
 };

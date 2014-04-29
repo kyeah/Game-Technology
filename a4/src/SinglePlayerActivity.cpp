@@ -5,7 +5,7 @@
 #include "OBAnimationManager.h"
 #include "Sounds.h"
 
-SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName) : Activity(app) {
+SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName, int mCharacter) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
   lastTilt = btQuaternion(0,0,0);
@@ -14,7 +14,8 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   currentLevelName = std::string(levelName, std::strlen(levelName));
   menuActive = false;
   ceguiActive = false;
-  lives = 4;
+  lives = 10;
+  character = mCharacter;
 }
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
@@ -146,7 +147,20 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   collectibles = 0;
   score = 0;
 
-  player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
+  //Choose the correct mesh for the selected character
+  std::stringstream playerChoice;
+  switch(character){
+    case CHARACTER_PENGUIN:
+      playerChoice << "penguin.mesh";
+      break;
+    case CHARACTER_OGRE:
+      playerChoice << "ogrehead.mesh";
+      break;
+
+
+  }
+
+  player = new OgreBall(app->mSceneMgr, "player1", "player1", playerChoice.str(), 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
                         16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 

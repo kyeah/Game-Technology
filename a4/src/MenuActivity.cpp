@@ -1,3 +1,6 @@
+
+
+
 #include "Interpolator.h"
 #include "LevelViewer.h"
 #include "MenuActivity.h"
@@ -16,6 +19,7 @@
 std::vector<LevelViewer*> MenuActivity::viewerPool;
 
 int type_flag = NOT_SELECTED;
+int player_flag = 0;
 
 MenuActivity::MenuActivity(OgreBallApplication *app) : Activity(app) {
   selectorStart = 0;
@@ -114,7 +118,7 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
 
   singlePlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                     CEGUI::Event::Subscriber(&MenuActivity::SinglePlayerLevelSelectWrapper, this));
+                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToPlayerSelectMenu, this));
 
   multiPlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -183,6 +187,38 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
   returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
 }
+
+/*
+ ====================================================
+ = Player Select Menu
+ ====================================================
+ */
+ bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
+    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/PlayerSelect"));
+
+    CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
+    CEGUI::Window* ogreButton = app->Wmgr->getWindow("Menu/Ogre");
+
+    penguinButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::SelectPenguin, this));
+
+    ogreButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::SelectOgre, this));
+ }
+
+ bool MenuActivity::SelectPenguin( const CEGUI::EventArgs& e){
+    player_flag = 0;
+    MenuActivity::SinglePlayerLevelSelectWrapper(e);
+
+ }
+ bool MenuActivity::SelectOgre( const CEGUI::EventArgs& e){
+    player_flag = 1;
+    MenuActivity::SinglePlayerLevelSelectWrapper(e);
+
+ }
+
+
+
 
 /*
   ==========================================================
@@ -358,7 +394,7 @@ bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
     {
 
     }
-  app->switchActivity(new SinglePlayerActivity(app, levelName.c_str()));
+  app->switchActivity(new SinglePlayerActivity(app, levelName.c_str(), player_flag));
   return true;
 }
 

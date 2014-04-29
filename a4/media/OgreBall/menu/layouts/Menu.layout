@@ -48,5 +48,6 @@
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
+
   </Window>
 </GUILayout>

@@ -135,7 +135,7 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("GameOver.layout");
   Wmgr->loadWindowLayout("Leaderboard.layout");
   Wmgr->loadWindowLayout("LevelSelector.layout");
-
+  Wmgr->loadWindowLayout("PlayerSelector.layout");
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
