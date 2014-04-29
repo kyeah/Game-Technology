@@ -117,7 +117,7 @@ bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
 
   singlePlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                     CEGUI::Event::Subscriber(&MenuActivity::SinglePlayerLevelSelectWrapper, this));
+                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToPlayerSelectMenu, this));
 
   multiPlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -192,9 +192,8 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
  = Player Select Menu
  ====================================================
  */
- bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
-    close();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/Background"));
+ bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
+    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/PlayerSelect"));
 
     CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
     CEGUI::Window* ogreButton = app->Wmgr->getWindow("Menu/Ogre");
@@ -206,14 +205,14 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
                                 CEGUI::Event::Subscriber(&MenuActivity::SelectOgre, this));
  }
 
- bool SelectPenguin( const CEGUI::EventArgs& e){
+ bool MenuActivity::SelectPenguin( const CEGUI::EventArgs& e){
     player_flag = 0;
-    MenuActivity::StartSinglePlayer(e);
+    MenuActivity::SinglePlayerLevelSelectWrapper(e);
 
  }
- bool SelectOgre( const CEGUI::EventArgs& e){
+ bool MenuActivity::SelectOgre( const CEGUI::EventArgs& e){
     player_flag = 1;
-    MenuActivity::StartSinglePlayer(e);
+    MenuActivity::SinglePlayerLevelSelectWrapper(e);
 
  }
 
@@ -267,7 +266,7 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
     if(type_flag == SINGLE_PLAYER){
       v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
       v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
-                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToPlayerSelectMenu, this));
+                                CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, this));
 
       lsButtons[i % 8]->setVisible(true);
       lsButtons[i % 8]->removeEvent(CEGUI::PushButton::EventMouseClick);
