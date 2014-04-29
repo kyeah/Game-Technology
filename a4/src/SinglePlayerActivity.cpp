@@ -26,6 +26,16 @@ void SinglePlayerActivity::close(void) {
 
 }
 
+bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
+  CEGUI::MouseCursor::getSingleton().hide();
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  menuActive = false;
+  ceguiActive = false;
+  lives = 4;
+
+  loadLevel(currentLevelName.c_str());
+}
+
 void SinglePlayerActivity::start(void) {
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   CEGUI::System::getSingleton().setGUISheet(guiSheet);
@@ -281,8 +291,6 @@ bool SinglePlayerActivity::ShowLeaderboard( const CEGUI::EventArgs& e ) {
     OBAnimationManager::startAnimation("FadeInFromLeft", leaderboardWindows[i], 1.0, 1.0 + 0.2f*i);
     i++;
   }
-
-  leaderboard.saveToFile();
 }
 
 bool SinglePlayerActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
@@ -412,6 +420,11 @@ void SinglePlayerActivity::handleGameOver() {
   goBackToMenu
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  goRetry->removeEvent(CEGUI::PushButton::EventClicked);
+  goRetry
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::Retry, this));
 }
 
 bool SinglePlayerActivity::HandleHighscoreSubmitted( const CEGUI::EventArgs &e ) {
@@ -504,6 +517,13 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
     tiltDest *= btQuaternion(0,-MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
+    break;
+  case OIS::KC_R:
+    if (lives > 0) {
+      lives--;
+      OBAnimationManager::startAnimation("SpinPopup", livesDisplay);
+      loadLevel(currentLevelName.c_str());
+    }
     break;
   default:
     return false;

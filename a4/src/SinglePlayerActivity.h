@@ -29,6 +29,7 @@ class SinglePlayerActivity : public Activity {
 
   void loadLevel( const char* name );
   bool nextLevel( const CEGUI::EventArgs& e );
+  bool Retry( const CEGUI::EventArgs& e );
   bool ShowLeaderboard( const CEGUI::EventArgs& e);
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );

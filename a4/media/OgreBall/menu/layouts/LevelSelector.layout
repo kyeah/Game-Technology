@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Menu/LevelSelector">
+    <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <Property Name="InheritsAlpha" Value="False"/>
+    <Property Name="Alpha" Value="1.0" />
+
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/1">
+      <Property Name="UnifiedAreaRect" Value="{{0.05,0.0},{0.37,0.0},{0.26,0.0},{0.42,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/2">
+      <Property Name="UnifiedAreaRect" Value="{{0.275,0.0},{0.37,0.0},{0.485,0.0},{0.42,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/3">
+      <Property Name="UnifiedAreaRect" Value="{{0.5,0.0},{0.37,0.0},{0.71,0.0},{0.42,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/4">
+      <Property Name="UnifiedAreaRect" Value="{{0.725,0.0},{0.37,0.0},{0.94,0.0},{0.42,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/5">
+      <Property Name="UnifiedAreaRect" Value="{{0.05,0.0},{0.67,0.0},{0.26,0.0},{0.72,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/6">
+      <Property Name="UnifiedAreaRect" Value="{{0.275,0.0},{0.67,0.0},{0.485,0.0},{0.72,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/7">
+      <Property Name="UnifiedAreaRect" Value="{{0.5,0.0},{0.67,0.0},{0.71,0.0},{0.72,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/8">
+      <Property Name="UnifiedAreaRect" Value="{{0.725,0.0},{0.67,0.0},{0.94,0.0},{0.72,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leaderboard" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/Back">
+      <Property Name="UnifiedAreaRect" Value="{{0.70,0.0},{0.77,0.0},{0.82,0.0},{0.82,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Main Menu" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/Prev">
+      <Property Name="UnifiedAreaRect" Value="{{0.83,0.0},{0.77,0.0},{0.87,0.0},{0.82,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="&lt;" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="LevelSelector/Next">
+      <Property Name="UnifiedAreaRect" Value="{{0.88,0.0},{0.77,0.0},{0.92,0.0},{0.82,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="&gt;" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+  </Window>
+</GUILayout>

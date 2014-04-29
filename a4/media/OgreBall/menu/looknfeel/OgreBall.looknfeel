@@ -204,13 +204,43 @@
 
 
   <WidgetLook name="OgreBall/SelectorImage">
+    <PropertyDefinition name="TextColour" initialValue="00000000" redrawOnWrite="true" />
+    <PropertyDefinition name="ShadowTextColour" initialValue="00000000" redrawOnWrite="true" />
     <PropertyDefinition name="ImageColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
     <PropertyDefinition name="FrameColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
     <PropertyDefinition name="BackgroundColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
     <PropertyDefinition name="VertFormatting" initialValue="Stretched" redrawOnWrite="true" />
     <PropertyDefinition name="HorzFormatting" initialValue="Stretched" redrawOnWrite="true" />
+    <PropertyDefinition name="VertLabelFormatting" initialValue="VertCentred" redrawOnWrite="true" />
+    <PropertyDefinition name="HorzLabelFormatting" initialValue="WordWrapCentred" redrawOnWrite="true" />
     <Property name="BackgroundEnabled" value="True" />
     <Property name="FrameEnabled" value="True" />
+    <ImagerySection name="label">
+      <TextComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="15" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="15" /></Dim>
+          <Dim type="Width"><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height"><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <TextProperty name="Text" />
+        <VertFormatProperty name="VertLabelFormatting" />
+        <HorzFormatProperty name="HorzLabelFormatting" />
+      </TextComponent>
+    </ImagerySection>
+    <ImagerySection name="labelshadow">
+      <TextComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="17" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="17" /></Dim>
+          <Dim type="Width"><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height"><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <TextProperty name="Text" />
+        <VertFormatProperty name="VertLabelFormatting" />
+        <HorzFormatProperty name="HorzLabelFormatting" />
+      </TextComponent>
+    </ImagerySection>
     <ImagerySection name="image_withframe">
       <ImageryComponent>
         <Area>
@@ -256,41 +286,89 @@
     <StateImagery name="EnabledFrame">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="frame" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="DisabledFrame">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="frame" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="WithFrameEnabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="WithFrameDisabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="NoFrameEnabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background_noframe" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="NoFrameDisabledBackground">
       <Layer>
         <Section look="TaharezLook/StaticShared" section="background_noframe" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="WithFrameImage">
       <Layer>
         <Section section="image_withframe" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <StateImagery name="NoFrameImage">
       <Layer>
         <Section section="image_noframe" />
+        <Section section="labelshadow">
+          <ColourProperty name="ShadowTextColour" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
       </Layer>
     </StateImagery>
     <AnimationDefinition name="unHighlight" duration="0.001" replayMode="once">
@@ -298,12 +376,28 @@
         <KeyFrame position="0.0" value="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" />
         <KeyFrame position="0.001" value="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" />
       </Affector>
+      <Affector property="TextColour" interpolator="colour" applicationMethod="absolute">
+        <KeyFrame position="0.0" value="00000000" />
+        <KeyFrame position="0.001" value="00000000" />
+      </Affector>
+      <Affector property="ShadowTextColour" interpolator="colour" applicationMethod="absolute">
+        <KeyFrame position="0.0" value="00000000" />
+        <KeyFrame position="0.001" value="00000000" />
+      </Affector>
       <Subscription event="MouseLeavesArea" action="Start" />
     </AnimationDefinition>
     <AnimationDefinition name="Highlight" duration="0.001" replayMode="once">
       <Affector property="ImageColours" interpolator="ColourRect" applicationMethod="absolute">
         <KeyFrame position="0.0" value="tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837" />
         <KeyFrame position="0.001" value="tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837" />
+      </Affector>
+      <Affector property="TextColour" interpolator="colour" applicationMethod="absolute">
+        <KeyFrame position="0.0" value="FFFFFFFF" />
+        <KeyFrame position="0.001" value="FFFFFFFF" />
+      </Affector>
+      <Affector property="ShadowTextColour" interpolator="colour" applicationMethod="absolute">
+        <KeyFrame position="0.0" value="FF000000" />
+        <KeyFrame position="0.001" value="FF000000" />
       </Affector>
       <Subscription event="MouseEntersArea" action="Start" />
     </AnimationDefinition>

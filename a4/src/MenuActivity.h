@@ -37,9 +37,15 @@ class MenuActivity : public Activity {
   bool StartMultiPlayerHost( const CEGUI::EventArgs& e);
   bool StartMultiPlayerClient( const CEGUI::EventArgs& e);
 
+  bool ShowLeaderboard( const CEGUI::EventArgs& e );
+  bool handleLSPrev( const CEGUI::EventArgs& e );
+  bool handleLSNext( const CEGUI::EventArgs& e );
+
   bool quit(const CEGUI::EventArgs& e);
 
-  CEGUI::Window *levelSelectorWindow;
+  CEGUI::Window *levelSelectorWindow, *lsBack, *lsPrev, *lsNext;
+  CEGUI::Window *lsButtons[8];
+
   int selectorStart, selectorRows, selectorColumns;
   std::vector<LevelViewer*> levelViewers;
 };

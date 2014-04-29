@@ -90,6 +90,7 @@ void LevelViewer::loadLevel(const char* levelName) {
   else
     window = wmgr->createWindow("OgreBall/SelectorImage", levelName);
 
+  window->setText(levelName);
   window->setSize(CEGUI::UVector2(CEGUI::UDim(0.21f, 0),
                                   CEGUI::UDim(0.15f, 0)));
   window->setPosition(CEGUI::UVector2(CEGUI::UDim(0.5f, 0),

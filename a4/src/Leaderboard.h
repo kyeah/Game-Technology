@@ -32,7 +32,7 @@ class LeaderboardEntry {
     timess << seconds << ":";
     if (millis < 10) timess << "0";
     timess << millis;
-    
+
     return timess.str();
   }
 

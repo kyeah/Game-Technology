@@ -99,7 +99,6 @@ void OgreBallApplication::createScene(void)
   levelLoader->loadResources("media/OgreBall/scripts");
 
   switchActivity(new MenuActivity(this));
-  mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
 void OgreBallApplication::createCamera(void) {
@@ -135,6 +134,7 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
   Wmgr->loadWindowLayout("GameOver.layout");
   Wmgr->loadWindowLayout("Leaderboard.layout");
+  Wmgr->loadWindowLayout("LevelSelector.layout");
 
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 
