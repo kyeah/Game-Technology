@@ -1,0 +1,38 @@
+extrudedMesh curvedTunnelMesh {
+  path {
+     type bezierCurve
+     points {
+       p 0 0 0
+       p 0 0 -30000
+       p 30000 0 -45000
+       p 0 -10000 -60000
+       p 0 -15000 -70000
+     }
+  }
+  shape {
+     type rectangle
+     width 8000
+     height 8000
+  }
+  shape {
+     type circle
+     radius 2400
+     segments 40
+     combine difference
+  }
+  track {
+     addressing relative
+     keyframes {
+       k 0 0
+       k 0.1 .2
+       k 0.2 .4
+       k 0.3 .6
+       k 0.4 .8
+       k 0.5 .6
+       k 0.6 .4
+       k 0.7 .2
+       k 0.8 .3
+       k 0.9 .4
+     }
+  }  
+}

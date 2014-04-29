@@ -24,6 +24,7 @@ class LevelLoader {
 
   void loadResources(const std::string& path);  
   void loadLevel(const char* levelName);
+  void loadLevelRand();
   void loadLevel(LevelViewer *viewer, const char* levelName);
 
   void loadStartParameters(sh::ConfigNode *root);

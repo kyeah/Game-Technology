@@ -238,11 +238,13 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (gameEnded) {
     player->getBody()->setGravity(btVector3(0, 1000, 0));
   } else if (countdown == -1) {
-    player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
-                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                  .rotate(q.getAxis(), q.getAngle()));
+    btVector3 tweakedGrav = 2*app->mPhysics->getDynamicsWorld()->getGravity()
+      .rotate(currTilt.getAxis(), -3*currTilt.getAngle())
+      .rotate(q.getAxis(), q.getAngle());
+
+    tweakedGrav[1] /= 2;
+    player->getBody()->setGravity(tweakedGrav);
+      
   }
 
   // Update Camera Position

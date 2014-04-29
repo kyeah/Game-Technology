@@ -42,7 +42,8 @@ void MenuActivity::start(void) {
   Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", 64);
   
   // Load a background
-  app->levelLoader->loadLevel("menuBG");
+  app->levelLoader->loadLevelRand();
+  //  app->levelLoader->loadLevel("menuBG");
 
   new OgreBall(app->mSceneMgr, "free", "penguin", "penguin.mesh", 0, app->mPhysics,
                app->levelLoader->playerStartPositions[0]);

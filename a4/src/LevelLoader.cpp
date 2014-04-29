@@ -95,6 +95,10 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
   setScene(mgr, cam, physics, lvlRoot);
 }
 
+void LevelLoader::loadLevelRand() {
+  loadLevel(levelNames[rand() % levelNames.size()].c_str());
+}
+
 void LevelLoader::loadLevel(const char* levelName) {
   numCollectibles = 0;
 
@@ -736,8 +740,8 @@ Procedural::Track* LevelLoader::parseTrack(ConfigNode *path) {
 void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
   string meshName, materialName;
   btVector3 scale(1,1,1);
-  btVector3 startPos;
-  btQuaternion startRot;
+  btVector3 startPos(0,0,0);
+  btQuaternion startRot(0,0,0);
   Ogre::String soundEffect;
 
   vector<float> interpTimes;

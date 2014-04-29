@@ -20,7 +20,7 @@ level guidedPath {
       }
       goal {
            pos {
-               start 5000 500 -10000
+               start 5000 200 -10000
            }
            rot { 
                start 0 0 0
@@ -56,7 +56,7 @@ level guidedPath {
             meshname sphere.mesh
             rest 0.8
             pos {
-                start 0 100 0
+                start 2245 250 -4960
             }
 
       }
