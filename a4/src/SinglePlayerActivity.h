@@ -71,7 +71,7 @@ class SinglePlayerActivity : public Activity {
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
-  int collectibles, lives;
+  int lives;
   int character;
   int countdown;
 
