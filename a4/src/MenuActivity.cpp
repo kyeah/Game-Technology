@@ -203,6 +203,9 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 
   for (int i = 0; i < 8; i++) {
     lsButtons[i]->setVisible(false);
+    if (viewerPool.size() > i) {
+      viewerPool[i]->window->setVisible(false);
+    }
   }
 
   for (int i = selectorStart; i < selectorEnd && i < loader->levelNames.size(); i++) {
@@ -214,7 +217,7 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
       v = viewerPool.back();
       viewerPool.pop_back();
       v->loadLevel(loader->levelNames[i].c_str());
-
+      v->window->setVisible(true);
     } else {
       v = new LevelViewer(app->mRenderer, loader->levelNames[i].c_str());
     }
@@ -236,8 +239,8 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
       v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
                                 CEGUI::Event::Subscriber(&MenuActivity::StartMultiPlayerHost, this));
     }
-    v->setPositionPercent(0.05 + (i%selectorColumns)*0.9/selectorColumns,
-                          0.2 + (i/selectorColumns)*0.6/selectorRows);
+    v->setPositionPercent(0.05 + ((i%8)%selectorColumns)*0.9/selectorColumns,
+                          0.2 + ((i%8)/selectorColumns)*0.6/selectorRows);
 
     levelViewers.push_back(v);
   }

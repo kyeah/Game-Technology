@@ -96,8 +96,6 @@ void LevelLoader::loadLevel(LevelViewer *viewer, const char* levelName) {
 }
 
 void LevelLoader::loadLevel(const char* levelName) {
-
-  std::cout << "loading level!" << std::endl;
   numCollectibles = 0;
 
   for (int i = 0; i < levelNames.size(); i++) {
