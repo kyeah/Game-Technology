@@ -50,6 +50,17 @@ void SinglePlayerActivity::start(void) {
   pauseQuit = app->Wmgr->getWindow("PauseMenu/Quit");
   pauseReturn = app->Wmgr->getWindow("PauseMenu/Return");
 
+  pauseQuit->removeEvent(CEGUI::PushButton::EventClicked);
+  pauseQuit
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  pauseReturn->removeEvent(CEGUI::PushButton::EventClicked);
+  pauseReturn
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
+
+
   gameWonSheet = app->Wmgr->getWindow("GameWon");
   gwGoal = app->Wmgr->getWindow("GameWon/Goal");
   gwNextLevel = app->Wmgr->getWindow("GameWon/NextLevel");
@@ -63,16 +74,51 @@ void SinglePlayerActivity::start(void) {
   gwNameEditText = app->Wmgr->getWindow("GameWon/EnterName");
   gwSubmitHighscore = app->Wmgr->getWindow("GameWon/SubmitHighscore");
 
+  gwBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  gwBackToMenu
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  gwViewLeaderboard->removeEvent(CEGUI::PushButton::EventClicked);
+  gwViewLeaderboard
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ShowLeaderboard, this));
+
+  gwNextLevel->removeEvent(CEGUI::PushButton::EventClicked);
+  gwNextLevel
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
+
   gameOverSheet = app->Wmgr->getWindow("GameOver");
   goGame = app->Wmgr->getWindow("GameOver/Game");
   goOver = app->Wmgr->getWindow("GameOver/Over");
   goRetry = app->Wmgr->getWindow("GameOver/Retry");
   goBackToMenu = app->Wmgr->getWindow("GameOver/BackToMenu");
 
+  goBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  goBackToMenu
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  goRetry->removeEvent(CEGUI::PushButton::EventClicked);
+  goRetry
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::Retry, this));
+
   leaderboardWindow = app->Wmgr->getWindow("Leaderboard");
   leaderboardName = app->Wmgr->getWindow("Leaderboard/LevelName");
   leaderboardNextLevel = app->Wmgr->getWindow("Leaderboard/NextLevel");
   leaderboardBackToMenu = app->Wmgr->getWindow("Leaderboard/BackToMenu");
+
+  leaderboardBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
+  leaderboardBackToMenu
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
+
+  leaderboardNextLevel->removeEvent(CEGUI::PushButton::EventClicked);
+  leaderboardNextLevel
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
 
   for (int i = 0; i < 10; i++) {
     std::stringstream ss;
@@ -219,15 +265,6 @@ void SinglePlayerActivity::togglePauseMenu( ) {
     CEGUI::MouseCursor::getSingleton().show();
     CEGUI::System::getSingleton().setGUISheet(pauseMenuSheet);
 
-    pauseQuit->removeEvent(CEGUI::PushButton::EventClicked);
-    pauseQuit
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                       CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-
-    pauseReturn->removeEvent(CEGUI::PushButton::EventClicked);
-    pauseReturn
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                       CEGUI::Event::Subscriber(&SinglePlayerActivity::togglePauseMenu, this));
   } else {
     app->paused = false;
     CEGUI::MouseCursor::getSingleton().hide();
@@ -252,16 +289,6 @@ bool SinglePlayerActivity::nextLevel( const CEGUI::EventArgs& e ) {
 
 bool SinglePlayerActivity::ShowLeaderboard( const CEGUI::EventArgs& e ) {
   CEGUI::System::getSingleton().setGUISheet(leaderboardWindow);
-
-  leaderboardBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
-  leaderboardBackToMenu
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-
-  leaderboardNextLevel->removeEvent(CEGUI::PushButton::EventClicked);
-  leaderboardNextLevel
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
 
   for (int i = 0; i < 10; i++)
     leaderboardWindows[i]->setAlpha(0.0);
@@ -327,16 +354,6 @@ void SinglePlayerActivity::handleGameEnd() {
   OBAnimationManager::startAnimation("SpinPopup", gwBackToMenu, 0.5);
   OBAnimationManager::startAnimation("SpinPopup", gwViewLeaderboard, 0.35);
 
-  gwBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
-  gwBackToMenu
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-
-  gwViewLeaderboard->removeEvent(CEGUI::PushButton::EventClicked);
-  gwViewLeaderboard
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ShowLeaderboard, this));
-
   int totalScore = score + timeLeft + (collectibles == app->levelLoader->numCollectibles ? 10000 : 0);
 
   std::stringstream timess;
@@ -388,15 +405,12 @@ void SinglePlayerActivity::handleGameEnd() {
     OBAnimationManager::startAnimation("FadeInFromLeft", gwSubmitHighscore, 1.0, 3.2f);
 
     gwSubmitHighscore->setText("Add to Leaderboards");
+
     gwSubmitHighscore->removeEvent(CEGUI::PushButton::EventClicked);
     gwSubmitHighscore
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&SinglePlayerActivity::HandleHighscoreSubmitted, this));
   }
-
-  app->Wmgr->getWindow("GameWon/NextLevel")
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::nextLevel, this));
 }
 
 void SinglePlayerActivity::handleGameOver() {
@@ -415,16 +429,6 @@ void SinglePlayerActivity::handleGameOver() {
   OBAnimationManager::startAnimation("SpinPopup", goOver, 0.25);
   OBAnimationManager::startAnimation("SpinPopup", goRetry, 0.2);
   OBAnimationManager::startAnimation("SpinPopup", goBackToMenu, 0.2);
-
-  goBackToMenu->removeEvent(CEGUI::PushButton::EventClicked);
-  goBackToMenu
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::ExitToMenu, this));
-
-  goRetry->removeEvent(CEGUI::PushButton::EventClicked);
-  goRetry
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                     CEGUI::Event::Subscriber(&SinglePlayerActivity::Retry, this));
 }
 
 bool SinglePlayerActivity::HandleHighscoreSubmitted( const CEGUI::EventArgs &e ) {
@@ -519,7 +523,7 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
     currTiltDelay = 0;
     break;
   case OIS::KC_R:
-    if (lives > 0) {
+    if (lives > 0 && !gameEnded) {
       lives--;
       OBAnimationManager::startAnimation("SpinPopup", livesDisplay);
       loadLevel(currentLevelName.c_str());
