@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Menu/ServerList">
+    <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <Property Name="InheritsAlpha" Value="False"/>
+    <Property Name="Alpha" Value="1.0" />    
+    <Window Type="TaharezLook/Listbox" Name="ServerList/List">
+      <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.25,0.0},{0.92,0.0},{0.75,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="ServerList/Back">
+      <Property Name="UnifiedAreaRect" Value="{{0.70,0.0},{0.77,0.0},{0.82,0.0},{0.82,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Main Menu" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+  </Window>
+</GUILayout>

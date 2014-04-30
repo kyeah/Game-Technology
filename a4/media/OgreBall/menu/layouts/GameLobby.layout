@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="GameLobby">
+    <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <Property Name="InheritsAlpha" Value="False"/>
+    <Property Name="Alpha" Value="1.0" />
+    <Window Type="TaharezLook/StaticText" Name="GameLobby/1">
+      <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.25,0.0},{0.92,0.0},{0.30,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="GameLobby/2">
+      <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.30,0.0},{0.92,0.0},{0.35,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="GameLobby/3">
+      <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.35,0.0},{0.92,0.0},{0.40,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="TaharezLook/StaticText" Name="GameLobby/4">
+      <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.40,0.0},{0.92,0.0},{0.45,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameLobby/SelectLevel">
+      <Property Name="UnifiedAreaRect" Value="{{0.83,0.0},{0.77,0.0},{0.90,0.0},{0.82,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Select Level" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="0.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameLobby/SelectCharacter">
+      <Property Name="UnifiedAreaRect" Value="{{0.70,0.0},{0.77,0.0},{0.82,0.0},{0.82,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Select Character" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameLobby/Leave">
+      <Property Name="UnifiedAreaRect" Value="{{0.70,0.0},{0.83,0.0},{0.82,0.0},{0.88,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Leave Lobby" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="GameLobby/Ready">
+      <Property Name="UnifiedAreaRect" Value="{{0.83,0.0},{0.83,0.0},{0.90,0.0},{0.88,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Ready" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="0.0" />
+    </Window>
+  </Window>
+</GUILayout>

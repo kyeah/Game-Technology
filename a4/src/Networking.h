@@ -50,6 +50,15 @@ typedef struct {
   int id;
 } ConnectAck;
 
+typedef struct {
+  bool isJoining;
+} PingMessage;
+
+typedef struct {
+  const char* serverName;
+  int numPlayers;
+} PingResponseMessage;
+
 class Networking{
 public:
 	static void initSDLNet();
@@ -57,6 +66,7 @@ public:
 	static void serverConnect();
 	static void Close();
 	static bool clientConnect(int *id, char* hostName); 
+        static std::vector<PingResponseMessage> hostCheck( const char* filename );
 
 	static TCPsocket server_socket, client_socket;
 	static IPaddress serv_ip, client_ip;

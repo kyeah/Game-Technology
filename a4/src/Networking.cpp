@@ -24,9 +24,9 @@ void Networking::initSDLNet() {
 
 
 void Networking::Send(TCPsocket socket, char *msg, int len) {
-        if (SDLNet_TCP_Send(socket, (void*)msg, len) < len) {
-                printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-        }
+  if (SDLNet_TCP_Send(socket, (void*)msg, len) < len) {
+    printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  }
 }
 
 void Networking::serverConnect(){
@@ -46,19 +46,52 @@ void Networking::serverConnect(){
 
 void Networking::Close(){
   /*
-  if (server_socket)
+    if (server_socket)
     SDLNet_TCP_Close(server_socket);
 
-  if (client_socket)
+    if (client_socket)
     SDLNet_TCP_Close(client_socket);
-  
-  for (int i = 1; i < 4; i++) {
+
+    for (int i = 1; i < 4; i++) {
     Player *mPlayer = players[i];
     if (mPlayer && mPlayer->csd) {
-      SDLNet_TCP_Close(mPlayer->csd);
+    SDLNet_TCP_Close(mPlayer->csd);
     }
     }*/
   SDLNet_Quit();
+}
+
+std::vector<PingResponseMessage> Networking::hostCheck( const char* filename ) {
+  SDLNet_Init();
+
+  std::ifstream ifs(filename);
+
+  std::vector<PingResponseMessage> messages;
+
+  if (ifs) {
+    std::string host;
+    while (!ifs.eof()) {
+      // Get next hostname
+      std::getline(ifs, host);
+      
+      if (SDLNet_ResolveHost(&client_ip, host.c_str(), PORT) != -1) {
+        client_socket = SDLNet_TCP_Open(&client_ip);
+        if (client_socket) {
+
+          // Ping server for information
+          PingMessage ping;
+          ping.isJoining = false;
+          SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
+
+          PingResponseMessage response;
+          SDLNet_TCP_Recv(client_socket, &response, sizeof(response));
+          messages.push_back(response);
+        }
+      }
+    }
+  }
+
+  return messages;
 }
 
 bool Networking::clientConnect(int *id, char* host){
@@ -86,14 +119,13 @@ bool Networking::clientConnect(int *id, char* host){
     return false;
   }
 
-//connected = true
+  //connected = true
   ConnectAck ack;
   SDLNet_TCP_Recv(client_socket, &ack, sizeof(ack));
   *id = ack.id;
   for (int i = 0; i < 4; i++) {
     client_ids[i] = ack.ids[i];
   }
-//  printf("myID: %d\n", myId);
+  //  printf("myID: %d\n", myId);
   return true;
 }
-

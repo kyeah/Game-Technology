@@ -128,6 +128,8 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("Menu.layout");
   Wmgr->loadWindowLayout("HostsMenu.layout");
   Wmgr->loadWindowLayout("MultiSubMenu.layout");
+  Wmgr->loadWindowLayout("ServerList.layout");
+  Wmgr->loadWindowLayout("GameLobby.layout");
   Wmgr->loadWindowLayout("Chatbox.layout");
   Wmgr->loadWindowLayout("PauseMenu.layout");
   Wmgr->loadWindowLayout("GameWon.layout");

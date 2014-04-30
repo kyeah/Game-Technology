@@ -14,8 +14,10 @@ HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lev
   currentLevelName = levelName;
   menuActive = false;
   ceguiActive = false;
+  bool inGame = false;
   lives = 10;
   Networking::serverConnect();
+  inGame = false;
 }
 
 HostPlayerActivity::~HostPlayerActivity(void) {
@@ -36,14 +38,14 @@ void HostPlayerActivity::close(void) {
 }
 
 void HostPlayerActivity::start(void) {
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  //CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
   timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
   levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
 
-  loadLevel(currentLevelName);
+  //  loadLevel(currentLevelName);
 }
 
 void HostPlayerActivity::loadLevel(const char* name) {

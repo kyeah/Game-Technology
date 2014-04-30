@@ -187,6 +187,12 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
 }
 
+bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
+  
+  
+
+}
+
 /*
  ====================================================
  = Player Select Menu

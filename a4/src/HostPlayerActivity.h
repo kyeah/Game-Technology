@@ -52,7 +52,7 @@ class HostPlayerActivity : public Activity {
   //Networking Stuff
   int myId;
   IPaddress ip, *remoteIP;
-  
+  bool inGame;
 
   // Game State Variables
   OgreBall *player;
