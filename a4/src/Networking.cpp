@@ -61,19 +61,19 @@ void Networking::Close(){
   SDLNet_Quit();
 }
 
-std::vector<PingResponseMessage> Networking::hostCheck( const char* filename ) {
+std::vector<PingResponseMessage*> Networking::hostCheck( const char* filename ) {
   SDLNet_Init();
 
   std::ifstream ifs(filename);
 
-  std::vector<PingResponseMessage> messages;
+  std::vector<PingResponseMessage*> messages;
 
   if (ifs) {
     std::string host;
     while (!ifs.eof()) {
       // Get next hostname
       std::getline(ifs, host);
-      
+
       if (SDLNet_ResolveHost(&client_ip, host.c_str(), PORT) != -1) {
         client_socket = SDLNet_TCP_Open(&client_ip);
         if (client_socket) {
@@ -84,10 +84,11 @@ std::vector<PingResponseMessage> Networking::hostCheck( const char* filename ) {
           ping.isJoining = false;
           SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
 
-          PingResponseMessage response;
-          SDLNet_TCP_Recv(client_socket, &response, sizeof(response));
+          PingResponseMessage *response = new PingResponseMessage();
+          SDLNet_TCP_Recv(client_socket, response, sizeof(*response));
 
-          std::cout << "Received lobby name: " << response.lobbyName << std::endl;
+          std::cout << "Received lobby name: " << response->lobbyName << std::endl;
+          strcpy(response->hostName, host.c_str());
           messages.push_back(response);
         }
       }
@@ -108,7 +109,14 @@ bool Networking::clientConnect(int *id, char* host){
   }
 
   client_socket = SDLNet_TCP_Open(&client_ip);
+
+  int retries = 0;
   while(!client_socket){
+    retries++;
+    if (retries >= 50) {
+      return false;
+    }
+
     client_socket = SDLNet_TCP_Open(&client_ip);
     if(!client_socket){
       printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
@@ -121,6 +129,11 @@ bool Networking::clientConnect(int *id, char* host){
     printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError()); // Probably need to make the socketset bigger
     return false;
   }
+
+  // Ping server for information
+  PingMessage ping;
+  ping.isJoining = true;
+  SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
 
   //connected = true
   ConnectAck ack;

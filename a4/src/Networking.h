@@ -40,7 +40,7 @@ typedef struct {
 
 typedef struct {
 	int type;
-	const char* level;
+	char level[128];
 	int clientId;
 //TODO: create server packet
 } ServerPacket;
@@ -55,8 +55,10 @@ typedef struct {
 } PingMessage;
 
 typedef struct {
+  char hostName[128];
   char lobbyName[128];
   int numPlayers;
+  int maxPlayers;
 } PingResponseMessage;
 
 class Networking{
@@ -66,7 +68,7 @@ public:
 	static void serverConnect();
 	static void Close();
 	static bool clientConnect(int *id, char* hostName); 
-        static std::vector<PingResponseMessage> hostCheck( const char* filename );
+        static std::vector<PingResponseMessage*> hostCheck( const char* filename );
 
 	static TCPsocket server_socket, client_socket;
 	static IPaddress serv_ip, client_ip;

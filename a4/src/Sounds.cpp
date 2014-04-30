@@ -2,9 +2,9 @@
 #include "Sounds.h"
 #include <boost/thread.hpp>
 
+int Sounds::volume = 64;
 int Sounds::enabled = true;
 Mix_Music* Sounds::mBackgroundMusic = NULL;
-
 
 void Sounds::init(){
   //SETUP MUSIC

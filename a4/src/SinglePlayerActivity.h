@@ -38,7 +38,6 @@ class SinglePlayerActivity : public Activity {
   std::string currentLevelName;
 
   const static int CHARACTER_PENGUIN = 0;
-
   const static int CHARACTER_OGRE = 1;
 
   // User Input Variables

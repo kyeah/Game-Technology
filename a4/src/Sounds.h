@@ -12,6 +12,7 @@ public:
 	static const int SCORE_POINT = 4;
 	static const int MAX_VOLUME = 128;
 	static const int MIN_VOLUME = 0;
+        static int volume;
         static int enabled;
         static Mix_Music* mBackgroundMusic;
 

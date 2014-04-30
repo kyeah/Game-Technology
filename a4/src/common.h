@@ -15,6 +15,10 @@ public:
  	OgreBall* getBall(){return mOgreBall;}		
 
 	TCPsocket csd;
+        btQuaternion lastTilt, currTilt, tiltDest;
+        float currTiltDelay;
+        int character;
+
 private:
 	int id;
 	OgreBall *mOgreBall;

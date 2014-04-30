@@ -8,7 +8,7 @@
 
 class ClientPlayerActivity : public Activity {
  public:
-  ClientPlayerActivity(OgreBallApplication *app, const char* levelName);
+  ClientPlayerActivity(OgreBallApplication *app);
   virtual ~ClientPlayerActivity(void);
   virtual void close(void);
 
@@ -22,6 +22,8 @@ class ClientPlayerActivity : public Activity {
   virtual bool mouseMoved( const OIS::MouseEvent &arg );
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+  void handleLobbyState();
   virtual void handleGameEnd();
 
   void loadLevel( const char* name );
@@ -36,12 +38,17 @@ class ClientPlayerActivity : public Activity {
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
-  OgreBall* mOgreBall;  
+  OgreBall* mOgreBall;
   CameraObject* mCameraObj;
 
   // Menu Variables
-  CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
+  CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay,
     *collectDisplay, *livesDisplay, *levelDisplay;
+
+  CEGUI::Window *lobbySheet, *lobbySelectLevel, *lobbySelectCharacter,
+    *lobbyLeave, *lobbyStart;
+
+  CEGUI::Window *lobbyPlayerWindows[4];
 
   bool menuActive;
   bool ceguiActive;
@@ -55,5 +62,7 @@ class ClientPlayerActivity : public Activity {
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
-  int collectibles, lives;
+  int lives;
+
+  bool inGame;
 };

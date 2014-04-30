@@ -24,39 +24,50 @@ class HostPlayerActivity : public Activity {
   virtual bool mouseMoved( const OIS::MouseEvent &arg );
   virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+  bool handleKeyPressed( OIS::KeyCode arg, int userID );
+  bool handleKeyReleased( OIS::KeyCode arg, int userID );
+
   virtual void handleGameEnd();
 
   void handleLobbyState(void);
   void loadLevel( const char* name );
+
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
+
   Player* addPlayer(int userID);
 
-  const char* currentLevelName;
+  std::string currentLevelName;
 
   // User Input Variables
   btScalar MAX_TILT;
-  btQuaternion lastTilt, currTilt, tiltDest;
-  float currTiltDelay, tiltDelay;
-  OgreBall* mOgreBall;  
+  float tiltDelay;
   CameraObject* mCameraObj;
 
   // Menu Variables
-  CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
+  CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay,
     *collectDisplay, *livesDisplay, *levelDisplay;
+
+  CEGUI::Window *readyWindow, *goWindow;
+  CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
+
+  CEGUI::Window *lobbySheet, *lobbySelectLevel, *lobbySelectCharacter,
+    *lobbyLeave, *lobbyStart;
+
+  CEGUI::Window *lobbyPlayerWindows[4];
 
   bool menuActive;
   bool ceguiActive;
   bool gameEnded;
-  
+
   //Networking Stuff
   int myId;
   IPaddress ip, *remoteIP;
-  bool inGame;
+  bool inGame, chatFocus;
 
   // Game State Variables
-  OgreBall *player;
   float timeLeft;  // In millis
-  int collectibles, lives;
+  int countdown;
 };

@@ -25,7 +25,6 @@ SinglePlayerActivity::~SinglePlayerActivity(void) {
 void SinglePlayerActivity::close(void) {
   delete player;
   delete mCameraObj;
-
 }
 
 bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
@@ -39,8 +38,8 @@ bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
 }
 
 void SinglePlayerActivity::start(void) {
-  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", 64);
-  
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   CEGUI::System::getSingleton().setGUISheet(guiSheet);
 
@@ -150,12 +149,12 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   //Choose the correct mesh for the selected character
   std::stringstream playerChoice;
   switch(character){
-    case CHARACTER_PENGUIN:
-      playerChoice << "penguin.mesh";
-      break;
-    case CHARACTER_OGRE:
-      playerChoice << "ogrehead.mesh";
-      break;
+  case CHARACTER_PENGUIN:
+    playerChoice << "penguin.mesh";
+    break;
+  case CHARACTER_OGRE:
+    playerChoice << "ogrehead.mesh";
+    break;
 
 
   }
@@ -258,7 +257,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
     tweakedGrav[1] /= 2;
     player->getBody()->setGravity(tweakedGrav);
-      
+
   }
 
   // Update Camera Position

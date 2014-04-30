@@ -31,6 +31,7 @@ class MenuActivity : public Activity {
   bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToServerListMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+  bool JoinServer(const CEGUI::EventArgs& e);
 
   bool SelectPenguin( const CEGUI::EventArgs& e);
   bool SelectOgre( const CEGUI::EventArgs& e);
