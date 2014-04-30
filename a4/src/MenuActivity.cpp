@@ -1,6 +1,3 @@
-
-
-
 #include "Interpolator.h"
 #include "LevelViewer.h"
 #include "MenuActivity.h"
@@ -10,6 +7,7 @@
 #include "Leaderboard.h"
 #include "OBAnimationManager.h"
 #include "Sounds.h"
+#include "Networking.h"
 
 #define NOT_SELECTED -1
 #define SINGLE_PLAYER 0
@@ -68,7 +66,14 @@ void MenuActivity::start(void) {
 
   lsNext->subscribeEvent(CEGUI::PushButton::EventClicked,
                          CEGUI::Event::Subscriber(&MenuActivity::handleLSNext, this));
-  
+
+  // Server List
+  serverListWindow = wmgr->getWindow("Menu/ServerList");
+  serverListbox = (CEGUI::Listbox*)wmgr->getWindow("ServerList/List");
+  serverListBack = wmgr->getWindow("ServerList/Back");
+
+  serverListBack->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                 CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
 
   for (int i = 0; i < 8; i++) {
     std::stringstream ss;
@@ -188,9 +193,21 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
 }
 
 bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
-  
-  
+  CEGUI::System::getSingleton().setGUISheet(serverListWindow);
 
+  // Ping all known hosts from file
+  vector<PingResponseMessage> responses = Networking::hostCheck( "data/hosts/hosts.txt" );
+
+  // Display list of active hosts waiting to start a game
+  serverListbox->resetList();
+
+  for (int i = 0; i < responses.size(); i++) {
+    CEGUI::ListboxTextItem* chatItem = new CEGUI::ListboxTextItem(responses[i].lobbyName);
+    // TODO: Set click handler to submit PingMessage with join request
+    serverListbox->addItem(chatItem);
+  };
+
+  serverListbox->ensureItemIsVisible((size_t)0);
 }
 
 /*

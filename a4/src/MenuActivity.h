@@ -52,6 +52,9 @@ class MenuActivity : public Activity {
   CEGUI::Window *levelSelectorWindow, *lsBack, *lsPrev, *lsNext;
   CEGUI::Window *lsButtons[8];
 
+  CEGUI::Window *serverListWindow, *serverListBack;
+  CEGUI::Listbox *serverListbox;
+
   int selectorStart, selectorRows, selectorColumns;
   int chosenCharacter;
   std::vector<LevelViewer*> levelViewers;

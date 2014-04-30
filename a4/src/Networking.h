@@ -55,7 +55,7 @@ typedef struct {
 } PingMessage;
 
 typedef struct {
-  const char* serverName;
+  char lobbyName[128];
   int numPlayers;
 } PingResponseMessage;
 

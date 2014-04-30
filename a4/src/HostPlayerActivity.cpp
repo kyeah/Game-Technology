@@ -23,9 +23,9 @@ HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lev
 HostPlayerActivity::~HostPlayerActivity(void) {
   ServerPacket msg;//  msg.type = SERVER_CLOSED;
   for(int i = 1; i < MAX_PLAYERS; i++) {
-	if(players[i]) {
-		Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
-	}
+    if(players[i]) {
+      Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+    }
   }
   Networking::Close();
   close();
@@ -48,8 +48,65 @@ void HostPlayerActivity::start(void) {
   //  loadLevel(currentLevelName);
 }
 
-void HostPlayerActivity::loadLevel(const char* name) {
+void HostPlayerActivity::handleLobbyState(void) {
 
+  // Handle New Connections
+  TCPsocket csd_t = SDLNet_TCP_Accept(Networking::server_socket);
+  if(csd_t){
+
+    remoteIP = SDLNet_TCP_GetPeerAddress(csd_t);
+    if(remoteIP){
+      printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
+    }
+
+    if (SDLNet_TCP_AddSocket(Networking::server_socketset, csd_t) == -1) {
+      printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());
+    } else {
+      PingMessage ping;
+
+      if(SDLNet_TCP_Recv(csd_t, &ping, sizeof(ping)) > 0) {
+        if (!ping.isJoining) {
+          PingResponseMessage response;
+          strcpy(response.lobbyName, "TEMPORARY SWAGGY P");
+          response.numPlayers = 1;
+          Networking::Send(csd_t, (char*)&response, sizeof(response));
+        } else {
+          /*          for (int i = 0; i < MAX_PLAYERS; i++) {
+                      if (!players[i]) {
+
+                      // Send ack with its new user ID
+                      ConnectAck ack;
+                      for (int j = 0; j < MAX_PLAYERS; j++) {
+                      if (players[j])
+                      ack.ids[j] = 1;
+                      else
+                      ack.ids[j] = 0;
+                      }
+
+                      addPlayer(i);
+                      players[i]->csd = csd_t;
+                      ack.id = i;
+                      Networking::Send(csd_t, (char*)&ack, sizeof(ack));
+
+                      // Send notifications to rest of players
+                      ServerPacket packet;
+                      packet.type = SERVER_CLIENT_CONNECT;
+                      packet.level = currentLevelName;
+                      packet.clientId = i;
+                      for (int j = 1; j < MAX_PLAYERS; j++) {
+                      if (i != j && players[j])
+                      Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
+                      }
+                      break;
+                      }
+                      } */
+        }
+      }
+    }
+  }
+}
+
+void HostPlayerActivity::loadLevel(const char* name) {
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->loadLevel(name);
   app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
@@ -80,8 +137,8 @@ Player* HostPlayerActivity::addPlayer(int userID) {
   ss << "node";
 
   mPlayer->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0, app->mPhysics,
-			app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0), 
-			16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]));
+                                app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
+                                16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]));
 
   players[userID] = mPlayer;
   return mPlayer;
@@ -93,6 +150,11 @@ bool HostPlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+  if (!inGame) {
+    handleLobbyState();
+    return true;
+  }
+
   timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
   currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
                                       lastTilt, tiltDest);
@@ -164,11 +226,11 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
   //Player *mPlayer = players[myId];
   //if (mPlayer) {
-   // btVector3 pos = (mPlayer->pongMode ? mPlayer->getRacquet()->getPosition() : mPlayer->getNode()->getPosition());
-   // mCamera->lookAt(pos[0], pos[1], pos[2]);
+  // btVector3 pos = (mPlayer->pongMode ? mPlayer->getRacquet()->getPosition() : mPlayer->getNode()->getPosition());
+  // mCamera->lookAt(pos[0], pos[1], pos[2]);
   //}
 
- // Handle New Connections
+  // Handle New Connections
   TCPsocket csd_t = SDLNet_TCP_Accept(Networking::server_socket);
   if(csd_t){
     remoteIP = SDLNet_TCP_GetPeerAddress(csd_t);
@@ -199,7 +261,7 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
           // Send notifications to rest of players
           ServerPacket packet;
           packet.type = SERVER_CLIENT_CONNECT;
-	  packet.level = currentLevelName;
+          packet.level = currentLevelName;
           packet.clientId = i;
           for (int j = 1; j < MAX_PLAYERS; j++) {
             if (i != j && players[j])
@@ -210,9 +272,9 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
       }
     }
   }
-  
 
- //RECEIVE INPUTS
+
+  //RECEIVE INPUTS
   while (SDLNet_CheckSockets(Networking::server_socketset, 1) > 0) {
     for (int i = 1; i < MAX_PLAYERS; i++) {
       if (players[i]) {
@@ -222,8 +284,8 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
           ServerPacket closemsg;
 
           if(SDLNet_TCP_Recv(csd, &cmsg, sizeof(cmsg)) > 0) {
-   		//TODO: DO STUFF FOR RECEIVED PACKETS         
-  	  }
+            //TODO: DO STUFF FOR RECEIVED PACKETS
+          }
         }
       }
     }
@@ -236,12 +298,12 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   for (int i = 0; i < MAX_PLAYERS; i++) {
     Player *mPlayer = players[i];
     if (mPlayer) {
-     //TODO: update clients based off of received thing?
-    /* btVector3 playerPos = mPlayer->getNode()->getPosition();
-      btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
-      msg.players[i].nodePos = playerPos;
-      msg.players[i].nodeOrientation = playerOrientation;
-    */}
+      //TODO: update clients based off of received thing?
+      /* btVector3 playerPos = mPlayer->getNode()->getPosition();
+         btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
+         msg.players[i].nodePos = playerPos;
+         msg.players[i].nodeOrientation = playerOrientation;
+      */}
   }
 
   for (int i = 1; i < MAX_PLAYERS; i++) {
@@ -249,7 +311,7 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
- true;
+  true;
 }
 
 //-------------------------------------------------------------------------------------

@@ -77,6 +77,7 @@ std::vector<PingResponseMessage> Networking::hostCheck( const char* filename ) {
       if (SDLNet_ResolveHost(&client_ip, host.c_str(), PORT) != -1) {
         client_socket = SDLNet_TCP_Open(&client_ip);
         if (client_socket) {
+          std::cout << "Pinging hostname: " << host << std::endl;
 
           // Ping server for information
           PingMessage ping;
@@ -85,6 +86,8 @@ std::vector<PingResponseMessage> Networking::hostCheck( const char* filename ) {
 
           PingResponseMessage response;
           SDLNet_TCP_Recv(client_socket, &response, sizeof(response));
+
+          std::cout << "Received lobby name: " << response.lobbyName << std::endl;
           messages.push_back(response);
         }
       }

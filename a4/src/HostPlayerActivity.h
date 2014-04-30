@@ -26,6 +26,7 @@ class HostPlayerActivity : public Activity {
   virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
   virtual void handleGameEnd();
 
+  void handleLobbyState(void);
   void loadLevel( const char* name );
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
