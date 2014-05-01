@@ -251,11 +251,11 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (gameEnded) {
     player->getBody()->setGravity(btVector3(0, 1000, 0));
   } else if (countdown == -1) {
-    btVector3 tweakedGrav = 2*app->mPhysics->getDynamicsWorld()->getGravity()
-      .rotate(currTilt.getAxis(), -3*currTilt.getAngle())
+    btVector3 tweakedGrav = 1.8*app->mPhysics->getDynamicsWorld()->getGravity()
+      .rotate(currTilt.getAxis(), -2.5*currTilt.getAngle())
       .rotate(q.getAxis(), q.getAngle());
 
-    tweakedGrav[1] /= 2;
+    tweakedGrav[1] /= 1.5;
     player->getBody()->setGravity(tweakedGrav);
 
   }
@@ -265,7 +265,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
-  app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
+  //app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
   app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
 
   // Tilt Camera to simulate level tilt
@@ -521,6 +521,8 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
     tiltDest *= btQuaternion(0,MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
+    break;
+  case OIS::KC_R:
     break;
   default:
     return false;

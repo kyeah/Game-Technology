@@ -25,6 +25,7 @@ public:
         Ogre::SceneNode *mCameraLookAtNode, *mCameraNode;        
         CameraObject *mCameraObj;
 
+        bool ready;
         bool crossedFinishLine;
 
 private:

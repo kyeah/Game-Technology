@@ -17,7 +17,7 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
 
   node->attachObject(entity);
 
-  Ogre::Entity* charHead = mgr->createEntity(_entName + "head", _meshName);
+  charHead = mgr->createEntity(_entName + "head", _meshName);
   Ogre::SceneNode* headNode = node->createChildSceneNode(_nodeName + "head");
   headNode->attachObject(charHead);
   headNode->scale(2,2,2);
@@ -38,4 +38,8 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
 }
 
 void OgreBall::update(float elapsedTime) {
+}
+
+Ogre::Entity* OgreBall::getHeadEntity() {
+  return charHead;
 }

@@ -12,6 +12,10 @@ class OgreBall : public GameObject{
            btVector3 localInertia=btVector3(0,0,0),  btQuaternion *rotation=0);
 
   void update(float elapsedTime);
+  Ogre::Entity* getHeadEntity();
+
+ private:
+  Ogre::Entity* charHead;
 };
 
 class Plane : public GameObject {

@@ -1,8 +1,10 @@
 
 //#include <btBulletDynamicsCommon.h>
 #include "GameObjectDescription.h"
+#include "HostPlayerActivity.h"
 #include "OgreBallApplication.h"
 #include "Sounds.h"
+#include "common.h"
 
 Ogre::SceneNode* leftFlap;
 Ogre::SceneNode* rightFlap;
@@ -71,7 +73,21 @@ void GoalObject::update(float elapsedTime) {
 	leftFlapEntity->setMaterialName("OgreBall/Passed");
         rightFlapEntity->setMaterialName("OgreBall/Passed");
  	swinging = 36;
-	OgreBallApplication::getSingleton()->activity->handleGameEnd();
+        
+        Activity *activity = OgreBallApplication::getSingleton()->activity;
+        if (activity) {
+          HostPlayerActivity *h = dynamic_cast<HostPlayerActivity*>(activity);
+          if (h) {
+            for (int id = 0; id < MAX_PLAYERS; i++) {
+              if (players[id] && players[id]->getBall() == contexts[i]->object) {
+                h->handleCrossedFinishLine(id);
+                break;
+              }
+            }
+          } else {
+            activity->handleGameEnd();
+          }
+        }
       }
     }
   }

@@ -21,6 +21,7 @@ static const int KEY_RELEASED = 4;
 static const int CLIENT_CLOSE = 5;
 static const int CLIENT_CHAT = 6;
 static const int CLIENT_CLEAR_DIR = 7;
+static const int CLIENT_TOGGLEREADY = 77;
 
 static const int SERVER_CLIENT_CONNECT = 8;
 static const int SERVER_CLIENT_CLOSED = 9;
@@ -28,6 +29,9 @@ static const int SERVER_CLIENT_MESSAGE = 10;
 static const int SERVER_CLOSED = 11;
 static const int SERVER_UPDATE = 12;
 static const int SERVER_GAME_START = 13;
+static const int SERVER_CROSSED_FINISH_LINE = 14;
+static const int SERVER_PLAYER_MESH_CHANGE = 15;
+static const int SERVER_LEVEL_CHANGE = 16;
 
 static const int SEND_TO_SERV = 10;
 static const int SEND_TO_CLIENT = 11;
