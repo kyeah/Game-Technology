@@ -1,39 +1,69 @@
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "ClientPlayerActivity.h"
+#include "OBAnimationManager.h"
 #include "common.h"
 #include "Networking.h"
 
-ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app) : Activity(app) {
+ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, int id, const char* levelName) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
+
   lastTilt = btQuaternion(0,0,0);
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
-  currentLevelName = "undefined";
+
+  myId = id;
+  currentLevelName = std::string(levelName, strlen(levelName));
+  menuActive = false;
+  ceguiActive = false;
+
   levelLoaded = false;
   waitingScreenLoaded = false;
   readyToLoadLevel = false;
-  menuActive = false;
-  ceguiActive = false;
-  lives = 10;
 
+  lives = 10;
   inGame = false;
-  //  Networking::clientConnect(&myId,(char*) hostName);
+  chatFocus = false;
+
+  for (int i = 0; i < MAX_PLAYERS; i++)
+    players[i] = 0;
+}
+
+Player* ClientPlayerActivity::addPlayer(int userID, const char* name) {
+  Player* mPlayer = new Player(userID);
+
+  strcpy(mPlayer->name, name);
+  mPlayer->character = 0;
+  mPlayer->currTiltDelay = tiltDelay;
+  mPlayer->lastTilt = btQuaternion(0,0,0);
+  mPlayer->currTilt = btQuaternion(0,0,0);
+  mPlayer->tiltDest = btQuaternion(0,0,0);
+
+  lobbyPlayerWindows[userID]->setText(mPlayer->name);
+  players[userID] = mPlayer;
+  return mPlayer;
 }
 
 ClientPlayerActivity::~ClientPlayerActivity(void) {
-  Networking::Close();
   close();
 }
 
 void ClientPlayerActivity::close(void) {
-  delete player;
-  delete mCameraObj;
+  ClientPacket msg;
+  msg.type = CLIENT_CLOSE;
+  msg.userID = myId;
 
+  Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+  Networking::Close();
+
+  //  delete player;
+  //  delete mCameraObj;
 }
 
 void ClientPlayerActivity::start(void) {
+  //  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
@@ -41,11 +71,34 @@ void ClientPlayerActivity::start(void) {
   timeDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Timer");
   levelDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Level");
 
+  readyWindow = app->Wmgr->getWindow("SPHUD/Ready");
+  goWindow = app->Wmgr->getWindow("SPHUD/Go");
+
+  pauseMenuSheet = app->Wmgr->getWindow("PauseMenu");
+  pauseQuit = app->Wmgr->getWindow("PauseMenu/Quit");
+  pauseReturn = app->Wmgr->getWindow("PauseMenu/Return");
+
+  pauseQuit->removeEvent(CEGUI::PushButton::EventClicked);
+  pauseQuit
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&ClientPlayerActivity::ExitToMenu, this));
+
+  pauseReturn->removeEvent(CEGUI::PushButton::EventClicked);
+  pauseReturn
+    ->subscribeEvent(CEGUI::PushButton::EventClicked,
+                     CEGUI::Event::Subscriber(&ClientPlayerActivity::togglePauseMenu, this));
+
   lobbySheet = app->Wmgr->getWindow("GameLobby");
   lobbySelectLevel = app->Wmgr->getWindow("GameLobby/SelectLevel");
   lobbySelectCharacter = app->Wmgr->getWindow("GameLobby/SelectCharacter");
   lobbyLeave = app->Wmgr->getWindow("GameLobby/Leave");
   lobbyStart = app->Wmgr->getWindow("GameLobby/Ready");
+
+  lobbySelectLevel->setVisible(false);
+
+  lobbyLeave->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&ClientPlayerActivity::ExitToMenu, this));
+
 
   for (int i = 0; i < 4; i++) {
     std::stringstream ss;
@@ -54,86 +107,168 @@ void ClientPlayerActivity::start(void) {
   }
 
   // TODO: Add Chatbox Window to layout
+  CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(lobbySheet);
 
   for (int i = 0; i < 4; i++) {
     // Need to replace client_ids with PlayerInfo so we can show name, player mesh choice information
   }
 
+  addPlayer(0, "name-plz-go-here");
+  addPlayer(myId, "my name");
+
   // Need to keep track of server information to show level selection, etc.
 
   //  loadLevel(currentLevelName);
 }
 
-void ClientPlayerActivity::loadLevel(const char* name) {
-  app->destroyAllEntitiesAndNodes();
-  app->levelLoader->loadLevel(name);
-  app->mSceneMgr->setSkyDome(true,"Examples/CloudySky", 5, 8);
+void ClientPlayerActivity::handleLobbyState() {
+  while(SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)){
+    ServerPacket msg;
+    if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
+      switch(msg.type){
+      case SERVER_GAME_START:
+        inGame = true;
+        loadLevel(currentLevelName.c_str());
+        CEGUI::System::getSingleton().setGUISheet(guiSheet);
+        CEGUI::MouseCursor::getSingleton().hide();
+        break;
+      }
+    }
+  }
+}
+// handleWaiting()
 
-  levelDisplay->setText(name);
+void ClientPlayerActivity::loadLevel(const char* name) {
+  currentLevelName = std::string(name, std::strlen(name));
+  app->destroyAllEntitiesAndNodes();
+  app->levelLoader->currObjID = 0;  // VERY IMPORTANT TO ENSURE CONSISTENT OBJECT NAMES ACROSS HOST AND CLIENTS
+  app->levelLoader->loadLevel(name);
+
+
+  levelDisplay->setText(currentLevelName.c_str());
 
   timeLeft = 60000;  // TODO: Should get timeLeft from level script
-  collectibles = 0;  // TODO: Get total number of collectibles when loading level
+  collectibles = 0;
   score = 0;
 
-  player = new OgreBall(app->mSceneMgr, "player1", "player1", "penguin.mesh", 0, app->mPhysics,
-                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
-                        16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      std::stringstream ss;
+      ss << "Player" << i;
+      std::string playerEnt = ss.str();
+      ss << "node";
 
-  app->mCamera->setPosition(Ogre::Vector3(0,0,0));
-  mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
-                                (Ogre::Vector3)player->getPosition(), app->levelLoader->cameraStartPos);
+      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0,
+                                       app->mPhysics,
+                                       app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
+                                       btVector3(0,0,0), 16000.0f, 0.5f, btVector3(0,0,0),
+                                       &app->levelLoader->playerStartRotations[0]));
+    }
+  }
+
+  app->mCamera->setPosition(app->levelLoader->cameraStartPos);
+  /*  mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
+      (Ogre::Vector3)players[0]->getBall()->getPosition(),
+      app->levelLoader->cameraStartPos);
+  */
 
   gameEnded = false;
+  countdown = 2000;
+  readyWindow->setAlpha(0.0);
+  goWindow->setAlpha(0.0);
+
+  menuActive = false;
+  ceguiActive = false;
 }
 
 bool ClientPlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
+  CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
   return true;
-}
-
-void ClientPlayerActivity::handleLobbyState() {
-
 }
 
 bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (!inGame) {
     handleLobbyState();
     return true;
+  } //else if (waitingForLoad) {
+  //stuff
+  //}
+
+  /*
+    while(SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)){
+    ServerPacket msg;
+    if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
+    switch(msg.type){
+    case SERVER_CLIENT_CONNECT:
+    currentLevelName = msg.level;
+    loadLevel(currentLevelName);
+    readyToLoadLevel = true;
+    default:
+    break;
+    }
+    //TODO receive server stuff
+    }
+    }
+  */
+
+  /*
+    if(!levelLoaded){
+    if(!waitForHosts())
+    return true;
+    }
+  */
+
+  if (countdown != -1 && !menuActive && !ceguiActive) {
+    int lastcountdown = countdown;
+    countdown = std::max((int)(countdown - elapsedTime), -1);
+    if (lastcountdown > 1750 && countdown <= 1750) {
+      OBAnimationManager::startAnimation("SpinPopin", readyWindow, 0.8);
+    } else if (lastcountdown > 0 && countdown <= 0) {
+      OBAnimationManager::startAnimation("Popin", goWindow);
+    }
   }
+
+  // Update HUD
+  /*  std::stringstream sst;
+      sst << "SCORE: " << score;
+      scoreDisplay->setText(sst.str());
+  */
+  /*
+    std:: stringstream livesSS;
+    livesSS << lives << (lives != 1 ? " Lives" : " Life");
+    livesDisplay->setText(livesSS.str());
+  */
+  /*
+    std::stringstream css;
+    css << collectibles << "/" << app->levelLoader->numCollectibles;
+    collectDisplay->setText(css.str());
+  */
+
   while(SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)){
     ServerPacket msg;
     if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
       switch(msg.type){
+      case SERVER_UPDATE: {
+        timeLeft = msg.timeLeft;
+        std::deque<GameObject*> objects = app->mPhysics->getObjects();
+        for (int i = 0; i < objects.size(); i++) {
+          objects[i]->setPosition(msg.objectInfo[i].position);
+          objects[i]->setOrientation(msg.objectInfo[i].orientation);
+        }
+        break;
+      }
       case SERVER_CLIENT_CONNECT:
-        currentLevelName = msg.level;
-        loadLevel(currentLevelName);
-        readyToLoadLevel = true;
-      default:
+        /*        currentLevelName = msg.level;
+                  loadLevel(currentLevelName);
+                  readyToLoadLevel = true;*/
+        addPlayer(msg.clientID, "name");
         break;
       }
       //TODO receive server stuff
     }
   }
 
-  /*
-  if(!levelLoaded){
-    if(!waitForHosts())
-      return true;
-  }
-  */
-  timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
-  currTilt = Interpolator::interpQuat(currTiltDelay, elapsedTime, tiltDelay,
-                                      lastTilt, tiltDest);
-
-  // Update HUD
-  std::stringstream sst;
-  sst << "SCORE: " << score;
-  scoreDisplay->setText(sst.str());
-
-  std:: stringstream livesSS;
-  livesSS << lives << " Lives";
-  livesDisplay->setText(livesSS.str());
-  collectDisplay->setText(std::to_string(collectibles));
 
   std::stringstream timess;
   int seconds = std::round(timeLeft/1000);
@@ -144,52 +279,6 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   timess << millis;
 
   timeDisplay->setText(timess.str());
-
-  // Set player's gravity based on the direction they are facing
-  Ogre::Vector3 ocam = app->mCameraNode->_getDerivedPosition();
-  btVector3 facingDirection = player->getPosition() - btVector3(ocam[0], ocam[1], ocam[2]);
-  facingDirection[1] = 0;
-  facingDirection.normalize();
-
-  btScalar yaw = btVector3(0,0,-1).angle(facingDirection);
-  btQuaternion q((facingDirection[0] > 0 ? -yaw : yaw),0,0);
-  q.normalize();
-
-  if (gameEnded) {
-    player->getBody()->setGravity(btVector3(0, 1000, 0));
-  } else {
-    player->getBody()->setGravity(app->mPhysics->getDynamicsWorld()->getGravity()
-                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                  .rotate(currTilt.getAxis(), -currTilt.getAngle())
-                                  .rotate(q.getAxis(), q.getAngle()));
-  }
-
-  // Update Camera Position
-  //comment out the lines below if you're building a level; also return false in mouseMoved.
-  mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
-
-  // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
-  app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
-  app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
-
-  // Tilt Camera to simulate level tilt
-  Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
-  Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
-
-  Ogre::Real xTilt = currTilt.x();
-  if (xTilt < 0) xTilt /= 3;
-  Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
-                                             xTilt,
-                                             currTilt.y(),
-                                             currTilt.z());
-
-  if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
-    app->mCameraLookAtNode->rotate(oq);
-    app->mCameraLookAtNode->rotate(notilt*notilt);
-    app->mCameraLookAtNode->rotate(noq);
-  }
-
 
   return true;
 }
@@ -204,7 +293,6 @@ bool ClientPlayerActivity::togglePauseMenu( const CEGUI::EventArgs& e ) {
 void ClientPlayerActivity::togglePauseMenu( ) {
   menuActive = !menuActive;
   if (menuActive) {
-    app->paused = true;
     CEGUI::MouseCursor::getSingleton().show();
     CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
     app->Wmgr->getWindow("PauseMenu/Quit")
@@ -214,7 +302,6 @@ void ClientPlayerActivity::togglePauseMenu( ) {
       ->subscribeEvent(CEGUI::PushButton::EventClicked,
                        CEGUI::Event::Subscriber(&ClientPlayerActivity::togglePauseMenu, this));
   } else {
-    app->paused = false;
     CEGUI::MouseCursor::getSingleton().hide();
     CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
   }
@@ -264,84 +351,66 @@ void ClientPlayerActivity::handleGameEnd() {
 bool ClientPlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
   if (arg.key == OIS::KC_ESCAPE) {
-    togglePauseMenu();
-    return true;
+    if (chatFocus) {
+      // toggleChat();
+      // chatEditBox->setText("");
+      // return true;
+    } else if (inGame) {
+      togglePauseMenu();
+      return true;
+    }
   }
 
-  if (ceguiActive || menuActive) {
+  if (!inGame || chatFocus || ceguiActive || menuActive) {
     CEGUI::System::getSingleton().injectKeyDown(arg.key);
     CEGUI::System::getSingleton().injectChar(arg.text);
   }
 
   switch(arg.key){
   case OIS::KC_D:
-    tiltDest *= btQuaternion(0,0,-MAX_TILT);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
   case OIS::KC_A:
-    tiltDest *= btQuaternion(0,0,MAX_TILT);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
   case OIS::KC_W:
-    tiltDest *= btQuaternion(0,-MAX_TILT,0);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
   case OIS::KC_S:
-    tiltDest *= btQuaternion(0,MAX_TILT,0);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
-  default:
-    return false;
+    ClientPacket msg;
+    msg.type = KEY_PRESSED;
+    msg.keyArg = arg.key;
+    msg.userID = myId;
+    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 //-------------------------------------------------------------------------------------
 
 bool ClientPlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 {
-  if (menuActive || ceguiActive) {
+  if (inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectKeyUp(arg.key);
   }
 
   switch(arg.key){
   case OIS::KC_D:
-    tiltDest *= btQuaternion(0,0,MAX_TILT);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
   case OIS::KC_A:
-    tiltDest *= btQuaternion(0,0,-MAX_TILT);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
   case OIS::KC_W:
-    tiltDest *= btQuaternion(0,MAX_TILT,0);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
   case OIS::KC_S:
-    tiltDest *= btQuaternion(0,-MAX_TILT,0);
-    lastTilt = currTilt;
-    currTiltDelay = 0;
-    break;
-  default:
-    return false;
+    ClientPacket msg;
+    msg.type = KEY_RELEASED;
+    msg.keyArg = arg.key;
+    msg.userID = myId;
+    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 //-------------------------------------------------------------------------------------
 
 bool ClientPlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 {
-  if (menuActive || ceguiActive) {
+  if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System &sys = CEGUI::System::getSingleton();
     sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
     // Scroll wheel.
@@ -357,7 +426,7 @@ bool ClientPlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 
 bool ClientPlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  if (menuActive || ceguiActive) {
+  if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
     return true;
   }
@@ -368,7 +437,7 @@ bool ClientPlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseB
 
 bool ClientPlayerActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  if (menuActive || ceguiActive) {
+  if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
     return true;
   }

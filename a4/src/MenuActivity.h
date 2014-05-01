@@ -31,7 +31,10 @@ class MenuActivity : public Activity {
   bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToServerListMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+
   bool JoinServer(const CEGUI::EventArgs& e);
+  bool PromptForJoinServer(const CEGUI::EventArgs& e);
+  bool CancelPrompt(const CEGUI::EventArgs& e);
 
   bool SelectPenguin( const CEGUI::EventArgs& e);
   bool SelectOgre( const CEGUI::EventArgs& e);
@@ -55,6 +58,9 @@ class MenuActivity : public Activity {
 
   CEGUI::Window *serverListWindow, *serverListBack;
   CEGUI::Listbox *serverListbox;
+
+  CEGUI::Window *promptWindow, *promptHeader, *promptSubmit, *promptCancel;
+  CEGUI::Editbox *promptInputbox;
 
   int selectorStart, selectorRows, selectorColumns;
   int chosenCharacter;

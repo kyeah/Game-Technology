@@ -11,10 +11,11 @@ class Player {
 public:
 	Player(int i);
 	int getId() { return id; }
-	void setBall(OgreBall* o) {mOgreBall = 0;}	
+	void setBall(OgreBall* o) {mOgreBall = o;}	
  	OgreBall* getBall(){return mOgreBall;}		
 
 	TCPsocket csd;
+        char name[128];
         btQuaternion lastTilt, currTilt, tiltDest;
         float currTiltDelay;
         int character;

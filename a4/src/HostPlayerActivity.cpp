@@ -17,41 +17,58 @@ HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lev
 
   Networking::serverConnect();
   inGame = false;
+  waitingForClientsToLoad = false;
   chatFocus = false;
+  myId = 0;
+
+  for (int i = 0; i < MAX_PLAYERS; i++)
+    players[i] = 0;
 }
 
 HostPlayerActivity::~HostPlayerActivity(void) {
-  ServerPacket msg;//  msg.type = SERVER_CLOSED;
+  close();
+}
+
+void HostPlayerActivity::close(void) {
+  ServerPacket msg;
+  msg.type = SERVER_CLOSED;
   for(int i = 1; i < MAX_PLAYERS; i++) {
     if(players[i]) {
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
+  
   Networking::Close();
-  close();
-}
-
-void HostPlayerActivity::close(void) {
   //  delete player;
   //  delete mCameraObj;
 }
 
-Player* HostPlayerActivity::addPlayer(int userID) {
+Player* HostPlayerActivity::addPlayer(int userID, const char* name) {
   Player* mPlayer = new Player(userID);
 
+  strcpy(mPlayer->name, name);
   mPlayer->character = 0;
   mPlayer->currTiltDelay = tiltDelay;
   mPlayer->lastTilt = btQuaternion(0,0,0);
   mPlayer->currTilt = btQuaternion(0,0,0);
   mPlayer->tiltDest = btQuaternion(0,0,0);
 
+  lobbyPlayerWindows[userID]->setText(mPlayer->name);
   players[userID] = mPlayer;
   return mPlayer;
 }
 
-void HostPlayerActivity::start(void) {
-  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+/*
+  void HostPlayerActivity::removePlayer(int userID) {
+  players[userID] = NULL;
+  // send message to all other players
+  }
+*/
 
+void HostPlayerActivity::start(void) {
+  //  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+
+  guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
@@ -82,6 +99,8 @@ void HostPlayerActivity::start(void) {
   lobbyStart = app->Wmgr->getWindow("GameLobby/Ready");
   lobbyStart->setText("Start");
 
+  lobbyStart->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&HostPlayerActivity::startGame, this));
   lobbyLeave->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&HostPlayerActivity::ExitToMenu, this));
 
@@ -94,6 +113,7 @@ void HostPlayerActivity::start(void) {
   // TODO: Add Chatbox Window to layout
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(lobbySheet);
+  addPlayer(0, "host-username");
   //  loadLevel(currentLevelName);
 }
 
@@ -134,18 +154,16 @@ void HostPlayerActivity::handleLobbyState(void) {
         } else {
           for (int i = 0; i < MAX_PLAYERS; i++) {
             if (!players[i]) {
-              lobbyPlayerWindows[i]->setText("Player HIII"); // Should receive name in Ping Message
-
               // Send ack with its new user ID
               ConnectAck ack;
+
+              strcpy(ack.level, currentLevelName.c_str());
               for (int j = 0; j < MAX_PLAYERS; j++) {
-                if (players[j])
-                  ack.ids[j] = 1;
-                else
-                  ack.ids[j] = 0;
+                if (players[j]) ack.ids[j] = 1;
+                else            ack.ids[j] = 0;
               }
 
-              addPlayer(i);
+              addPlayer(i, ping.name);
               players[i]->csd = csd_t;
               ack.id = i;
               Networking::Send(csd_t, (char*)&ack, sizeof(ack));
@@ -154,7 +172,7 @@ void HostPlayerActivity::handleLobbyState(void) {
               ServerPacket packet;
               packet.type = SERVER_CLIENT_CONNECT;
               //strcpy(packet.level, currentLevelName.c_str());
-              packet.clientId = i;
+              packet.clientID = i;
               for (int j = 1; j < MAX_PLAYERS; j++) {
                 if (i != j && players[j])
                   Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
@@ -168,9 +186,32 @@ void HostPlayerActivity::handleLobbyState(void) {
   }
 }
 
+void HostPlayerActivity::handleWaiting() {
+  // Wait for clients to send READY messages
+}
+
+bool HostPlayerActivity::startGame( const CEGUI::EventArgs& e ) {
+  ServerPacket packet;
+  packet.type = SERVER_GAME_START;
+
+  for (int j = 1; j < MAX_PLAYERS; j++) {
+    if (players[j]) {
+      Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
+    }
+  }
+
+  inGame = true;
+  waitingForClientsToLoad = true;
+  loadLevel(currentLevelName.c_str());
+  CEGUI::System::getSingleton().setGUISheet(guiSheet);
+  CEGUI::MouseCursor::getSingleton().hide();
+}
+
 void HostPlayerActivity::loadLevel(const char* name) {
   currentLevelName = std::string(name, std::strlen(name));
   app->destroyAllEntitiesAndNodes();
+  app->levelLoader->currObjID = 0;
+
   app->levelLoader->loadLevel(name);
 
   levelDisplay->setText(currentLevelName.c_str());
@@ -186,15 +227,18 @@ void HostPlayerActivity::loadLevel(const char* name) {
       std::string playerEnt = ss.str();
       ss << "node";
 
-      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0, app->mPhysics,
-                                       app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
-                                       16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]));
+      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0,
+                                       app->mPhysics,
+                                       app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
+                                       btVector3(0,0,0), 16000.0f, 0.5f, btVector3(0,0,0),
+                                       &app->levelLoader->playerStartRotations[0]));
     }
   }
 
   app->mCamera->setPosition(Ogre::Vector3(0,0,0));
   mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
-                                (Ogre::Vector3)players[0]->getBall()->getPosition(), app->levelLoader->cameraStartPos);
+                                (Ogre::Vector3)players[0]->getBall()->getPosition(),
+                                app->levelLoader->cameraStartPos);
 
   gameEnded = false;
   countdown = 2000;
@@ -214,6 +258,9 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (!inGame) {
     handleLobbyState();
     return true;
+  } else if (waitingForClientsToLoad) {
+    handleWaiting();
+    //    return true;  // Comment out for now
   }
 
   if (countdown != -1 && !menuActive && !ceguiActive) {
@@ -227,6 +274,7 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   }
 
   timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
+
   /*
     if (!gameEnded  && countdown == -1) {
     timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
@@ -252,9 +300,9 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   scoreDisplay->setText(sst.str());
 
   /*
-  std:: stringstream livesSS;
-  livesSS << lives << (lives != 1 ? " Lives" : " Life");
-  livesDisplay->setText(livesSS.str());
+    std:: stringstream livesSS;
+    livesSS << lives << (lives != 1 ? " Lives" : " Life");
+    livesDisplay->setText(livesSS.str());
   */
 
   std::stringstream css;
@@ -336,58 +384,13 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   }
   */
 
-  //Player *mPlayer = players[myId];
-  //if (mPlayer) {
-  // btVector3 pos = (mPlayer->pongMode ? mPlayer->getRacquet()->getPosition() : mPlayer->getNode()->getPosition());
-  // mCamera->lookAt(pos[0], pos[1], pos[2]);
-  //}
+  handleClientEvents();
+  updateClients();
 
-  /* // Don't accept new connections in game
-  // Handle New Connections
-  TCPsocket csd_t = SDLNet_TCP_Accept(Networking::server_socket);
-  if(csd_t){
-  remoteIP = SDLNet_TCP_GetPeerAddress(csd_t);
-  if(remoteIP){
-  printf("Successfully connected to %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
-  }
+  return true;
+}
 
-  if (SDLNet_TCP_AddSocket(Networking::server_socketset, csd_t) == -1) {
-  printf("SDLNet_TCP_AddSocket: %s\n", SDLNet_GetError());
-  } else {
-  for (int i = 0; i < MAX_PLAYERS; i++) {
-  if (!players[i]) {
-
-  // Send ack with its new user ID
-  ConnectAck ack;
-  for (int j = 0; j < MAX_PLAYERS; j++) {
-  if (players[j])
-  ack.ids[j] = 1;
-  else
-  ack.ids[j] = 0;
-  }
-
-  addPlayer(i);
-  players[i]->csd = csd_t;
-  ack.id = i;
-  Networking::Send(csd_t, (char*)&ack, sizeof(ack));
-
-  // Send notifications to rest of players
-  ServerPacket packet;
-  packet.type = SERVER_CLIENT_CONNECT;
-  packet.level = currentLevelName;
-  packet.clientId = i;
-  for (int j = 1; j < MAX_PLAYERS; j++) {
-  if (i != j && players[j])
-  Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
-  }
-  break;
-  }
-  }
-  }
-  }
-  */
-
-  //RECEIVE INPUTS
+void HostPlayerActivity::handleClientEvents(void) {
   while (SDLNet_CheckSockets(Networking::server_socketset, 1) > 0) {
     for (int i = 1; i < MAX_PLAYERS; i++) {
       if (players[i]) {
@@ -397,26 +400,61 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
           ServerPacket closemsg;
 
           if(SDLNet_TCP_Recv(csd, &cmsg, sizeof(cmsg)) > 0) {
-            //TODO: DO STUFF FOR RECEIVED PACKETS
+            switch (cmsg.type) {
+            case KEY_PRESSED:
+              handleKeyPressed(cmsg.keyArg, cmsg.userID);
+              break;
+            case KEY_RELEASED:
+              handleKeyReleased(cmsg.keyArg, cmsg.userID);
+              break;
+            case CLIENT_CHAT:
+              /*              addChatMessage(cmsg.msg);
+
+                              ServerPacket packet;
+                              packet.type = SERVER_CLIENT_MESSAGE;
+                              packet.clientId = i;
+                              memcpy(packet.msg, cmsg.msg, 512);
+
+                              for (int j = 1; j < MAX_PLAYERS; j++) {
+                              if (i != j && players[j]) {
+                              Networking::Send(players[j]->csd, (char*)&closemsg, sizeof(closemsg));
+                              }
+                              }*/
+              break;
+            case CLIENT_CLOSE:
+              app->mPhysics->removeObject(players[cmsg.userID]->getBall());
+              app->mSceneMgr->destroyEntity(players[cmsg.userID]->getBall()->getEntity());
+              // Need to destroy more entities?
+
+              SDLNet_TCP_Close(players[cmsg.userID]->csd);
+              players[cmsg.userID] = NULL;
+
+              closemsg.type = SERVER_CLIENT_CLOSED;
+              closemsg.clientID = cmsg.userID;
+              for (int j = 1; j < MAX_PLAYERS; j++) {
+                if (players[j]) {
+                  Networking::Send(players[j]->csd, (char*)&closemsg, sizeof(closemsg));
+                }
+              }
+            }
           }
         }
       }
     }
   }
+}
 
+void HostPlayerActivity::updateClients(void) {
   ServerPacket msg;
-  //TODO: NEED TO SETUP MESSAGE THING
 
-  // UPDATE ALL CLIENTS
-  for (int i = 0; i < MAX_PLAYERS; i++) {
-    Player *mPlayer = players[i];
-    if (mPlayer) {
-      //TODO: update clients based off of received thing?
-      /* btVector3 playerPos = mPlayer->getNode()->getPosition();
-         btQuaternion playerOrientation = mPlayer->getNode()->getOrientation();
-         msg.players[i].nodePos = playerPos;
-         msg.players[i].nodeOrientation = playerOrientation;
-      */}
+  msg.type = SERVER_UPDATE;
+  msg.timeLeft = timeLeft;
+
+  std::deque<GameObject*> objects = app->mPhysics->getObjects();
+  for (int i = 0; i < objects.size() && i < 200; i++) {
+    ObjectInfo objInfo;
+    msg.objectInfo[i].position = objects[i]->getPosition();
+    msg.objectInfo[i].orientation = objects[i]->getOrientation();
   }
 
   for (int i = 1; i < MAX_PLAYERS; i++) {
@@ -424,7 +462,6 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
-  true;
 }
 
 //-------------------------------------------------------------------------------------
@@ -574,7 +611,7 @@ bool HostPlayerActivity::handleKeyReleased( OIS::KeyCode arg, int userId ) {
 
 bool HostPlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 {
-  if (!inGame || menuActive || ceguiActive) {
+  if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System &sys = CEGUI::System::getSingleton();
     sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
     // Scroll wheel.
@@ -590,7 +627,7 @@ bool HostPlayerActivity::mouseMoved( const OIS::MouseEvent &arg )
 
 bool HostPlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  if (!inGame || menuActive || ceguiActive) {
+  if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
     return true;
   }
@@ -601,7 +638,7 @@ bool HostPlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseBut
 
 bool HostPlayerActivity::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-  if (!inGame || menuActive || ceguiActive) {
+  if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectMouseButtonUp(OgreBallApplication::convertButton(id));
     return true;
   }

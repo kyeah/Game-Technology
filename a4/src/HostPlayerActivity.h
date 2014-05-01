@@ -31,13 +31,18 @@ class HostPlayerActivity : public Activity {
   virtual void handleGameEnd();
 
   void handleLobbyState(void);
+  void handleWaiting();
+
+  bool startGame( const CEGUI::EventArgs& e );
   void loadLevel( const char* name );
 
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
 
-  Player* addPlayer(int userID);
+  Player* addPlayer(int userID, const char* name);
+  void handleClientEvents(void);
+  void updateClients(void);
 
   std::string currentLevelName;
 
@@ -65,7 +70,7 @@ class HostPlayerActivity : public Activity {
   //Networking Stuff
   int myId;
   IPaddress ip, *remoteIP;
-  bool inGame, chatFocus;
+  bool inGame, chatFocus, waitingForClientsToLoad;
 
   // Game State Variables
   float timeLeft;  // In millis

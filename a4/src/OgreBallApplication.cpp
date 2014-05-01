@@ -130,7 +130,6 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("MultiSubMenu.layout");
   Wmgr->loadWindowLayout("ServerList.layout");
   Wmgr->loadWindowLayout("GameLobby.layout");
-  Wmgr->loadWindowLayout("Chatbox.layout");
   Wmgr->loadWindowLayout("PauseMenu.layout");
   Wmgr->loadWindowLayout("GameWon.layout");
   Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
@@ -138,10 +137,12 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("Leaderboard.layout");
   Wmgr->loadWindowLayout("LevelSelector.layout");
   Wmgr->loadWindowLayout("PlayerSelector.layout");
+  Wmgr->loadWindowLayout("Chatbox.layout");
+  Wmgr->loadWindowLayout("Prompt.layout");
+
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
-  // CEGUI::System::getSingleton().setGUISheet(sheet);
 }
 
 //-------------------------------------------------------------------------------------

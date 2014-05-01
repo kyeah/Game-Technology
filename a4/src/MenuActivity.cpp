@@ -74,10 +74,20 @@ void MenuActivity::start(void) {
 
   serverListbox->setMultiselectEnabled(false);
   serverListbox->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
-                                CEGUI::Event::Subscriber(&MenuActivity::JoinServer, this));
+                                CEGUI::Event::Subscriber(&MenuActivity::PromptForJoinServer, this));
 
   serverListBack->subscribeEvent(CEGUI::PushButton::EventClicked,
                                  CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
+
+  // Prompt
+  promptWindow = wmgr->getWindow("Prompt");
+  promptHeader = wmgr->getWindow("Prompt/Header");
+  promptInputbox = (CEGUI::Editbox*)wmgr->getWindow("Prompt/Input");
+  promptSubmit = wmgr->getWindow("Prompt/Submit");
+  promptCancel = wmgr->getWindow("Prompt/Cancel");
+
+  promptCancel->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::CancelPrompt, this));
 
   for (int i = 0; i < 8; i++) {
     std::stringstream ss;
@@ -186,6 +196,7 @@ bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
   */
   clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                CEGUI::Event::Subscriber(&MenuActivity::SwitchToServerListMenu,this));
+
   /*
     hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
@@ -217,15 +228,36 @@ bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
 }
 
 bool MenuActivity::JoinServer( const CEGUI::EventArgs& e ) {
+  CEGUI::String name = promptInputbox->getText();
+  if (!name.length()) return true;
+
+  CEGUI::System::getSingleton().getGUISheet()->removeChildWindow(promptWindow);
+
   CEGUI::ListboxItem * selectedItem = serverListbox->getFirstSelectedItem();
+
   int id;
-  
+  char levelname[128];
+
   PingResponseMessage* serverData = static_cast<PingResponseMessage*>(selectedItem->getUserData());
   std::cout << "connecting to " << serverData->hostName << std::endl;
-  if (Networking::clientConnect(&id, serverData->hostName)) {
+
+  if (Networking::clientConnect(&id, levelname, name.c_str(), serverData->hostName)) {
     std::cout << "Client connected" << std::endl;
-    app->switchActivity(new ClientPlayerActivity(app));
+    app->switchActivity(new ClientPlayerActivity(app, id, levelname));
   }
+}
+
+bool MenuActivity::PromptForJoinServer( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().getGUISheet()->addChildWindow(promptWindow);
+  promptHeader->setText("Enter name to show to other users.");
+  promptInputbox->setText("");
+  promptSubmit->removeEvent(CEGUI::PushButton::EventClicked);
+  promptSubmit->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::JoinServer,this));
+}
+
+bool MenuActivity::CancelPrompt( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().getGUISheet()->removeChildWindow(promptWindow);
 }
 
 /*
@@ -444,10 +476,10 @@ bool MenuActivity::StartMultiPlayerHost( const CEGUI::EventArgs& e ){
 }
 
 bool MenuActivity::StartMultiPlayerClient( const CEGUI::EventArgs& e) {
-  CEGUI::MouseCursor::getSingleton().hide();
+/*  CEGUI::MouseCursor::getSingleton().hide();
   CEGUI::String hostName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getText();
   printf("host name is %s\n", hostName.c_str());
-  app->switchActivity(new ClientPlayerActivity(app));
+  app->switchActivity(new ClientPlayerActivity(app));*/
   return true;
 }
 

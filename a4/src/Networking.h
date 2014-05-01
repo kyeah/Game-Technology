@@ -26,12 +26,20 @@ static const int SERVER_CLIENT_CLOSED = 9;
 static const int SERVER_CLIENT_MESSAGE = 10;
 static const int SERVER_CLOSED = 11;
 static const int SERVER_UPDATE = 12;
+static const int SERVER_GAME_START = 13;
 
 static const int SEND_TO_SERV = 10;
 static const int SEND_TO_CLIENT = 11;
 
 typedef struct {
-//TODO: Create Client Packet
+  int type;
+  int userID;
+  char msg[512];
+  
+  OIS::KeyCode keyArg;
+  OIS::MouseState mouseArg;
+  OIS::MouseButtonID mouseID;
+
 } ClientPacket;
 
 typedef struct {
@@ -39,18 +47,28 @@ typedef struct {
 } PlayerInfo;
 
 typedef struct {
-	int type;
-	char level[128];
-	int clientId;
-//TODO: create server packet
+  btVector3 position;
+  btQuaternion orientation;
+} ObjectInfo;
+
+typedef struct {
+  int type;
+  int clientID;
+  float timeLeft;
+  char msg[512];
+
+  int playSound;
+  ObjectInfo objectInfo[200];  // Should correspond to objList from Physics instance
 } ServerPacket;
 
 typedef struct {
+  char level[128];
   int ids[4];
   int id;
 } ConnectAck;
 
 typedef struct {
+  char name[128];
   bool isJoining;
 } PingMessage;
 
@@ -67,7 +85,7 @@ public:
 	static void Send(TCPsocket socket, char* msg, int len);
 	static void serverConnect();
 	static void Close();
-	static bool clientConnect(int *id, char* hostName); 
+	static bool clientConnect(int *id, char* levelname, const char* username, char* hostName); 
         static std::vector<PingResponseMessage*> hostCheck( const char* filename );
 
 	static TCPsocket server_socket, client_socket;
@@ -75,7 +93,6 @@ public:
 	static SDLNet_SocketSet client_socketset, server_socketset;
 	static int client_ids[4];
 	static int soundState;
-
 };
 
 

@@ -112,3 +112,7 @@ void Physics::removeObject(GameObject *obj) {
   objList.erase(std::remove(objList.begin(), objList.end(), obj), objList.end());
   getDynamicsWorld()->removeRigidBody(obj->getBody());
 }
+
+std::deque<GameObject*>& Physics::getObjects() {
+  return objList;
+}

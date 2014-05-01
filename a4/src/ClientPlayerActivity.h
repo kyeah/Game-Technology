@@ -5,10 +5,11 @@
 #include "Activity.h"
 #include "CameraObject.h"
 #include "GameObjectDescription.h"
+#include "common.h"
 
 class ClientPlayerActivity : public Activity {
  public:
-  ClientPlayerActivity(OgreBallApplication *app);
+  ClientPlayerActivity(OgreBallApplication *app, int id, const char* levelName);
   virtual ~ClientPlayerActivity(void);
   virtual void close(void);
 
@@ -32,7 +33,9 @@ class ClientPlayerActivity : public Activity {
   bool waitForHosts();
   void togglePauseMenu();
 
-  const char* currentLevelName;
+  Player* addPlayer(int userID, const char* name);
+
+  std::string currentLevelName;
 
   // User Input Variables
   btScalar MAX_TILT;
@@ -45,24 +48,22 @@ class ClientPlayerActivity : public Activity {
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay,
     *collectDisplay, *livesDisplay, *levelDisplay;
 
+  CEGUI::Window *readyWindow, *goWindow;
+  CEGUI::Window *pauseMenuSheet, *pauseQuit, *pauseReturn;
+
   CEGUI::Window *lobbySheet, *lobbySelectLevel, *lobbySelectCharacter,
     *lobbyLeave, *lobbyStart;
 
   CEGUI::Window *lobbyPlayerWindows[4];
 
-  bool menuActive;
-  bool ceguiActive;
-  bool gameEnded;
-  bool levelLoaded;
-  bool waitingScreenLoaded;
-  bool readyToLoadLevel;
+  bool menuActive, ceguiActive, gameEnded, levelLoaded,
+    waitingScreenLoaded, readyToLoadLevel, inGame, chatFocus;
 
   int myId;
+  int countdown;
 
   // Game State Variables
   OgreBall *player;
   float timeLeft;  // In millis
   int lives;
-
-  bool inGame;
 };
