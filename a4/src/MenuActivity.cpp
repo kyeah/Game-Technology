@@ -197,12 +197,16 @@ bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
 
     CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
     CEGUI::Window* ogreButton = app->Wmgr->getWindow("Menu/Ogre");
+    CEGUI::Window* ninjaButton = app->Wmgr->getWindow("Menu/Ninja");
 
     penguinButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                 CEGUI::Event::Subscriber(&MenuActivity::SelectPenguin, this));
 
     ogreButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                 CEGUI::Event::Subscriber(&MenuActivity::SelectOgre, this));
+
+    ninjaButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::SelectNinja, this));
  }
 
  bool MenuActivity::SelectPenguin( const CEGUI::EventArgs& e){
@@ -212,6 +216,11 @@ bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
  }
  bool MenuActivity::SelectOgre( const CEGUI::EventArgs& e){
     player_flag = 1;
+    MenuActivity::SinglePlayerLevelSelectWrapper(e);
+
+ }
+ bool MenuActivity::SelectNinja( const CEGUI::EventArgs& e){
+    player_flag = 2;
     MenuActivity::SinglePlayerLevelSelectWrapper(e);
 
  }

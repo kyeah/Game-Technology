@@ -28,5 +28,17 @@
       <Property Name="Alpha" Value="1.0" />
     </Window>
 
+    <Window Type="OgreBall/TextButton" Name="Menu/Ninja">
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0.0},{0.6,0.0},{0.75,0.0},{0.65,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Ninja" />
+      <Property Name="Tooltip" Value="Play as Ninja"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+
   </Window>
 </GUILayout>

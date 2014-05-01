@@ -20,7 +20,13 @@ OgreBall::OgreBall(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String 
   Ogre::Entity* charHead = mgr->createEntity(_entName + "head", _meshName);
   Ogre::SceneNode* headNode = node->createChildSceneNode(_nodeName + "head");
   headNode->attachObject(charHead);
-  headNode->scale(2,2,2);
+  if(_meshName.compare("ninja.mesh") == 0){
+    headNode->scale(.8, .8, .8);
+    headNode->translate(0, -55, 0);
+  }
+  else{
+    headNode->scale(2,2,2);
+  }
 
   node->_update(true,true);
   node->_updateBounds();

@@ -33,6 +33,7 @@ class MenuActivity : public Activity {
 
   bool SelectPenguin( const CEGUI::EventArgs& e);
   bool SelectOgre( const CEGUI::EventArgs& e);
+  bool SelectNinja( const CEGUI::EventArgs& e);
 
   bool SwitchToHostSelectMenu( const CEGUI::EventArgs& e);
   bool SinglePlayerLevelSelectWrapper(const CEGUI::EventArgs& e);

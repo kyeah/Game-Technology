@@ -156,6 +156,9 @@ void SinglePlayerActivity::loadLevel(const char* name) {
     case CHARACTER_OGRE:
       playerChoice << "ogrehead.mesh";
       break;
+    case CHARACTER_NINJA:
+      playerChoice << "ninja.mesh";
+      break;
 
 
   }
