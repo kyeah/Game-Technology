@@ -11,6 +11,7 @@
 #include <OISInputManager.h>
 #include <OISMouse.h>
 #include <OISKeyboard.h>
+#include <OgreSceneManager.h>
 
 static const int MOUSE_MOVED = 0;
 static const int MOUSE_PRESSED = 1;
@@ -43,8 +44,14 @@ typedef struct {
 } ClientPacket;
 
 typedef struct {
-//TODO: this may not even be necessary
+  char name[128];
+  int characterChoice;
 } PlayerInfo;
+
+typedef struct {
+  Ogre::Vector3 position;
+  Ogre::Quaternion orientation;
+} PlayerCamInfo;
 
 typedef struct {
   btVector3 position;
@@ -59,12 +66,16 @@ typedef struct {
 
   int playSound;
   ObjectInfo objectInfo[200];  // Should correspond to objList from Physics instance
+  PlayerCamInfo camInfo;
 } ServerPacket;
 
 typedef struct {
-  char level[128];
-  int ids[4];
   int id;
+  int ids[4];
+  PlayerInfo playerInfo[4];
+
+  char level[128];
+  char lobbyName[128];
 } ConnectAck;
 
 typedef struct {
@@ -85,7 +96,7 @@ public:
 	static void Send(TCPsocket socket, char* msg, int len);
 	static void serverConnect();
 	static void Close();
-	static bool clientConnect(int *id, char* levelname, const char* username, char* hostName); 
+	static bool clientConnect(ConnectAck *ack, const char* username, char* hostName); 
         static std::vector<PingResponseMessage*> hostCheck( const char* filename );
 
 	static TCPsocket server_socket, client_socket;

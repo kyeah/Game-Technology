@@ -6,10 +6,11 @@
 #include "CameraObject.h"
 #include "GameObjectDescription.h"
 #include "common.h"
+#include "Networking.h"
 
 class ClientPlayerActivity : public Activity {
  public:
-  ClientPlayerActivity(OgreBallApplication *app, int id, const char* levelName);
+  ClientPlayerActivity(OgreBallApplication *app, ConnectAck *ack);
   virtual ~ClientPlayerActivity(void);
   virtual void close(void);
 

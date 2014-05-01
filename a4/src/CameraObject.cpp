@@ -65,7 +65,6 @@ void CameraObject::update(Ogre::Vector3 newPosition, Ogre::Real elapsedTime){
   cameraNode->_setDerivedPosition(lastInterpPos);
 }
 
-
 void CameraObject::setFixedDistance(Ogre::Vector3 v1, Ogre::Vector3 v2){
   Ogre::Real dist = v1.distance(v2);
   previousPos = lastInterpPos = destPos = v2;

@@ -5,7 +5,7 @@
 #include "common.h"
 #include "Networking.h"
 
-ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, int id, const char* levelName) : Activity(app) {
+ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck *ack) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
   currTiltDelay = tiltDelay = 300;  // Increasing this increases the time it takes for the level to rotate
 
@@ -13,8 +13,8 @@ ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, int id, con
   currTilt = btQuaternion(0,0,0);
   tiltDest = btQuaternion(0,0,0);
 
-  myId = id;
-  currentLevelName = std::string(levelName, strlen(levelName));
+  myId = ack->id;
+  currentLevelName = std::string(ack->level, strlen(ack->level));
   menuActive = false;
   ceguiActive = false;
 
@@ -28,6 +28,30 @@ ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, int id, con
 
   for (int i = 0; i < MAX_PLAYERS; i++)
     players[i] = 0;
+
+
+  lobbySheet = app->Wmgr->getWindow("GameLobby");
+  lobbySelectLevel = app->Wmgr->getWindow("GameLobby/SelectLevel");
+  lobbySelectCharacter = app->Wmgr->getWindow("GameLobby/SelectCharacter");
+  lobbyLeave = app->Wmgr->getWindow("GameLobby/Leave");
+  lobbyStart = app->Wmgr->getWindow("GameLobby/Ready");
+
+  lobbySelectLevel->setVisible(false);
+
+  lobbyLeave->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&ClientPlayerActivity::ExitToMenu, this));
+
+
+  for (int i = 0; i < 4; i++) {
+    std::stringstream ss;
+    ss << "GameLobby/" << i+1;
+    lobbyPlayerWindows[i] = app->Wmgr->getWindow(ss.str());
+  }
+
+  for (int i = 0; i < 4; i++) {
+    if (ack->ids[i])
+      addPlayer(i, ack->playerInfo[i].name);
+  }
 }
 
 Player* ClientPlayerActivity::addPlayer(int userID, const char* name) {
@@ -64,7 +88,7 @@ void ClientPlayerActivity::close(void) {
 void ClientPlayerActivity::start(void) {
   //  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
 
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+  guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
   livesDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Lives");
   collectDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Collectibles");
@@ -88,24 +112,6 @@ void ClientPlayerActivity::start(void) {
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&ClientPlayerActivity::togglePauseMenu, this));
 
-  lobbySheet = app->Wmgr->getWindow("GameLobby");
-  lobbySelectLevel = app->Wmgr->getWindow("GameLobby/SelectLevel");
-  lobbySelectCharacter = app->Wmgr->getWindow("GameLobby/SelectCharacter");
-  lobbyLeave = app->Wmgr->getWindow("GameLobby/Leave");
-  lobbyStart = app->Wmgr->getWindow("GameLobby/Ready");
-
-  lobbySelectLevel->setVisible(false);
-
-  lobbyLeave->subscribeEvent(CEGUI::PushButton::EventClicked,
-                             CEGUI::Event::Subscriber(&ClientPlayerActivity::ExitToMenu, this));
-
-
-  for (int i = 0; i < 4; i++) {
-    std::stringstream ss;
-    ss << "GameLobby/" << i+1;
-    lobbyPlayerWindows[i] = app->Wmgr->getWindow(ss.str());
-  }
-
   // TODO: Add Chatbox Window to layout
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(lobbySheet);
@@ -113,9 +119,6 @@ void ClientPlayerActivity::start(void) {
   for (int i = 0; i < 4; i++) {
     // Need to replace client_ids with PlayerInfo so we can show name, player mesh choice information
   }
-
-  addPlayer(0, "name-plz-go-here");
-  addPlayer(myId, "my name");
 
   // Need to keep track of server information to show level selection, etc.
 
@@ -145,7 +148,6 @@ void ClientPlayerActivity::loadLevel(const char* name) {
   app->levelLoader->currObjID = 0;  // VERY IMPORTANT TO ENSURE CONSISTENT OBJECT NAMES ACROSS HOST AND CLIENTS
   app->levelLoader->loadLevel(name);
 
-
   levelDisplay->setText(currentLevelName.c_str());
 
   timeLeft = 60000;  // TODO: Should get timeLeft from level script
@@ -167,7 +169,8 @@ void ClientPlayerActivity::loadLevel(const char* name) {
     }
   }
 
-  app->mCamera->setPosition(app->levelLoader->cameraStartPos);
+  app->mCamera->setPosition(Ogre::Vector3(0,0,0));
+  app->mCameraNode->_setDerivedPosition(app->levelLoader->cameraStartPos);
   /*  mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
       (Ogre::Vector3)players[0]->getBall()->getPosition(),
       app->levelLoader->cameraStartPos);
@@ -251,11 +254,16 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
       switch(msg.type){
       case SERVER_UPDATE: {
         timeLeft = msg.timeLeft;
+        app->mCameraNode->setPosition(msg.camInfo.position);
+        app->mCameraNode->setOrientation(msg.camInfo.orientation);
+
         std::deque<GameObject*> objects = app->mPhysics->getObjects();
         for (int i = 0; i < objects.size(); i++) {
           objects[i]->setPosition(msg.objectInfo[i].position);
           objects[i]->setOrientation(msg.objectInfo[i].orientation);
         }
+
+        app->mCamera->lookAt((Ogre::Vector3)players[myId]->getBall()->getPosition() + Ogre::Vector3(0,250,0));
         break;
       }
       case SERVER_CLIENT_CONNECT:

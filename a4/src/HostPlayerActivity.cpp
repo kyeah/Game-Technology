@@ -37,7 +37,7 @@ void HostPlayerActivity::close(void) {
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
-  
+
   Networking::Close();
   //  delete player;
   //  delete mCameraObj;
@@ -99,8 +99,10 @@ void HostPlayerActivity::start(void) {
   lobbyStart = app->Wmgr->getWindow("GameLobby/Ready");
   lobbyStart->setText("Start");
 
+  lobbyStart->removeEvent(CEGUI::PushButton::EventClicked);
   lobbyStart->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&HostPlayerActivity::startGame, this));
+
   lobbyLeave->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&HostPlayerActivity::ExitToMenu, this));
 
@@ -154,18 +156,25 @@ void HostPlayerActivity::handleLobbyState(void) {
         } else {
           for (int i = 0; i < MAX_PLAYERS; i++) {
             if (!players[i]) {
-              // Send ack with its new user ID
-              ConnectAck ack;
-
-              strcpy(ack.level, currentLevelName.c_str());
-              for (int j = 0; j < MAX_PLAYERS; j++) {
-                if (players[j]) ack.ids[j] = 1;
-                else            ack.ids[j] = 0;
-              }
-
               addPlayer(i, ping.name);
               players[i]->csd = csd_t;
+
+              // Send ack with its new user ID
+              ConnectAck ack;
               ack.id = i;
+              strcpy(ack.level, currentLevelName.c_str());
+              strcpy(ack.lobbyName, "TEMPORARY SWAGGY P");
+
+              for (int j = 0; j < MAX_PLAYERS; j++) {
+                if (players[j]) {
+                  ack.ids[j] = 1;
+                  strcpy(ack.playerInfo[j].name, players[j]->name);
+                  // ack.playerInfo[j].characterChoice = WHATEVER CHOICE;
+                } else {
+                  ack.ids[j] = 0;
+                }
+              }
+
               Networking::Send(csd_t, (char*)&ack, sizeof(ack));
 
               // Send notifications to rest of players
@@ -232,13 +241,26 @@ void HostPlayerActivity::loadLevel(const char* name) {
                                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
                                        btVector3(0,0,0), 16000.0f, 0.5f, btVector3(0,0,0),
                                        &app->levelLoader->playerStartRotations[0]));
+
+      if (i == 0) {
+        players[i]->mCameraLookAtNode = app->mCameraLookAtNode;
+        players[i]->mCameraNode = app->mCameraNode;
+      } else {
+        ss << "lookAt";
+        players[i]->mCameraLookAtNode = app->mSceneMgr->getRootSceneNode()->createChildSceneNode(ss.str());
+
+        ss << "cam";
+        players[i]->mCameraNode = players[i]->mCameraLookAtNode->createChildSceneNode(ss.str());
+        players[i]->mCameraNode->setFixedYawAxis(true);
+      }
+
+      players[i]->mCameraObj = new CameraObject(players[i]->mCameraLookAtNode, players[i]->mCameraNode,
+                                                (Ogre::Vector3)players[i]->getBall()->getPosition(),
+                                                app->levelLoader->cameraStartPos);
     }
   }
 
   app->mCamera->setPosition(Ogre::Vector3(0,0,0));
-  mCameraObj = new CameraObject(app->mCameraLookAtNode, app->mCameraNode,
-                                (Ogre::Vector3)players[0]->getBall()->getPosition(),
-                                app->levelLoader->cameraStartPos);
 
   gameEnded = false;
   countdown = 2000;
@@ -331,58 +353,66 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
     }
   }
 
-  Player *player = players[myId];
+  //TODO: Keep Local ghost camera for every player, or have them update and send their state to us?
 
-  /* TODO: Keep Local ghost camera for every player, or have them update and send their state to us?
-  // Set player's gravity based on the direction they are facing
-  Ogre::Vector3 ocam = app->mCameraNode->_getDerivedPosition();
-  btVector3 facingDirection = player->mOgreBall->getPosition() - btVector3(ocam[0], ocam[1], ocam[2]);
-  facingDirection[1] = 0;
-  facingDirection.normalize();
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    Player *player = players[i];
+    if (player) {
 
-  btScalar yaw = btVector3(0,0,-1).angle(facingDirection);
-  btQuaternion q((facingDirection[0] > 0 ? -yaw : yaw),0,0);
-  q.normalize();
+      // Set player's gravity based on the direction they are facing
+      Ogre::Vector3 ocam = player->mCameraNode->_getDerivedPosition();
+      btVector3 facingDirection = player->getBall()->getPosition() - btVector3(ocam[0], ocam[1], ocam[2]);
+      facingDirection[1] = 0;
+      facingDirection.normalize();
 
-  if (gameEnded) {
-  player->getBody()->setGravity(btVector3(0, 1000, 0));
-  } else if (countdown == -1) {
-  btVector3 tweakedGrav = 2*app->mPhysics->getDynamicsWorld()->getGravity()
-  .rotate(currTilt.getAxis(), -3*currTilt.getAngle())
-  .rotate(q.getAxis(), q.getAngle());
+      btScalar yaw = btVector3(0,0,-1).angle(facingDirection);
+      btQuaternion q((facingDirection[0] > 0 ? -yaw : yaw),0,0);
+      q.normalize();
 
-  tweakedGrav[1] /= 2;
-  player->getBody()->setGravity(tweakedGrav);
+      //      if (gameEnded) {
+      if (player->crossedFinishLine) {
+        player->getBall()->getBody()->setGravity(btVector3(0, 1000, 0));
+      } else if (countdown == -1) {
+        btVector3 tweakedGrav = 2*app->mPhysics->getDynamicsWorld()->getGravity()
+          .rotate(player->currTilt.getAxis(), -3*player->currTilt.getAngle())
+          .rotate(q.getAxis(), q.getAngle());
 
+        tweakedGrav[1] /= 2;
+        player->getBall()->getBody()->setGravity(tweakedGrav);
+
+      }
+
+      // Update Camera Position
+      player->mCameraObj->update((Ogre::Vector3)player->getBall()->getPosition(), elapsedTime);
+
+      // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
+      player->mCameraNode->lookAt((Ogre::Vector3)player->getBall()->getPosition() + Ogre::Vector3(0,250,0), 
+                                  Ogre::SceneNode::TS_WORLD);
+      //      player->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
+      // Do ^ in client
+
+      // Tilt Camera to simulate level tilt
+      if (countdown == -1) {
+        Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
+        Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
+
+        Ogre::Real xTilt = player->currTilt.x();
+        if (xTilt < 0) xTilt /= 3;
+        Ogre::Quaternion notilt = Ogre::Quaternion(-player->currTilt.w(),
+                                                   xTilt,
+                                                   player->currTilt.y(),
+                                                   player->currTilt.z());
+
+        if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
+          player->mCameraLookAtNode->rotate(oq);
+          player->mCameraLookAtNode->rotate(notilt*notilt);
+          player->mCameraLookAtNode->rotate(noq);
+        }
+      }
+    }
   }
 
-  // Update Camera Position
-  //comment out the lines below if you're building a level; also return false in mouseMoved.
-  mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
-
-  // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
-  app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
-  app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
-
-  // Tilt Camera to simulate level tilt
-  if (countdown == -1) {
-  Ogre::Quaternion oq = Ogre::Quaternion(q.w(), q.x(), q.y(), q.z());
-  Ogre::Quaternion noq = Ogre::Quaternion(-q.w(), q.x(), q.y(), q.z());
-
-  Ogre::Real xTilt = currTilt.x();
-  if (xTilt < 0) xTilt /= 3;
-  Ogre::Quaternion notilt = Ogre::Quaternion(-currTilt.w(),
-  xTilt,
-  currTilt.y(),
-  currTilt.z());
-
-  if (!oq.isNaN() && !notilt.isNaN() && !noq.isNaN()) {
-  app->mCameraLookAtNode->rotate(oq);
-  app->mCameraLookAtNode->rotate(notilt*notilt);
-  app->mCameraLookAtNode->rotate(noq);
-  }
-  }
-  */
+  app->mCamera->lookAt((Ogre::Vector3)players[0]->getBall()->getPosition() + Ogre::Vector3(0,250,0));
 
   handleClientEvents();
   updateClients();
@@ -452,13 +482,15 @@ void HostPlayerActivity::updateClients(void) {
 
   std::deque<GameObject*> objects = app->mPhysics->getObjects();
   for (int i = 0; i < objects.size() && i < 200; i++) {
-    ObjectInfo objInfo;
     msg.objectInfo[i].position = objects[i]->getPosition();
     msg.objectInfo[i].orientation = objects[i]->getOrientation();
   }
 
   for (int i = 1; i < MAX_PLAYERS; i++) {
     if (players[i]) {
+      msg.camInfo.position = players[i]->mCameraNode->_getDerivedPosition();
+      msg.camInfo.orientation = players[i]->mCameraNode->_getDerivedOrientation();
+
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }

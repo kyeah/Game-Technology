@@ -98,7 +98,7 @@ std::vector<PingResponseMessage*> Networking::hostCheck( const char* filename ) 
   return messages;
 }
 
-bool Networking::clientConnect(int *id, char* levelname, const char* username, char* host){
+bool Networking::clientConnect(ConnectAck *ack, const char* username, char* host){
 
   printf("trying to connect to player 2...\n");
   SDLNet_Init();
@@ -118,7 +118,7 @@ bool Networking::clientConnect(int *id, char* levelname, const char* username, c
     }
 
     client_socket = SDLNet_TCP_Open(&client_ip);
-    if(!client_socket){
+    if(!client_socket) {
       printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
       printf("trying again...\n");
     }
@@ -137,13 +137,10 @@ bool Networking::clientConnect(int *id, char* levelname, const char* username, c
   SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
 
   //connected = true
-  ConnectAck ack;
-  SDLNet_TCP_Recv(client_socket, &ack, sizeof(ack));
-  *id = ack.id;
-  strcpy(levelname, ack.level);
+  SDLNet_TCP_Recv(client_socket, ack, sizeof(*ack));
 
   for (int i = 0; i < 4; i++) {
-    client_ids[i] = ack.ids[i];
+    client_ids[i] = ack->ids[i];
   }
   //  printf("myID: %d\n", myId);
   return true;

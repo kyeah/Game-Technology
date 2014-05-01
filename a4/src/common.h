@@ -3,6 +3,7 @@
 #include "GameObjectDescription.h"
 #include <btBulletDynamicsCommon.h>
 #include "BaseApplication.h"
+#include "CameraObject.h"
 #include "SDL_net.h"
 
 extern const int MAX_PLAYERS;
@@ -16,9 +17,15 @@ public:
 
 	TCPsocket csd;
         char name[128];
-        btQuaternion lastTilt, currTilt, tiltDest;
-        float currTiltDelay;
         int character;
+
+        btQuaternion lastTilt, currTilt, tiltDest;
+        float currTiltDelay;        
+
+        Ogre::SceneNode *mCameraLookAtNode, *mCameraNode;        
+        CameraObject *mCameraObj;
+
+        bool crossedFinishLine;
 
 private:
 	int id;

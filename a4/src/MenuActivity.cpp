@@ -241,9 +241,10 @@ bool MenuActivity::JoinServer( const CEGUI::EventArgs& e ) {
   PingResponseMessage* serverData = static_cast<PingResponseMessage*>(selectedItem->getUserData());
   std::cout << "connecting to " << serverData->hostName << std::endl;
 
-  if (Networking::clientConnect(&id, levelname, name.c_str(), serverData->hostName)) {
+  ConnectAck *ack = new ConnectAck();
+  if (Networking::clientConnect(ack, name.c_str(), serverData->hostName)) {
     std::cout << "Client connected" << std::endl;
-    app->switchActivity(new ClientPlayerActivity(app, id, levelname));
+    app->switchActivity(new ClientPlayerActivity(app, ack));
   }
 }
 
