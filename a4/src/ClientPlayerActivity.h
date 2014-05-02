@@ -19,11 +19,13 @@ class ClientPlayerActivity : public BaseMultiActivity {
 
   virtual bool keyPressed( const OIS::KeyEvent &arg );
   virtual bool keyReleased( const OIS::KeyEvent &arg );
+  virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
   bool toggleReady( const CEGUI::EventArgs &args );
+  bool handleTextSubmitted( const CEGUI::EventArgs &args );
 
-  void handleLobbyState();
-  virtual void handleGameEnd();
+  void handleServerUpdates();
+  virtual void handleCrossedFinishLine();
 
   void loadLevel( const char* name );
   bool waitForHosts();

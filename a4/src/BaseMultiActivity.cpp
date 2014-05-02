@@ -12,6 +12,7 @@ BaseMultiActivity::BaseMultiActivity(OgreBallApplication *app) : Activity(app) {
 
   menuActive = false;
   ceguiActive = false;
+  allowKeyPress = true;
 
   lives = 10;
   inGame = false;
@@ -67,7 +68,18 @@ BaseMultiActivity::BaseMultiActivity(OgreBallApplication *app) : Activity(app) {
     ->subscribeEvent(CEGUI::PushButton::EventClicked,
                      CEGUI::Event::Subscriber(&BaseMultiActivity::SwitchToLobby, this));
 
+  chatWindow = app->Wmgr->getWindow("ConsoleRoot");
+  chatbox = (CEGUI::Listbox*)app->Wmgr->getWindow("ConsoleRoot/ChatBox");
+  chatEditbox = (CEGUI::Editbox*)app->Wmgr->getWindow("ConsoleRoot/EditBox");
+
+  chatWindow->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0),
+                                          CEGUI::UDim(0.65f, 0)));
+
+  chatbox->resetList();
+  chatEditbox->setVisible(false);
+
   lobbySheet = app->Wmgr->getWindow("GameLobby");
+  lobbyNamebar = app->Wmgr->getWindow("GameLobby/Name");
   lobbySelectLevel = app->Wmgr->getWindow("GameLobby/SelectLevel");
   lobbySelectCharacter = app->Wmgr->getWindow("GameLobby/SelectCharacter");
   lobbyLeave = app->Wmgr->getWindow("GameLobby/Leave");
@@ -77,6 +89,13 @@ BaseMultiActivity::BaseMultiActivity(OgreBallApplication *app) : Activity(app) {
 
   lobbyLeave->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&BaseMultiActivity::ExitToMenu, this));
+
+  multiGameEndSheet = app->Wmgr->getWindow("MultiGameEnd");
+  multiGameEndFinish = app->Wmgr->getWindow("MultiGameEnd/Finish");
+  multiGameEndContinue = app->Wmgr->getWindow("MultiGameEnd/Continue");
+
+  multiGameEndContinue->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                       CEGUI::Event::Subscriber(&BaseMultiActivity::SwitchToLobby, this));
 
   for (int i = 0; i < 4; i++) {
     std::stringstream ss;
@@ -101,6 +120,49 @@ Player* BaseMultiActivity::addPlayer(int userID, const char* name) {
   return mPlayer;
 }
 
+void BaseMultiActivity::toggleChat() {
+  chatFocus = !chatFocus;
+  chatEditbox->setVisible(!chatEditbox->isVisible());
+  if (chatFocus)
+    chatEditbox->activate();
+  else
+    chatEditbox->deactivate();
+}
+
+void BaseMultiActivity::addChatMessage(const char* msg) {
+  CEGUI::ListboxTextItem* chatItem;
+  /*  if(chatbox->getItemCount() == 7)
+      {
+      chatItem = static_cast<CEGUI::ListboxTextItem*>(chatbox->getListboxItemFromIndex(0));
+      chatItem->setAutoDeleted(false);
+      chatbox->removeItem(chatItem);
+      chatItem->setAutoDeleted(true);
+      chatItem->setText(msg);
+      }
+      else
+      {*/
+  // Create a new listbox item
+  chatItem = new CEGUI::ListboxTextItem(msg);
+  //  }
+
+  chatbox->addItem(chatItem);
+  chatbox->ensureItemIsVisible(chatbox->getItemCount());
+}
+
+bool BaseMultiActivity::handleTextSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String cmsg = chatEditbox->getText();
+
+  std::stringstream ss;
+  ss << players[myId]->name << ": " << cmsg.c_str();
+  const char *msg = ss.str().c_str();
+
+  toggleChat();
+  chatEditbox->setText("");
+  addChatMessage(msg);
+
+  allowKeyPress = false;  // Don't allow keyrelease without the keypress
+}
+
 BaseMultiActivity::~BaseMultiActivity(void) {
   close();
 }
@@ -110,15 +172,16 @@ void BaseMultiActivity::close(void) {
 }
 
 void BaseMultiActivity::start(void) {
-  // TODO: Add Chatbox Window to layout
   CEGUI::MouseCursor::getSingleton().show();
-  CEGUI::System::getSingleton().setGUISheet(lobbySheet);
+  CEGUI::System::getSingleton().setGUISheet(lobbySheet);  
+  lobbySheet->addChildWindow(chatWindow);
 }
 
 bool BaseMultiActivity::SwitchToLobby( const CEGUI::EventArgs& e ) {
   Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", Sounds::volume);
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(lobbySheet);
+  lobbySheet->addChildWindow(chatWindow);
 }
 
 void BaseMultiActivity::handleLobbyState() {
@@ -127,6 +190,7 @@ void BaseMultiActivity::handleLobbyState() {
 // handleWaiting()
 
 void BaseMultiActivity::loadLevel(const char* name) {
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
   currentLevelName = std::string(name, std::strlen(name));
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->currObjID = 0;  // VERY IMPORTANT TO ENSURE CONSISTENT OBJECT NAMES ACROSS HOST AND CLIENTS
@@ -261,16 +325,10 @@ void BaseMultiActivity::togglePauseMenu( ) {
   menuActive = !menuActive;
   if (menuActive) {
     CEGUI::MouseCursor::getSingleton().show();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("PauseMenu"));
-    app->Wmgr->getWindow("PauseMenu/Quit")
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                       CEGUI::Event::Subscriber(&BaseMultiActivity::ExitToMenu, this));
-    app->Wmgr->getWindow("PauseMenu/Return")
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-                       CEGUI::Event::Subscriber(&BaseMultiActivity::togglePauseMenu, this));
+    CEGUI::System::getSingleton().setGUISheet(pauseMenuSheet);
   } else {
     CEGUI::MouseCursor::getSingleton().hide();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("SinglePlayerHUD"));
+    CEGUI::System::getSingleton().setGUISheet(guiSheet);
   }
 }
 
@@ -281,7 +339,6 @@ bool BaseMultiActivity::ExitToMenu( const CEGUI::EventArgs& e ) {
 
 void BaseMultiActivity::handleCrossedFinishLine() {
   ceguiActive = true;
-
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(gameWonSheet);
 
@@ -292,11 +349,12 @@ void BaseMultiActivity::handleCrossedFinishLine() {
   gwHighscore->setAlpha(0.0);
   gwNameEditText->setAlpha(0.0);
   gwSubmitHighscore->setAlpha(0.0);
+  gwTimeTaken->setAlpha(0.0);
 
   OBAnimationManager::startAnimation("SpinPopup", gwGoal);
-  OBAnimationManager::startAnimation("SpinPopup", gwNextLevel, 0.5);
-  OBAnimationManager::startAnimation("SpinPopup", gwBackToMenu, 0.5);
-  OBAnimationManager::startAnimation("SpinPopup", gwViewLeaderboard, 0.35);
+  OBAnimationManager::startAnimation("SpinPopup", gwGoal, 1.0, 4.0);
+  //  OBAnimationManager::startAnimation("SpinPopup", gwNextLevel, 0.5);
+  //  OBAnimationManager::startAnimation("SpinPopup", gwBackToMenu, 0.5);
 
   std::stringstream timess;
   int seconds = std::round((60000-timeLeft)/1000);
@@ -311,42 +369,41 @@ void BaseMultiActivity::handleCrossedFinishLine() {
 }
 
 void BaseMultiActivity::handleGameEnd() {
-  //  ceguiActive = true;
+  ceguiActive = true;
   gameEnded = true;
 
-  /*
-    CEGUI::MouseCursor::getSingleton().show();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
-
-    app->Wmgr->getWindow("GameWon/BackToMenu")
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&BaseMultiActivity::ExitToMenu, this));
-  */
-  /*  app->Wmgr->getWindow("GameWon/NextLevel")
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-      CEGUI::Event::Subscriber(&BaseMultiActivity::nextLevel, this));*/
+  CEGUI::MouseCursor::getSingleton().show();
+  CEGUI::System::getSingleton().setGUISheet(multiGameEndSheet);
+  OBAnimationManager::startAnimation("SpinPopup", multiGameEndFinish);
+  OBAnimationManager::startAnimation("SpinPopup", multiGameEndContinue, 1.0, 0.5);
 }
 
 //-------------------------------------------------------------------------------------
 
 bool BaseMultiActivity::keyPressed( const OIS::KeyEvent &arg )
 {
-  if (arg.key == OIS::KC_ESCAPE) {
-    if (chatFocus) {
-      // toggleChat();
-      // chatEditBox->setText("");
-      // return true;
-    } else if (inGame) {
-      togglePauseMenu();
-      return true;
-    }
+  if (arg.key == OIS::KC_ESCAPE && inGame && !chatFocus) {
+    togglePauseMenu();
+    return true;
   }
 
-  if (!inGame || chatFocus || ceguiActive || menuActive) {
+  if (chatFocus && arg.key == OIS::KC_ESCAPE) {
+    toggleChat();
+    chatEditbox->setText("");
+    return true;
+  }
+
+  if (chatFocus || ceguiActive || menuActive) {
     CEGUI::System::getSingleton().injectKeyDown(arg.key);
     CEGUI::System::getSingleton().injectChar(arg.text);
+    if (chatFocus)
+      return true;
   }
 
+  if (!allowKeyPress) {
+    allowKeyPress = true;
+    return true;
+  }
   return false;
 }
 
@@ -354,10 +411,24 @@ bool BaseMultiActivity::keyPressed( const OIS::KeyEvent &arg )
 
 bool BaseMultiActivity::keyReleased( const OIS::KeyEvent &arg )
 {
-  if (inGame || chatFocus || menuActive || ceguiActive) {
-    CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  if (chatFocus && arg.key == OIS::KC_ESCAPE) {
+    toggleChat();
+    chatEditbox->setText("");
+    return true;
   }
 
+  if (chatFocus || menuActive || ceguiActive) {
+    CEGUI::System::getSingleton().injectKeyUp(arg.key);
+    if (chatFocus)
+      return true;
+  }
+
+  if (arg.key == OIS::KC_C) {
+    chatWindow->setVisible(!chatbox->isVisible());
+    return true;
+  }
+
+  allowKeyPress = true;
   return false;
 }
 
@@ -383,7 +454,7 @@ bool BaseMultiActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButt
 {
   if (!inGame || chatFocus || menuActive || ceguiActive) {
     CEGUI::System::getSingleton().injectMouseButtonDown(OgreBallApplication::convertButton(id));
-    return true;
+    //    return true;
   }
   return false;
 }

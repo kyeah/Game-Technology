@@ -116,3 +116,12 @@ void Physics::removeObject(GameObject *obj) {
 std::deque<GameObject*>& Physics::getObjects() {
   return objList;
 }
+
+int Physics::indexOfObject(GameObject *obj) {
+  for (int i = 0; i < objList.size(); i++) {
+    if (obj == objList[i])
+      return i;
+  }
+
+  return -1;
+}

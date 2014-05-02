@@ -29,9 +29,12 @@ static const int SERVER_CLIENT_MESSAGE = 10;
 static const int SERVER_CLOSED = 11;
 static const int SERVER_UPDATE = 12;
 static const int SERVER_GAME_START = 13;
+static const int SERVER_GAME_END = 133;
 static const int SERVER_CROSSED_FINISH_LINE = 14;
 static const int SERVER_PLAYER_MESH_CHANGE = 15;
 static const int SERVER_LEVEL_CHANGE = 16;
+static const int SERVER_OBJECT_REMOVAL = 17;
+static const int SERVER_PLAY_SOUND = 18;
 
 static const int SEND_TO_SERV = 10;
 static const int SEND_TO_CLIENT = 11;
@@ -55,6 +58,7 @@ typedef struct {
 typedef struct {
   Ogre::Vector3 position;
   Ogre::Quaternion orientation;
+  int viewingPlayer;
 } PlayerCamInfo;
 
 typedef struct {

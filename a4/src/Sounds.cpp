@@ -1,6 +1,10 @@
 #include <stdio.h>
-#include "Sounds.h"
 #include <boost/thread.hpp>
+#include "Sounds.h"
+#include "OgreBallApplication.h"
+#include "HostPlayerActivity.h"
+#include "Networking.h"
+#include "common.h"
 
 int Sounds::volume = 64;
 int Sounds::enabled = true;
@@ -61,6 +65,20 @@ void Sounds::playSoundEffect(const char* aFilePath, int aVolume){
     Mix_ChannelFinished(channelDone);
   }
 
+  Activity *a = OgreBallApplication::getSingleton()->activity;
+  HostPlayerActivity *h = dynamic_cast<HostPlayerActivity*>(a);
+
+  if (h) {
+    ServerPacket soundPacket;
+    soundPacket.type = SERVER_PLAY_SOUND;
+    strcpy(soundPacket.msg, aFilePath);
+
+    for (int j = 1; j < MAX_PLAYERS; j++) {
+      if (players[j]) {
+        Networking::Send(players[j]->csd, (char*)&soundPacket, sizeof(soundPacket));
+      }
+    }
+  }
 }
 
 void Sounds::channelDone(int aChannel){

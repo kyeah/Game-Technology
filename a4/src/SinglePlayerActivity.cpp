@@ -41,6 +41,7 @@ void SinglePlayerActivity::start(void) {
   Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
 
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
+  guiSheet->removeChildWindow(app->Wmgr->getWindow("ConsoleRoot"));
   CEGUI::System::getSingleton().setGUISheet(guiSheet);
 
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
@@ -183,6 +184,8 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+  app->mPhysics->stepSimulation(elapsedTime);
+
   if (OgreBallApplication::debug) return true;
 
   if (countdown != -1 && !menuActive && !ceguiActive) {

@@ -46,4 +46,5 @@ class Physics {
 
   std::deque<GameObject*>& getObjects();
   void removeAllObjects();
+  int indexOfObject(GameObject *obj);
 };

@@ -27,6 +27,7 @@ public:
 
         bool ready;
         bool crossedFinishLine;
+        int viewingPlayer;
 
 private:
 	int id;

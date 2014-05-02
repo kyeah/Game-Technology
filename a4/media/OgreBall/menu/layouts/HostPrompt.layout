@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <GUILayout >
-  <Window Type="DefaultWindow" Name="Prompt" >
+  <Window Type="WindowsLook/StaticImage" Name="HostPrompt" >
     <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
     <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.1,0},{0.9,0},{0.9,0}}" />
-    <Property Name="Alpha" Value="0.65" />
-    <Window Type="TaharezLook/StaticText" Name="Prompt/Header" >
+    <!--Property Name="FrameEnabled" Value="False" /-->
+    <Property Name="Image" Value="set:MenuBackground image:Background" />
+
+    <Window Type="TaharezLook/StaticText" Name="HostPrompt/Header" >
       <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.35,0},{0.7,0},{0.45,0}}" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
-    <Window Type="TaharezLook/Editbox" Name="Prompt/Input" >
-      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.5,0},{0.7,0},{0.59,0}}" />
-      <Property Name="MaxTextLength" Value="24" />
+    <Window Type="TaharezLook/Editbox" Name="HostPrompt/LobbyNameInput" >
+      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.46,0},{0.7,0},{0.52,0}}" />
+      <Property Name="MaxTextLength" Value="48" />
+      <Property Name="Tooltip" Value="Lobby Name" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
-    <Window Type="OgreBall/TextButton" Name="Prompt/Cancel" >
+    <Window Type="TaharezLook/Editbox" Name="HostPrompt/Input" >
+      <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.53,0},{0.7,0},{0.59,0}}" />
+      <Property Name="MaxTextLength" Value="24" />
+      <Property Name="Tooltip" Value="Username" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+    <Window Type="OgreBall/TextButton" Name="HostPrompt/Cancel" >
       <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0.62,0},{0.49,0},{0.69,0}}" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
@@ -29,7 +39,7 @@
       <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
     </Window>
-    <Window Type="OgreBall/TextButton" Name="Prompt/Submit" >
+    <Window Type="OgreBall/TextButton" Name="HostPrompt/Submit" >
       <Property Name="UnifiedAreaRect" Value="{{0.51,0},{0.62,0},{0.7,0},{0.69,0}}" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />

@@ -11,7 +11,7 @@
 
 class HostPlayerActivity : public BaseMultiActivity {
  public:
-  HostPlayerActivity(OgreBallApplication *app, const char* levelName);
+  HostPlayerActivity(OgreBallApplication *app, const char* lobbyname, const char* name, const char* levelName);
   virtual ~HostPlayerActivity(void);
   virtual void close(void);
 
@@ -23,6 +23,7 @@ class HostPlayerActivity : public BaseMultiActivity {
 
   bool handleKeyPressed( OIS::KeyCode arg, int userID );
   bool handleKeyReleased( OIS::KeyCode arg, int userID );
+  bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
   void handleCrossedFinishLine( int id );
   virtual void handleGameEnd();
@@ -36,7 +37,10 @@ class HostPlayerActivity : public BaseMultiActivity {
   void handleClientEvents(void);
   void updateClients(void);
 
+  bool handleTextSubmitted( const CEGUI::EventArgs& e );
+
   //Networking Stuff
+  std::string lobbyName;
   IPaddress ip, *remoteIP;
   bool waitingForClientsToLoad;
 };

@@ -34,7 +34,10 @@ class MenuActivity : public Activity {
 
   bool JoinServer(const CEGUI::EventArgs& e);
   bool PromptForJoinServer(const CEGUI::EventArgs& e);
+  bool PromptForHost(const CEGUI::EventArgs& e);
+
   bool CancelPrompt(const CEGUI::EventArgs& e);
+  bool CancelHprompt(const CEGUI::EventArgs& e);
 
   bool SelectPenguin( const CEGUI::EventArgs& e);
   bool SelectOgre( const CEGUI::EventArgs& e);
@@ -52,6 +55,11 @@ class MenuActivity : public Activity {
   bool handleLSNext( const CEGUI::EventArgs& e );
 
   bool quit(const CEGUI::EventArgs& e);
+  
+  CEGUI::Window *mainMenuSheet, *singlePlayerButton,
+    *multiPlayerButton, *quitButton;
+
+  CEGUI::Window *multiMenuSheet, *hostButton, *clientButton, *returnButton;
 
   CEGUI::Window *levelSelectorWindow, *lsBack, *lsPrev, *lsNext;
   CEGUI::Window *lsButtons[8];
@@ -61,6 +69,9 @@ class MenuActivity : public Activity {
 
   CEGUI::Window *promptWindow, *promptHeader, *promptSubmit, *promptCancel;
   CEGUI::Editbox *promptInputbox;
+
+  CEGUI::Window *hPromptWindow, *hPromptHeader, *hPromptSubmit, *hPromptCancel;
+  CEGUI::Editbox *hPromptInputbox, *hPromptLobbyNameInputbox;
 
   int selectorStart, selectorRows, selectorColumns;
   int chosenCharacter;

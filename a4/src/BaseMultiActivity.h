@@ -35,7 +35,12 @@ class BaseMultiActivity : public Activity {
   virtual bool togglePauseMenu( const CEGUI::EventArgs& e );
   virtual void togglePauseMenu();
 
+  virtual bool handleTextSubmitted( const CEGUI::EventArgs &e );
+
   Player* addPlayer(int userID, const char* name);
+
+  void toggleChat();
+  void addChatMessage(const char* msg);
 
   std::string currentLevelName;
 
@@ -50,13 +55,22 @@ class BaseMultiActivity : public Activity {
     *gwViewLeaderboard, *gwTimeTaken, *gwCollectibles, *gwBonus, *gwScore, *gwHighscore,
     *gwNameEditText, *gwSubmitHighscore;
 
+  CEGUI::Window *multiGameEndSheet, *multiGameEndFinish,
+    *multiGameEndContinue;
+
   CEGUI::Window *lobbySheet, *lobbySelectLevel, *lobbySelectCharacter,
-    *lobbyLeave, *lobbyStart;
+    *lobbyLeave, *lobbyStart, *lobbyNamebar;
 
   CEGUI::Window *lobbyPlayerWindows[4];
 
+  CEGUI::Window *chatWindow;
+  CEGUI::Listbox *chatbox;
+  CEGUI::Editbox *chatEditbox;
+
   bool menuActive, ceguiActive, gameEnded, levelLoaded,
     waitingScreenLoaded, readyToLoadLevel, inGame, chatFocus;
+
+  bool allowKeyPress;
 
   int myId;
   int countdown;

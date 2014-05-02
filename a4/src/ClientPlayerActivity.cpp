@@ -4,6 +4,7 @@
 #include "OBAnimationManager.h"
 #include "common.h"
 #include "Networking.h"
+#include "Sounds.h"
 
 ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck *ack) : BaseMultiActivity(app) {
   myId = ack->id;
@@ -14,9 +15,16 @@ ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck 
       addPlayer(i, ack->playerInfo[i].name);
   }
 
+  lobbyNamebar->setText(ack->level);
   lobbyStart->setText("Ready");
+
+  lobbyStart->removeEvent(CEGUI::PushButton::EventClicked);
   lobbyStart->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&ClientPlayerActivity::toggleReady, this));
+
+  chatEditbox->removeEvent(CEGUI::Editbox::EventTextAccepted);
+  chatEditbox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+                              CEGUI::Event::Subscriber(&ClientPlayerActivity::handleTextSubmitted,this));
 }
 
 ClientPlayerActivity::~ClientPlayerActivity(void) {
@@ -35,29 +43,35 @@ void ClientPlayerActivity::close(void) {
   //  delete mCameraObj;
 }
 
+bool ClientPlayerActivity::handleTextSubmitted( const CEGUI::EventArgs &e ) {
+  CEGUI::String cmsg = chatEditbox->getText();
+
+  std::stringstream ss;
+  ss << players[myId]->name << ": " << cmsg.c_str();
+  const char *msg = ss.str().c_str();
+
+  toggleChat();
+  chatEditbox->setText("");
+
+  if (cmsg.length()) {
+    addChatMessage(msg);
+
+    ClientPacket packet;
+    packet.type = CLIENT_CHAT;
+    packet.userID = myId;
+    strcpy(packet.msg, msg);
+    Networking::Send(Networking::client_socket, (char*)&packet, sizeof(packet));
+  }
+
+  allowKeyPress = false;
+}
+
 bool ClientPlayerActivity::toggleReady( const CEGUI::EventArgs& e ) {
   ClientPacket msg;
   msg.type = CLIENT_TOGGLEREADY;
   msg.userID = myId;
   Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
 }
-
-void ClientPlayerActivity::handleLobbyState() {
-  while(SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)){
-    ServerPacket msg;
-    if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0){
-      switch(msg.type){
-      case SERVER_GAME_START:
-        inGame = true;
-        loadLevel(currentLevelName.c_str());
-        CEGUI::System::getSingleton().setGUISheet(guiSheet);
-        CEGUI::MouseCursor::getSingleton().hide();
-        break;
-      }
-    }
-  }
-}
-// handleWaiting()
 
 void ClientPlayerActivity::loadLevel(const char* name) {
   BaseMultiActivity::loadLevel(name);
@@ -83,7 +97,7 @@ void ClientPlayerActivity::loadLevel(const char* name) {
 
 bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (!inGame) {
-    handleLobbyState();
+    handleServerUpdates();
     return true;
   }
 
@@ -144,6 +158,22 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
     collectDisplay->setText(css.str());
   */
 
+
+  handleServerUpdates();
+
+  std::stringstream timess;
+  int seconds = std::round(timeLeft/1000);
+  int millis = std::min((float)99.0, (float)std::round(fmod(timeLeft,1000)/10));
+
+  timess << seconds << ":";
+  if (millis < 10) timess << "0";
+  timess << millis;
+
+  timeDisplay->setText(timess.str());
+  return true;
+}
+
+void ClientPlayerActivity::handleServerUpdates() {
   while(SDLNet_CheckSockets(Networking::client_socketset, 1) > 0 && SDLNet_SocketReady(Networking::client_socket)){
     ServerPacket msg;
     if(SDLNet_TCP_Recv(Networking::client_socket, &msg, sizeof(msg)) > 0) {
@@ -159,19 +189,37 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
           objects[i]->setOrientation(msg.objectInfo[i].orientation);
         }
 
-        app->mCamera->lookAt((Ogre::Vector3)players[myId]->getBall()->getPosition() + Ogre::Vector3(0,250,0));
+        app->mCamera->lookAt((Ogre::Vector3)players[msg.camInfo.viewingPlayer]->getBall()->getPosition() 
+                             + Ogre::Vector3(0,250,0));
         break;
       }
+      case SERVER_GAME_START:
+        inGame = true;
+        loadLevel(currentLevelName.c_str());
+        CEGUI::System::getSingleton().setGUISheet(guiSheet);
+        guiSheet->addChildWindow(chatWindow);
+        CEGUI::MouseCursor::getSingleton().hide();
+        break;
+      case SERVER_GAME_END:
+        handleGameEnd();
+        break;
       case SERVER_CLIENT_CONNECT:
         addPlayer(msg.clientID, "name");
         break;
       case CLIENT_TOGGLEREADY:
         players[msg.clientID]->ready = !players[msg.clientID]->ready;
         break;
+      case SERVER_OBJECT_REMOVAL:
+        app->mPhysics->getObjects()[msg.clientID]->removeFromSimulator();
+        break;
+      case SERVER_PLAY_SOUND:
+        Sounds::playSoundEffect(msg.msg, Sounds::volume);
+        break;
       case SERVER_CROSSED_FINISH_LINE:
         handleCrossedFinishLine();
         break;
       case SERVER_CLIENT_MESSAGE:
+        addChatMessage(msg.msg);
         break;
       case SERVER_PLAYER_MESH_CHANGE:
         //player[msg.clientID]->character = msg.jifjeisf;
@@ -180,26 +228,15 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
         // currentLevelName = std::string(msg.level, strlen(msg.level));
         break;
       case SERVER_CLIENT_CLOSED:
-        app->mPhysics->removeObject(players[msg.clientID]->getBall());
-        app->mSceneMgr->destroyEntity(players[msg.clientID]->getBall()->getEntity());
-        app->mSceneMgr->destroyEntity(players[msg.clientID]->getBall()->getHeadEntity());
+        if (inGame) {
+          app->mPhysics->removeObject(players[msg.clientID]->getBall());
+          app->mSceneMgr->destroyEntity(players[msg.clientID]->getBall()->getEntity());
+          app->mSceneMgr->destroyEntity(players[msg.clientID]->getBall()->getHeadEntity());
+        }
         players[msg.clientID] = NULL;
       }
     }
   }
-
-
-  std::stringstream timess;
-  int seconds = std::round(timeLeft/1000);
-  int millis = std::min((float)99.0, (float)std::round(fmod(timeLeft,1000)/10));
-
-  timess << seconds << ":";
-  if (millis < 10) timess << "0";
-  timess << millis;
-
-  timeDisplay->setText(timess.str());
-
-  return true;
 }
 
 //-------------------------------------------------------------------------------------
@@ -222,79 +259,80 @@ bool ClientPlayerActivity::waitForHosts(){
       return false;*/
 }
 
-void ClientPlayerActivity::handleGameEnd() {
-  //  ceguiActive = true;
+void ClientPlayerActivity::handleCrossedFinishLine() {
+  BaseMultiActivity::handleCrossedFinishLine();
   gameEnded = true;
-
-  /*
-    CEGUI::MouseCursor::getSingleton().show();
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("GameWon"));
-
-    app->Wmgr->getWindow("GameWon/BackToMenu")
-    ->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&ClientPlayerActivity::ExitToMenu, this));
-  */
-  /*  app->Wmgr->getWindow("GameWon/NextLevel")
-      ->subscribeEvent(CEGUI::PushButton::EventClicked,
-      CEGUI::Event::Subscriber(&ClientPlayerActivity::nextLevel, this));*/
 }
 
 //-------------------------------------------------------------------------------------
 
 bool ClientPlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 {
-  if (arg.key == OIS::KC_ESCAPE) {
-    if (chatFocus) {
-      // toggleChat();
-      // chatEditBox->setText("");
-      // return true;
-    } else if (inGame) {
-      togglePauseMenu();
-      return true;
+  if (!BaseMultiActivity::keyPressed(arg)) {
+    switch(arg.key){
+    case OIS::KC_RETURN:
+      if (allowKeyPress) {
+        toggleChat();
+        chatEditbox->setText("");
+      }
+      break;
+    case OIS::KC_D:
+    case OIS::KC_A:
+    case OIS::KC_W:
+    case OIS::KC_S: {
+      ClientPacket msg;
+      msg.type = KEY_PRESSED;
+      msg.keyArg = arg.key;
+      msg.userID = myId;
+      Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+      break;
+    }
+    case OIS::KC_R:
+      break;
+    default:
+      return false;
     }
   }
 
-  if (!inGame || chatFocus || ceguiActive || menuActive) {
-    CEGUI::System::getSingleton().injectKeyDown(arg.key);
-    CEGUI::System::getSingleton().injectChar(arg.text);
-  }
-
-  switch(arg.key){
-  case OIS::KC_D:
-  case OIS::KC_A:
-  case OIS::KC_W:
-  case OIS::KC_S:
-    ClientPacket msg;
-    msg.type = KEY_PRESSED;
-    msg.keyArg = arg.key;
-    msg.userID = myId;
-    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
-    return true;
-  }
-
-  return false;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------
 
 bool ClientPlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 {
-  if (inGame || chatFocus || menuActive || ceguiActive) {
-    CEGUI::System::getSingleton().injectKeyUp(arg.key);
+  if (!BaseMultiActivity::keyReleased(arg)) {
+    switch(arg.key){
+    case OIS::KC_D:
+    case OIS::KC_A:
+    case OIS::KC_W:
+    case OIS::KC_S: {
+      ClientPacket msg;
+      msg.type = KEY_RELEASED;
+      msg.keyArg = arg.key;
+      msg.userID = myId;
+      Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+      break;
+    }
+    default:
+      return false;
+    }
   }
 
-  switch(arg.key){
-  case OIS::KC_D:
-  case OIS::KC_A:
-  case OIS::KC_W:
-  case OIS::KC_S:
-    ClientPacket msg;
-    msg.type = KEY_RELEASED;
-    msg.keyArg = arg.key;
-    msg.userID = myId;
-    Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
-    return true;
+  return true;
+}
+
+bool ClientPlayerActivity::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id ) {
+  if (!BaseMultiActivity::mousePressed(arg, id)) {
+    if (id == OIS::MB_Left) {
+      ClientPacket msg;
+      msg.type = MOUSE_PRESSED;
+      msg.mouseArg = arg.state;
+      msg.mouseID = id;
+      msg.userID = myId;
+      Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
+    }
   }
 
-  return false;
+  return true;
 }

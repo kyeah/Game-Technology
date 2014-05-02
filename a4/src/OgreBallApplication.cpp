@@ -139,6 +139,8 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("PlayerSelector.layout");
   Wmgr->loadWindowLayout("Chatbox.layout");
   Wmgr->loadWindowLayout("Prompt.layout");
+  Wmgr->loadWindowLayout("MultiGameEnd.layout");
+  Wmgr->loadWindowLayout("HostPrompt.layout");
 
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 
@@ -155,7 +157,6 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
 
 
   if (!paused) {
-    if (mPhysics) mPhysics->stepSimulation(elapsedTime);
     activity->frameStarted(elapsedTime);
   }
 

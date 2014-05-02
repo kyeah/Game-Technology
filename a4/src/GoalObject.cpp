@@ -78,7 +78,7 @@ void GoalObject::update(float elapsedTime) {
         if (activity) {
           HostPlayerActivity *h = dynamic_cast<HostPlayerActivity*>(activity);
           if (h) {
-            for (int id = 0; id < MAX_PLAYERS; i++) {
+            for (int id = 0; id < MAX_PLAYERS; id++) {
               if (players[id] && players[id]->getBall() == contexts[i]->object) {
                 h->handleCrossedFinishLine(id);
                 break;
