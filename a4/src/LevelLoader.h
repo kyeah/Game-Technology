@@ -49,6 +49,7 @@ class LevelLoader {
   std::vector<sh::ConfigNode*> levels;
   std::vector<std::string> levelNames;
 
+  int currObjID;
   int mCurrLevelID;
 
   // Start Parameters for most recently loaded level

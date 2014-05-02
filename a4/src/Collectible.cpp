@@ -3,6 +3,9 @@
 #include "GameObjectDescription.h"
 #include "../libs/MeshStrider.h"
 #include "SinglePlayerActivity.h"
+#include "HostPlayerActivity.h"
+#include "Networking.h"
+#include "common.h"
 #include "Sounds.h"
 
 Collectible::Collectible(Ogre::SceneManager *mgr, Ogre::String _entName, Ogre::String _meshName, Ogre::String _nodeName, Ogre::SceneNode* parentNode,
@@ -44,15 +47,29 @@ void Collectible::update(float elapsedTime) {
         if(ob && !isHit){
           isHit = true;
           std::cout << "Hit" << std::endl;
-          removeFromSimulator();
 
           Activity *a = OgreBallApplication::getSingleton()->activity;
+          HostPlayerActivity *h = dynamic_cast<HostPlayerActivity*>(a);
+
+          if (h) {
+            ServerPacket packet;
+            packet.type = SERVER_OBJECT_REMOVAL;
+            packet.clientID = physics->indexOfObject(this);
+
+            for (int j = 1; j < MAX_PLAYERS; j++) {
+              if (players[j]) {
+                Networking::Send(players[j]->csd, (char*)&packet, sizeof(packet));
+              }
+            }
+          }
+          removeFromSimulator();
+
           if (a) {
             a->score += 8000;
             a->collectibles += 1;
           }
-          Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME));
-          // TODO: Send sound notification to clients if is Host
+
+          Sounds::playSoundEffect(mHitSound.c_str(), Sounds::volume);
         }
       }
     }

@@ -1,6 +1,3 @@
-
-
-
 #include "Interpolator.h"
 #include "LevelViewer.h"
 #include "MenuActivity.h"
@@ -10,6 +7,7 @@
 #include "Leaderboard.h"
 #include "OBAnimationManager.h"
 #include "Sounds.h"
+#include "Networking.h"
 
 #define NOT_SELECTED -1
 #define SINGLE_PLAYER 0
@@ -44,7 +42,7 @@ bool MenuActivity::quit( const CEGUI::EventArgs& e ) {
 
 void MenuActivity::start(void) {
   Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", 64);
-  
+
   // Load a background
   app->levelLoader->loadLevelRand();
 
@@ -54,6 +52,44 @@ void MenuActivity::start(void) {
   // Pre-load windows
   CEGUI::WindowManager *wmgr = CEGUI::WindowManager::getSingletonPtr();
 
+  // Menu
+  mainMenuSheet = app->Wmgr->getWindow("Menu/Background");
+
+  singlePlayerButton = app->Wmgr->getWindow("Menu/SinglePlayer");
+  multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
+  quitButton = app->Wmgr->getWindow("Menu/QuitGame");
+
+  singlePlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
+  singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToPlayerSelectMenu, this));
+
+  multiPlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
+  multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                    CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
+
+  quitButton->removeEvent(CEGUI::PushButton::EventClicked);
+  quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&MenuActivity::quit,this));
+
+  // Multiplayer Base Menu
+  multiMenuSheet = app->Wmgr->getWindow("Menu/MultiBackground");
+
+  hostButton = app->Wmgr->getWindow("Menu/Host");
+  clientButton = app->Wmgr->getWindow("Menu/Client");
+  returnButton = app->Wmgr->getWindow("Menu/Return");
+
+  hostButton->removeEvent(CEGUI::PushButton::EventClicked);
+  hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&MenuActivity::PromptForHost,this));
+
+  clientButton->removeEvent(CEGUI::PushButton::EventClicked);
+  clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::SwitchToServerListMenu,this));
+
+  returnButton->removeEvent(CEGUI::PushButton::EventClicked);
+  returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
+
   // Level Selector
   levelSelectorWindow = wmgr->getWindow("Menu/LevelSelector");
   lsBack = wmgr->getWindow("LevelSelector/Back");
@@ -62,13 +98,45 @@ void MenuActivity::start(void) {
 
   lsBack->subscribeEvent(CEGUI::PushButton::EventClicked,
                          CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
-  
+
   lsPrev->subscribeEvent(CEGUI::PushButton::EventClicked,
                          CEGUI::Event::Subscriber(&MenuActivity::handleLSPrev, this));
 
   lsNext->subscribeEvent(CEGUI::PushButton::EventClicked,
                          CEGUI::Event::Subscriber(&MenuActivity::handleLSNext, this));
-  
+
+  // Server List
+  serverListWindow = wmgr->getWindow("Menu/ServerList");
+  serverListbox = (CEGUI::Listbox*)wmgr->getWindow("ServerList/List");
+  serverListBack = wmgr->getWindow("ServerList/Back");
+
+  serverListbox->setMultiselectEnabled(false);
+  serverListbox->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+                                CEGUI::Event::Subscriber(&MenuActivity::PromptForJoinServer, this));
+
+  serverListBack->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                 CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
+
+  // Prompt
+  promptWindow = wmgr->getWindow("Prompt");
+  promptHeader = wmgr->getWindow("Prompt/Header");
+  promptInputbox = (CEGUI::Editbox*)wmgr->getWindow("Prompt/Input");
+  promptSubmit = wmgr->getWindow("Prompt/Submit");
+  promptCancel = wmgr->getWindow("Prompt/Cancel");
+
+  promptCancel->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::CancelPrompt, this));
+
+  // Host Prompt
+  hPromptWindow = wmgr->getWindow("HostPrompt");
+  hPromptHeader = wmgr->getWindow("HostPrompt/Header");
+  hPromptLobbyNameInputbox = (CEGUI::Editbox*)wmgr->getWindow("HostPrompt/LobbyNameInput");
+  hPromptInputbox = (CEGUI::Editbox*)wmgr->getWindow("HostPrompt/Input");
+  hPromptSubmit = wmgr->getWindow("HostPrompt/Submit");
+  hPromptCancel = wmgr->getWindow("HostPrompt/Cancel");
+
+  hPromptCancel->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::CancelHprompt, this));
 
   for (int i = 0; i < 8; i++) {
     std::stringstream ss;
@@ -91,6 +159,8 @@ bool MenuActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
+  app->mPhysics->stepSimulation(elapsedTime);
+
   for (int i = 0; i < levelViewers.size(); i++) {
     levelViewers[i]->frameStarted(elapsedTime);
   }
@@ -102,37 +172,21 @@ bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
   ==========================================================
   = Main Menu
   ==========================================================
- */
+*/
 
 bool MenuActivity::SwitchToMainMenu( const CEGUI::EventArgs& e ) {
   selectorStart = 0;
   close();
 
   type_flag = NOT_SELECTED;
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/Background"));
-
-  CEGUI::Window* singlePlayerButton = app->Wmgr->getWindow("Menu/SinglePlayer");
-  CEGUI::Window* multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
-  CEGUI::Window* quitButton = app->Wmgr->getWindow("Menu/QuitGame");
-
-  singlePlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
-  singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                     CEGUI::Event::Subscriber(&MenuActivity::SwitchToPlayerSelectMenu, this));
-
-  multiPlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
-  multiPlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                    CEGUI::Event::Subscriber(&MenuActivity::SwitchToMultiMenu, this));
-
-  quitButton->removeEvent(CEGUI::PushButton::EventClicked);
-  quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                             CEGUI::Event::Subscriber(&MenuActivity::quit,this));
+  CEGUI::System::getSingleton().setGUISheet(mainMenuSheet);
 }
 
 /*
   ==========================================================
   = Host Selection Menu
   ==========================================================
- */
+*/
 
 bool MenuActivity::SwitchToHostSelectMenu( const CEGUI::EventArgs& e){
   CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/Hosts"));
@@ -155,81 +209,128 @@ bool MenuActivity::SwitchToHostSelectMenu( const CEGUI::EventArgs& e){
 
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
-
 }
 
 /*
   ==========================================================
   = Multiplayer Menu
   ==========================================================
- */
+*/
 
 bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
-  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/MultiBackground"));
+  CEGUI::System::getSingleton().setGUISheet(multiMenuSheet);
+}
 
-  CEGUI::Window* hostButton = app->Wmgr->getWindow("Menu/Host");
-  CEGUI::Window* clientButton = app->Wmgr->getWindow("Menu/Client");
-  CEGUI::Window* returnButton = app->Wmgr->getWindow("Menu/Return");
+bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().setGUISheet(serverListWindow);
 
-  hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                             CEGUI::Event::Subscriber(&MenuActivity::MultiPlayerLevelSelectWrapper,this));
-  clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                               CEGUI::Event::Subscriber(&MenuActivity::SwitchToHostSelectMenu,this));
+  // Ping all known hosts from file
+  vector<PingResponseMessage*> responses = Networking::hostCheck( "data/hosts/hosts.txt" );
 
-  /*
-    hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&MenuActivity::StartHost,this));
-    clientButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&MenuActivity::StartClient,this));*/
+  // Display list of active hosts waiting to start a game
+  serverListbox->resetList();
 
-  returnButton->removeEvent(CEGUI::PushButton::EventClicked);
-  returnButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                               CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
+  for (int i = 0; i < responses.size(); i++) {
+    CEGUI::ListboxTextItem* chatItem = new CEGUI::ListboxTextItem(responses[i]->lobbyName);
+    chatItem->setSelectionBrushImage("TaharezLook", "MultiListSelectionBrush");
+    chatItem->setUserData(responses[i]);
+    serverListbox->addItem(chatItem);
+  };
+
+  serverListbox->ensureItemIsVisible((size_t)0);
+}
+
+bool MenuActivity::JoinServer( const CEGUI::EventArgs& e ) {
+  CEGUI::String name = promptInputbox->getText();
+  if (!name.length()) return true;
+
+  CEGUI::System::getSingleton().getGUISheet()->removeChildWindow(promptWindow);
+
+  CEGUI::ListboxItem * selectedItem = serverListbox->getFirstSelectedItem();
+
+  int id;
+  char levelname[128];
+
+  PingResponseMessage* serverData = static_cast<PingResponseMessage*>(selectedItem->getUserData());
+  std::cout << "connecting to " << serverData->hostName << std::endl;
+
+  ConnectAck *ack = new ConnectAck();
+  if (Networking::clientConnect(ack, name.c_str(), serverData->hostName)) {
+    std::cout << "Client connected" << std::endl;
+    app->switchActivity(new ClientPlayerActivity(app, ack));
+  }
+}
+
+bool MenuActivity::PromptForHost( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().getGUISheet()->addChildWindow(hPromptWindow);
+  hPromptHeader->setText("Enter your lobby name and username.");
+  hPromptLobbyNameInputbox->setText("");
+  hPromptInputbox->setText("");
+  hPromptSubmit->removeEvent(CEGUI::PushButton::EventClicked);
+  hPromptSubmit->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                CEGUI::Event::Subscriber(&MenuActivity::MultiPlayerLevelSelectWrapper, this));
+}
+
+bool MenuActivity::PromptForJoinServer( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().getGUISheet()->addChildWindow(promptWindow);
+  promptHeader->setText("Enter name to show to other users.");
+  promptInputbox->setText("");
+  promptSubmit->removeEvent(CEGUI::PushButton::EventClicked);
+  promptSubmit->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::JoinServer,this));
+}
+
+bool MenuActivity::CancelPrompt( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().getGUISheet()->removeChildWindow(promptWindow);
+}
+
+bool MenuActivity::CancelHprompt( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().getGUISheet()->removeChildWindow(hPromptWindow);
 }
 
 /*
- ====================================================
- = Player Select Menu
- ====================================================
- */
+  ====================================================
+  = Player Select Menu
+  ====================================================
+*/
 bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
-    CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/PlayerSelect"));
+  CEGUI::System::getSingleton().setGUISheet(app->Wmgr->getWindow("Menu/PlayerSelect"));
 
-    CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
-    CEGUI::Window* ogreButton = app->Wmgr->getWindow("Menu/Ogre");
-    CEGUI::Window* ninjaButton = app->Wmgr->getWindow("Menu/Ninja");
+  CEGUI::Window* penguinButton = app->Wmgr->getWindow("Menu/Penguin");
+  CEGUI::Window* ogreButton = app->Wmgr->getWindow("Menu/Ogre");
+  CEGUI::Window* ninjaButton = app->Wmgr->getWindow("Menu/Ninja");
 
-    penguinButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  penguinButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                                 CEGUI::Event::Subscriber(&MenuActivity::SelectPenguin, this));
 
-    ogreButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                CEGUI::Event::Subscriber(&MenuActivity::SelectOgre, this));
+  ogreButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&MenuActivity::SelectOgre, this));
 
-    ninjaButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-                                CEGUI::Event::Subscriber(&MenuActivity::SelectNinja, this));
- }
+  ninjaButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                              CEGUI::Event::Subscriber(&MenuActivity::SelectNinja, this));
+}
 
- bool MenuActivity::SelectPenguin( const CEGUI::EventArgs& e){
-    player_flag = 0;
-    MenuActivity::SinglePlayerLevelSelectWrapper(e);
+bool MenuActivity::SelectPenguin( const CEGUI::EventArgs& e){
+  player_flag = 0;
+  MenuActivity::SinglePlayerLevelSelectWrapper(e);
 
- }
- bool MenuActivity::SelectOgre( const CEGUI::EventArgs& e){
-    player_flag = 1;
-    MenuActivity::SinglePlayerLevelSelectWrapper(e);
+}
+bool MenuActivity::SelectOgre( const CEGUI::EventArgs& e){
+  player_flag = 1;
+  MenuActivity::SinglePlayerLevelSelectWrapper(e);
 
- }
- bool MenuActivity::SelectNinja( const CEGUI::EventArgs& e){
-    player_flag = 2;
-    MenuActivity::SinglePlayerLevelSelectWrapper(e);
+}
+bool MenuActivity::SelectNinja( const CEGUI::EventArgs& e){
+  player_flag = 2;
+  MenuActivity::SinglePlayerLevelSelectWrapper(e);
 
- }
+}
 
 /*
   ==========================================================
   = Level Selection Menu
   ==========================================================
- */
+*/
 
 bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
   close();
@@ -296,14 +397,14 @@ bool MenuActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs& e ) {
 
 bool MenuActivity::handleLSPrev( const CEGUI::EventArgs& evt ) {
   if (selectorStart > 0) {
-    selectorStart -= 8;    
+    selectorStart -= 8;
     SwitchToLevelSelectMenu(evt);
   }
 }
 
 bool MenuActivity::handleLSNext( const CEGUI::EventArgs& evt ) {
   if (selectorStart < app->levelLoader->levelNames.size() - 8) {
-    selectorStart += 8;    
+    selectorStart += 8;
     SwitchToLevelSelectMenu(evt);
   }
 }
@@ -336,6 +437,7 @@ bool MenuActivity::ShowLeaderboard( const CEGUI::EventArgs& e ) {
   CEGUI::String name = levelViewers[levelViewerIndex]->window->getName();
 
   leaderboardNextLevel->setVisible(false);
+
   /*
     leaderboardNextLevel->removeEvent(CEGUI::PushButton::EventClicked);
     leaderboardNextLevel
@@ -387,7 +489,7 @@ bool MenuActivity::MultiPlayerLevelSelectWrapper( const CEGUI::EventArgs& e ){
   ==========================================================
   = Transition Methods
   ==========================================================
- */
+*/
 
 bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
   CEGUI::MouseCursor::getSingleton().hide();
@@ -403,19 +505,23 @@ bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
 }
 
 bool MenuActivity::StartMultiPlayerHost( const CEGUI::EventArgs& e ){
-  CEGUI::MouseCursor::getSingleton().hide();
+  CEGUI::String lobbyname = hPromptLobbyNameInputbox->getText();
+  CEGUI::String name = hPromptInputbox->getText();
+  if (!lobbyname.length() || !name.length()) return true;
+
+  CEGUI::System::getSingleton().getGUISheet()->removeChildWindow(hPromptWindow);
 
   CEGUI::String levelName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getName();
-  app->switchActivity(new HostPlayerActivity(app, levelName.c_str()));
+  app->switchActivity(new HostPlayerActivity(app, lobbyname.c_str(), name.c_str(), levelName.c_str()));
   return true;
 
 }
 
 bool MenuActivity::StartMultiPlayerClient( const CEGUI::EventArgs& e) {
-  CEGUI::MouseCursor::getSingleton().hide();
-  CEGUI::String hostName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getText();
-  printf("host name is %s\n", hostName.c_str());
-  app->switchActivity(new ClientPlayerActivity(app, hostName.c_str()));
+  /*  CEGUI::MouseCursor::getSingleton().hide();
+      CEGUI::String hostName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getText();
+      printf("host name is %s\n", hostName.c_str());
+      app->switchActivity(new ClientPlayerActivity(app));*/
   return true;
 }
 

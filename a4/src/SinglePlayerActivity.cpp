@@ -25,7 +25,6 @@ SinglePlayerActivity::~SinglePlayerActivity(void) {
 void SinglePlayerActivity::close(void) {
   delete player;
   delete mCameraObj;
-
 }
 
 bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
@@ -39,9 +38,10 @@ bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
 }
 
 void SinglePlayerActivity::start(void) {
-  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", 64);
-  
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
+  guiSheet->removeChildWindow(app->Wmgr->getWindow("ConsoleRoot"));
   CEGUI::System::getSingleton().setGUISheet(guiSheet);
 
   scoreDisplay = app->Wmgr->getWindow("SinglePlayerHUD/Score");
@@ -159,8 +159,6 @@ void SinglePlayerActivity::loadLevel(const char* name) {
     case CHARACTER_NINJA:
       playerChoice << "ninja.mesh";
       break;
-
-
   }
 
   player = new OgreBall(app->mSceneMgr, "player1", "player1", playerChoice.str(), 0, app->mPhysics,
@@ -187,6 +185,8 @@ bool SinglePlayerActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {
 }
 
 bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
+  app->mPhysics->stepSimulation(elapsedTime);
+
   if (OgreBallApplication::debug) return true;
 
   if (countdown != -1 && !menuActive && !ceguiActive) {
@@ -255,13 +255,13 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   if (gameEnded) {
     player->getBody()->setGravity(btVector3(0, 1000, 0));
   } else if (countdown == -1) {
-    btVector3 tweakedGrav = 2*app->mPhysics->getDynamicsWorld()->getGravity()
-      .rotate(currTilt.getAxis(), -3*currTilt.getAngle())
+    btVector3 tweakedGrav = 1.8*app->mPhysics->getDynamicsWorld()->getGravity()
+      .rotate(currTilt.getAxis(), -2.5*currTilt.getAngle())
       .rotate(q.getAxis(), q.getAngle());
 
-    tweakedGrav[1] /= 2;
+    tweakedGrav[1] /= 1.5;
     player->getBody()->setGravity(tweakedGrav);
-      
+
   }
 
   // Update Camera Position
@@ -269,7 +269,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   mCameraObj->update((Ogre::Vector3)player->getPosition(), elapsedTime);
 
   // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
-  app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
+  //app->mCameraNode->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0), Ogre::SceneNode::TS_WORLD);
   app->mCamera->lookAt((Ogre::Vector3)player->getPosition() + Ogre::Vector3(0,250,0));
 
   // Tilt Camera to simulate level tilt
@@ -525,6 +525,8 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
     tiltDest *= btQuaternion(0,MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
+    break;
+  case OIS::KC_R:
     break;
   default:
     return false;

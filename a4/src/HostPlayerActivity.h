@@ -2,60 +2,45 @@
 
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
+#include "BaseMultiActivity.h"
 #include "Activity.h"
 #include "CameraObject.h"
 #include "GameObjectDescription.h"
 #include "Networking.h"
 #include "common.h"
 
-class HostPlayerActivity : public Activity {
+class HostPlayerActivity : public BaseMultiActivity {
  public:
-  HostPlayerActivity(OgreBallApplication *app, const char* levelName);
+  HostPlayerActivity(OgreBallApplication *app, const char* lobbyname, const char* name, const char* levelName);
   virtual ~HostPlayerActivity(void);
   virtual void close(void);
 
   void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );
-  virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
   virtual bool keyPressed( const OIS::KeyEvent &arg );
   virtual bool keyReleased( const OIS::KeyEvent &arg );
 
-  virtual bool mouseMoved( const OIS::MouseEvent &arg );
-  virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
-  virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+  bool handleKeyPressed( OIS::KeyCode arg, int userID );
+  bool handleKeyReleased( OIS::KeyCode arg, int userID );
+  bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+  void handleCrossedFinishLine( int id );
   virtual void handleGameEnd();
 
+  void handleLobbyState(void);
+  void handleWaiting();
+
+  bool startGame( const CEGUI::EventArgs& e );
   void loadLevel( const char* name );
-  bool ExitToMenu( const CEGUI::EventArgs& e );
-  bool togglePauseMenu( const CEGUI::EventArgs& e );
-  void togglePauseMenu();
-  Player* addPlayer(int userID);
 
-  const char* currentLevelName;
+  void handleClientEvents(void);
+  void updateClients(void);
 
-  // User Input Variables
-  btScalar MAX_TILT;
-  btQuaternion lastTilt, currTilt, tiltDest;
-  float currTiltDelay, tiltDelay;
-  OgreBall* mOgreBall;  
-  CameraObject* mCameraObj;
+  bool handleTextSubmitted( const CEGUI::EventArgs& e );
 
-  // Menu Variables
-  CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
-    *collectDisplay, *livesDisplay, *levelDisplay;
-
-  bool menuActive;
-  bool ceguiActive;
-  bool gameEnded;
-  
   //Networking Stuff
-  int myId;
+  std::string lobbyName;
   IPaddress ip, *remoteIP;
-  
-
-  // Game State Variables
-  OgreBall *player;
-  float timeLeft;  // In millis
-  int collectibles, lives;
+  bool waitingForClientsToLoad;
 };

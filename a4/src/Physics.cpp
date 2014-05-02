@@ -13,7 +13,7 @@ Physics::Physics( btVector3 gravity ) {
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
   dynamicsWorld->setGravity(gravity);
   dynamicsWorld->getSolverInfo().m_splitImpulse = 1;
-  //  dynamicsWorld->getSolverInfo().m_friction = 0.7;
+  dynamicsWorld->getSolverInfo().m_friction = 3;
 }
 
 void Physics::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, const Ogre::Real fixedTimeStep) {
@@ -111,4 +111,17 @@ void Physics::removeAllObjects() {
 void Physics::removeObject(GameObject *obj) {
   objList.erase(std::remove(objList.begin(), objList.end(), obj), objList.end());
   getDynamicsWorld()->removeRigidBody(obj->getBody());
+}
+
+std::deque<GameObject*>& Physics::getObjects() {
+  return objList;
+}
+
+int Physics::indexOfObject(GameObject *obj) {
+  for (int i = 0; i < objList.size(); i++) {
+    if (obj == objList[i])
+      return i;
+  }
+
+  return -1;
 }

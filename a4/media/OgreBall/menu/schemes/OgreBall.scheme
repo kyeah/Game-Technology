@@ -4,6 +4,7 @@
   <Font Filename="helvetica-32.font" />
   <Imageset Filename="OgreBall.imageset" />
   <Imageset Filename="OgreBallButtons.imageset" />
+  <Imageset Name="MenuBackground" Filename="MenuBackground.imageset" />
   <LookNFeel Filename="OgreBall.looknfeel" />
   <WindowRendererSet Filename="CEGUIFalagardWRBase" />
   <FalagardMapping WindowType="OgreBall/TextButton" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="OgreBall/TextButton" />

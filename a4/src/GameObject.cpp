@@ -172,6 +172,7 @@ void GameObject::setPosition(btVector3 position) {
   motionState->getWorldTransform(transform);
   transform.setOrigin(position);
   motionState->setWorldTransform(transform);
+  body->setWorldTransform(transform);
 }
 
 void GameObject::translate(btVector3 d) {
@@ -205,6 +206,7 @@ btQuaternion GameObject::getOrientation() {
 void GameObject::setVelocity(btVector3 vel) {
   initVel = vel;
   body->setLinearVelocity(initVel);
+  body->setAngularVelocity(btVector3(0,0,0));
 }
 
 void GameObject::update(float elapsedTime) {

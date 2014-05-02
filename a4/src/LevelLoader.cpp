@@ -24,7 +24,7 @@ vector<string> LevelLoader::split(const string &s, char delim) {
   return elems;
 }
 
-LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot) {
+LevelLoader::LevelLoader(Ogre::SceneManager *mgr, Ogre::Camera *cam, Physics *phys, Ogre::SceneNode *lvlRoot) : mSceneMgr(mgr), mPhysics(phys), mCamera(cam), levelRoot(lvlRoot), currObjID(0) {
   instance = this;
 }
 
@@ -841,11 +841,10 @@ void LevelLoader::loadObject(ConfigNode *obj, Ogre::SceneNode *parentNode) {
     }
   }
 
-  static int id = 0;
   stringstream ss;
-  ss << "object" << id;
+  ss << "object" << currObjID;
   string name = ss.str();
-  id++;
+  currObjID++;
 
   if (!parentNode && kinematic) {
     parentNode = levelRoot;

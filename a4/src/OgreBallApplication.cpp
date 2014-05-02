@@ -128,7 +128,8 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("Menu.layout");
   Wmgr->loadWindowLayout("HostsMenu.layout");
   Wmgr->loadWindowLayout("MultiSubMenu.layout");
-  Wmgr->loadWindowLayout("Chatbox.layout");
+  Wmgr->loadWindowLayout("ServerList.layout");
+  Wmgr->loadWindowLayout("GameLobby.layout");
   Wmgr->loadWindowLayout("PauseMenu.layout");
   Wmgr->loadWindowLayout("GameWon.layout");
   Wmgr->loadWindowLayout("SinglePlayerHUD.layout");
@@ -136,10 +137,14 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("Leaderboard.layout");
   Wmgr->loadWindowLayout("LevelSelector.layout");
   Wmgr->loadWindowLayout("PlayerSelector.layout");
+  Wmgr->loadWindowLayout("Chatbox.layout");
+  Wmgr->loadWindowLayout("Prompt.layout");
+  Wmgr->loadWindowLayout("MultiGameEnd.layout");
+  Wmgr->loadWindowLayout("HostPrompt.layout");
+
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 
   sheet = Wmgr->createWindow("DefaultWindow", "CEGUIDemo/Sheet");
-  // CEGUI::System::getSingleton().setGUISheet(sheet);
 }
 
 //-------------------------------------------------------------------------------------
@@ -152,7 +157,6 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
 
 
   if (!paused) {
-    if (mPhysics) mPhysics->stepSimulation(elapsedTime);
     activity->frameStarted(elapsedTime);
   }
 

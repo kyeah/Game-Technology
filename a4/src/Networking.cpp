@@ -24,9 +24,9 @@ void Networking::initSDLNet() {
 
 
 void Networking::Send(TCPsocket socket, char *msg, int len) {
-        if (SDLNet_TCP_Send(socket, (void*)msg, len) < len) {
-                printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-        }
+  if (SDLNet_TCP_Send(socket, (void*)msg, len) < len) {
+    printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+  }
 }
 
 void Networking::serverConnect(){
@@ -45,10 +45,9 @@ void Networking::serverConnect(){
 }
 
 void Networking::Close(){
-  /*
   if (server_socket)
     SDLNet_TCP_Close(server_socket);
-
+  
   if (client_socket)
     SDLNet_TCP_Close(client_socket);
   
@@ -57,11 +56,49 @@ void Networking::Close(){
     if (mPlayer && mPlayer->csd) {
       SDLNet_TCP_Close(mPlayer->csd);
     }
-    }*/
-  SDLNet_Quit();
+  }
+
+  //  SDLNet_Quit();
 }
 
-bool Networking::clientConnect(int *id, char* host){
+std::vector<PingResponseMessage*> Networking::hostCheck( const char* filename ) {
+  SDLNet_Init();
+
+  std::ifstream ifs(filename);
+
+  std::vector<PingResponseMessage*> messages;
+
+  if (ifs) {
+    std::string host;
+    while (!ifs.eof()) {
+      // Get next hostname
+      std::getline(ifs, host);
+
+      if (SDLNet_ResolveHost(&client_ip, host.c_str(), PORT) != -1) {
+        client_socket = SDLNet_TCP_Open(&client_ip);
+        if (client_socket) {
+          std::cout << "Pinging hostname: " << host << std::endl;
+
+          // Ping server for information
+          PingMessage ping;
+          ping.isJoining = false;
+          SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
+
+          PingResponseMessage *response = new PingResponseMessage();
+          SDLNet_TCP_Recv(client_socket, response, sizeof(*response));
+
+          std::cout << "Received lobby name: " << response->lobbyName << std::endl;
+          strcpy(response->hostName, host.c_str());
+          messages.push_back(response);
+        }
+      }
+    }
+  }
+
+  return messages;
+}
+
+bool Networking::clientConnect(ConnectAck *ack, const char* username, char* host){
 
   printf("trying to connect to player 2...\n");
   SDLNet_Init();
@@ -72,9 +109,16 @@ bool Networking::clientConnect(int *id, char* host){
   }
 
   client_socket = SDLNet_TCP_Open(&client_ip);
+
+  int retries = 0;
   while(!client_socket){
+    retries++;
+    if (retries >= 50) {
+      return false;
+    }
+
     client_socket = SDLNet_TCP_Open(&client_ip);
-    if(!client_socket){
+    if(!client_socket) {
       printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
       printf("trying again...\n");
     }
@@ -86,14 +130,18 @@ bool Networking::clientConnect(int *id, char* host){
     return false;
   }
 
-//connected = true
-  ConnectAck ack;
-  SDLNet_TCP_Recv(client_socket, &ack, sizeof(ack));
-  *id = ack.id;
+  // Ping server for information
+  PingMessage ping;
+  ping.isJoining = true;
+  strcpy(ping.name, username);
+  SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
+
+  //connected = true
+  SDLNet_TCP_Recv(client_socket, ack, sizeof(*ack));
+
   for (int i = 0; i < 4; i++) {
-    client_ids[i] = ack.ids[i];
+    client_ids[i] = ack->ids[i];
   }
-//  printf("myID: %d\n", myId);
+  //  printf("myID: %d\n", myId);
   return true;
 }
-
