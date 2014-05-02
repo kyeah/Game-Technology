@@ -231,7 +231,9 @@ bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
   serverListbox->resetList();
 
   for (int i = 0; i < responses.size(); i++) {
-    CEGUI::ListboxTextItem* chatItem = new CEGUI::ListboxTextItem(responses[i]->lobbyName);
+    std::stringstream ss;
+    ss << responses[i]->lobbyName << " (" << responses[i]->numPlayers << "/" << responses[i]->maxPlayers << ")";
+    CEGUI::ListboxTextItem* chatItem = new CEGUI::ListboxTextItem(ss.str());
     chatItem->setSelectionBrushImage("TaharezLook", "MultiListSelectionBrush");
     chatItem->setUserData(responses[i]);
     serverListbox->addItem(chatItem);

@@ -167,7 +167,8 @@ bool HostPlayerActivity::startGame( const CEGUI::EventArgs& e ) {
   }
 
   for (int i = 1; i < MAX_PLAYERS; i++) {
-    if (players[i]) players[i]->ready = false;
+    if (players[i]) 
+      togglePlayerReady(i);
   }
 
   ServerPacket packet;
@@ -426,7 +427,8 @@ void HostPlayerActivity::handleClientEvents(void) {
               }
               break;
             case CLIENT_TOGGLEREADY:
-              players[cmsg.userID]->ready = !players[cmsg.userID]->ready;
+              togglePlayerReady(cmsg.userID);
+
               closemsg.type = CLIENT_TOGGLEREADY;
               closemsg.clientID = i;
               for (int i = 1; i < MAX_PLAYERS; i++) {

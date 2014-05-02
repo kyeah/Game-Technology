@@ -4,28 +4,34 @@
     <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
     <Property Name="InheritsAlpha" Value="False"/>
     <Property Name="Alpha" Value="1.0" />
-    <Window Type="TaharezLook/StaticText" Name="GameLobby/1">
+    <Window Type="OgreBall/StaticText" Name="GameLobby/1">
       <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.25,0.0},{0.92,0.0},{0.30,0.0}}" />
+      <Property Name="BackgroundColours" Value="tl:FF00FFAA tr:FF00FFAA bl:FF00FFAA br:FF00FFAA" />
+      <Property Name="HorzLabelFormatting" Value="WordWrapLeftAligned" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="GameLobby/2">
+    <Window Type="OgreBall/StaticText" Name="GameLobby/2">
       <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.30,0.0},{0.92,0.0},{0.35,0.0}}" />
+      <Property Name="BackgroundColours" Value="tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="GameLobby/3">
+    <Window Type="OgreBall/StaticText" Name="GameLobby/3">
       <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.35,0.0},{0.92,0.0},{0.40,0.0}}" />
+      <Property Name="BackgroundColours" Value="tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="GameLobby/4">
+    <Window Type="OgreBall/StaticText" Name="GameLobby/4">
       <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.40,0.0},{0.92,0.0},{0.45,0.0}}" />
+      <Property Name="BackgroundColours" Value="tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837" />
       <Property Name="InheritsAlpha" Value="False"/>
       <Property Name="Alpha" Value="1.0" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="GameLobby/Name">
+    <Window Type="OgreBall/StaticText" Name="GameLobby/Name">
       <Property Name="UnifiedAreaRect" Value="{{0.08,0.0},{0.1,0.0},{0.92,0.0},{0.2,0.0}}" />
+      <Property Name="FrameColours" Value="tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
       <Property Name="BackgroundEnabled" Value="False" />
@@ -33,7 +39,7 @@
       <Property Name="Alpha" Value="1.0" />
     </Window>
     <Window Type="OgreBall/TextButton" Name="GameLobby/SelectLevel">
-      <Property Name="UnifiedAreaRect" Value="{{0.83,0.0},{0.77,0.0},{0.90,0.0},{0.82,0.0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.57,0.0},{0.46,0.0},{0.7,0.0},{0.51,0.0}}" />
       <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
       <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
@@ -41,7 +47,7 @@
       <Property Name="Text" Value="Select Level" />
     </Window>
     <Window Type="OgreBall/TextButton" Name="GameLobby/SelectCharacter">
-      <Property Name="UnifiedAreaRect" Value="{{0.70,0.0},{0.77,0.0},{0.82,0.0},{0.82,0.0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.71,0.0},{0.46,0.0},{0.91,0.0},{0.51,0.0}}" />
       <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
       <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
@@ -51,7 +57,7 @@
       <Property Name="Alpha" Value="1.0" />
     </Window>
     <Window Type="OgreBall/TextButton" Name="GameLobby/Leave">
-      <Property Name="UnifiedAreaRect" Value="{{0.70,0.0},{0.83,0.0},{0.82,0.0},{0.88,0.0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.61,0.0},{0.805,0.0},{0.73,0.0},{0.855,0.0}}" />
       <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
       <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
@@ -61,7 +67,7 @@
       <Property Name="Alpha" Value="1.0" />
     </Window>
     <Window Type="OgreBall/TextButton" Name="GameLobby/Ready">
-      <Property Name="UnifiedAreaRect" Value="{{0.83,0.0},{0.83,0.0},{0.90,0.0},{0.88,0.0}}" />
+      <Property Name="UnifiedAreaRect" Value="{{0.74,0.0},{0.805,0.0},{0.81,0.0},{0.855,0.0}}" />
       <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
       <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
       <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />

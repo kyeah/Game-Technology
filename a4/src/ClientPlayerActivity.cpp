@@ -93,6 +93,10 @@ void ClientPlayerActivity::loadLevel(const char* name) {
 
   app->mCamera->setPosition(Ogre::Vector3(0,0,0));
   app->mCameraNode->_setDerivedPosition(app->levelLoader->cameraStartPos);
+
+  for (int i = 1; i < 4; i++)
+    if (players[i])
+      togglePlayerReady(i);
 }
 
 bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
@@ -207,7 +211,7 @@ void ClientPlayerActivity::handleServerUpdates() {
         addPlayer(msg.clientID, "name");
         break;
       case CLIENT_TOGGLEREADY:
-        players[msg.clientID]->ready = !players[msg.clientID]->ready;
+        togglePlayerReady(msg.clientID);
         break;
       case SERVER_OBJECT_REMOVAL:
         app->mPhysics->getObjects()[msg.clientID]->removeFromSimulator();

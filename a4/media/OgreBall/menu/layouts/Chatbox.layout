@@ -10,7 +10,16 @@
         <Window Type="TaharezLook/Listbox" Name="ConsoleRoot/ChatBox" >
           <Property Name="UnifiedAreaRect" Value="{{0,50},{0,0},{0,812},{0,160}}" />
           <Property Name="InheritsAlpha" Value="False"/>
-          <Property Name="Alpha" Value="0.65" />
+          <Property Name="Alpha" Value="0.9" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="ConsoleRoot/Tip" >
+          <Property Name="UnifiedAreaRect" Value="{{0,60},{0,120},{0,300},{0,160}}" />          
+          <Property Name="Text" Value="Press 'c' to Toggle Chat" />
+          <Property Name="Font" Value="Helvetica-12" />
+          <Property Name="FrameEnabled" Value="False" />
+          <Property Name="BackgroundEnabled" Value="False" />
+          <Property Name="InheritsAlpha" Value="False"/>
+          <Property Name="Alpha" Value="0.4" />
         </Window>
         <Window Type="TaharezLook/Editbox" Name="ConsoleRoot/EditBox" >
             <Property Name="UnifiedAreaRect" Value="{{0,50},{0,166},{0,812},{0,197}}" />

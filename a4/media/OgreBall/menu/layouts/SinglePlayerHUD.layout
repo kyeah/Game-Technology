@@ -12,7 +12,7 @@
       <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="Image" Value="set:OgreBall/Buttons image:ScoreBG" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Score" >
+    <Window Type="OgreBall/StaticText" Name="SinglePlayerHUD/Score" >
       <Property Name="Text" Value="SCORE: 0" />
       <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
       <Property Name="VertFormatting" Value="VertCentred" />
@@ -21,7 +21,7 @@
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Timer" >
+    <Window Type="OgreBall/StaticText" Name="SinglePlayerHUD/Timer" >
       <Property Name="Text" Value="TIMER: swag o' clock" />
       <Property Name="Font" Value="Helvetica" />
       <Property Name="TextColours" Value="tl:ff770000 tr:ff770000 bl:ff770000 br:ff770000" />
@@ -40,7 +40,7 @@
       <Property Name="Image" Value="set:OgreBall/Buttons image:playerBG" />
       <Property Name="InheritsAlpha" Value="False" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Collectibles" >
+    <Window Type="OgreBall/StaticText" Name="SinglePlayerHUD/Collectibles" >
       <Property Name="Text" Value="COLLECTIBLES" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
@@ -49,7 +49,7 @@
       <Property Name="FrameEnabled" Value="False" />
       <Property Name="BackgroundEnabled" Value="False" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Lives" >
+    <Window Type="OgreBall/StaticText" Name="SinglePlayerHUD/Lives" >
       <Property Name="Text" Value="LIVES: 0" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />
@@ -65,7 +65,7 @@
       <Property Name="BackgroundEnabled" Value="False" />
       <Property Name="Image" Value="set:OgreBall/Buttons image:LevelnameBG" />
     </Window>
-    <Window Type="TaharezLook/StaticText" Name="SinglePlayerHUD/Level" >
+    <Window Type="OgreBall/StaticText" Name="SinglePlayerHUD/Level" >
       <Property Name="Text" Value="LEVEL" />
       <Property Name="HorzFormatting" Value="WordWrapCentred" />
       <Property Name="VertFormatting" Value="VertCentred" />

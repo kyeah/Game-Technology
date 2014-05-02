@@ -102,6 +102,9 @@ BaseMultiActivity::BaseMultiActivity(OgreBallApplication *app) : Activity(app) {
     ss << "GameLobby/" << i+1;
     lobbyPlayerWindows[i] = app->Wmgr->getWindow(ss.str());
     lobbyPlayerWindows[i]->setText("");
+    if (i != 0) {
+      lobbyPlayerWindows[i]->setProperty("BackgroundColours", "tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837");
+    }
   }
 }
 
@@ -122,11 +125,26 @@ Player* BaseMultiActivity::addPlayer(int userID, const char* name) {
 
 void BaseMultiActivity::toggleChat() {
   chatFocus = !chatFocus;
-  chatEditbox->setVisible(!chatEditbox->isVisible());
-  if (chatFocus)
+  if (chatFocus) {
+    hideChatOnClose = !(chatWindow->isVisible());
+    chatWindow->setVisible(true);
+    chatEditbox->setVisible(true);
     chatEditbox->activate();
-  else
+
+  } else {
+    if (hideChatOnClose)
+      chatWindow->setVisible(false);
+    chatEditbox->setVisible(false);
     chatEditbox->deactivate();
+  }
+}
+
+void BaseMultiActivity::togglePlayerReady( int userID ) {
+  players[userID]->ready = !players[userID]->ready;
+  if (players[userID]->ready)
+    lobbyPlayerWindows[userID]->setProperty("BackgroundColours", "tl:FF00FFAA tr:FF00FFAA bl:FF00FFAA br:FF00FFAA");
+  else
+    lobbyPlayerWindows[userID]->setProperty("BackgroundColours", "tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837");
 }
 
 void BaseMultiActivity::addChatMessage(const char* msg) {
@@ -142,7 +160,7 @@ void BaseMultiActivity::addChatMessage(const char* msg) {
       else
       {*/
   // Create a new listbox item
-  chatItem = new CEGUI::ListboxTextItem(msg);
+  chatItem = new CEGUI::ListboxTextItem(msg);  
   //  }
 
   chatbox->addItem(chatItem);

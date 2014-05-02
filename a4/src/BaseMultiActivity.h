@@ -40,6 +40,7 @@ class BaseMultiActivity : public Activity {
   Player* addPlayer(int userID, const char* name);
 
   void toggleChat();
+  void togglePlayerReady(int userID);
   void addChatMessage(const char* msg);
 
   std::string currentLevelName;
@@ -70,7 +71,7 @@ class BaseMultiActivity : public Activity {
   bool menuActive, ceguiActive, gameEnded, levelLoaded,
     waitingScreenLoaded, readyToLoadLevel, inGame, chatFocus;
 
-  bool allowKeyPress;
+  bool allowKeyPress, hideChatOnClose;
 
   int myId;
   int countdown;
