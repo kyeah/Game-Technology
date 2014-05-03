@@ -4,6 +4,7 @@
 #include "Leaderboard.h"
 #include "OBAnimationManager.h"
 #include "Sounds.h"
+#include "SelectorHelper.h"
 
 SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char* levelName, int mCharacter) : Activity(app) {
   MAX_TILT = .10; //Increasing this increases the maximum degree to which the level can rotate
@@ -150,13 +151,13 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   //Choose the correct mesh for the selected character
   std::stringstream playerChoice;
   switch(character){
-    case CHARACTER_PENGUIN:
+  case SelectorHelper::CHARACTER_PENGUIN:
       playerChoice << "penguin.mesh";
       break;
-    case CHARACTER_OGRE:
+  case SelectorHelper::CHARACTER_OGRE:
       playerChoice << "ogrehead.mesh";
       break;
-    case CHARACTER_NINJA:
+  case SelectorHelper::CHARACTER_NINJA:
       playerChoice << "ninja.mesh";
       break;
   }

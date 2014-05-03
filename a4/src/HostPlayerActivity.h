@@ -25,6 +25,12 @@ class HostPlayerActivity : public BaseMultiActivity {
   bool handleKeyReleased( OIS::KeyCode arg, int userID );
   bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
+  bool SwitchToPlayerSelectMenu( const CEGUI::EventArgs &args );
+  bool SwitchToLevelSelectMenu( const CEGUI::EventArgs &args );
+
+  void handlePlayerSelected(int i);
+  bool handleLevelSelected( const CEGUI::EventArgs &args );
+
   void handleCrossedFinishLine( int id );
   virtual void handleGameEnd();
 

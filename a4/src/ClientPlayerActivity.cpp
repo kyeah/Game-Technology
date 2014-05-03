@@ -5,6 +5,7 @@
 #include "common.h"
 #include "Networking.h"
 #include "Sounds.h"
+#include "SelectorHelper.h"
 
 ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck *ack) : BaseMultiActivity(app) {
   myId = ack->id;
@@ -22,9 +23,29 @@ ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck 
   lobbyStart->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&ClientPlayerActivity::toggleReady, this));
 
+  lobbySelectCharacter->removeEvent(CEGUI::PushButton::EventClicked);
+  lobbySelectCharacter->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                       CEGUI::Event::Subscriber(&ClientPlayerActivity::SwitchToPlayerSelectMenu, this));
+
   chatEditbox->removeEvent(CEGUI::Editbox::EventTextAccepted);
   chatEditbox->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
                               CEGUI::Event::Subscriber(&ClientPlayerActivity::handleTextSubmitted,this));
+}
+
+bool ClientPlayerActivity::SwitchToPlayerSelectMenu( const CEGUI::EventArgs &e ) {
+  SelectorHelper::type_flag = SelectorHelper::TYPE_MULTI_CLIENT;
+  SelectorHelper::SwitchToPlayerSelectMenu();
+}
+
+void ClientPlayerActivity::handlePlayerSelected(int i) {
+  players[myId]->character = i;
+
+  ClientPacket msg;
+  msg.type = SERVER_PLAYER_MESH_CHANGE;
+  msg.userID = myId;
+  msg.characterChange = i;
+
+  Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
 }
 
 ClientPlayerActivity::~ClientPlayerActivity(void) {
@@ -193,7 +214,7 @@ void ClientPlayerActivity::handleServerUpdates() {
           objects[i]->setOrientation(msg.objectInfo[i].orientation);
         }
 
-        app->mCamera->lookAt((Ogre::Vector3)players[msg.camInfo.viewingPlayer]->getBall()->getPosition() 
+        app->mCamera->lookAt((Ogre::Vector3)players[msg.camInfo.viewingPlayer]->getBall()->getPosition()
                              + Ogre::Vector3(0,250,0));
         break;
       }
@@ -226,10 +247,10 @@ void ClientPlayerActivity::handleServerUpdates() {
         addChatMessage(msg.msg);
         break;
       case SERVER_PLAYER_MESH_CHANGE:
-        //player[msg.clientID]->character = msg.jifjeisf;
+        players[msg.clientID]->character = msg.characterChange;
         break;
       case SERVER_LEVEL_CHANGE:
-        // currentLevelName = std::string(msg.level, strlen(msg.level));
+        currentLevelName = std::string(msg.msg, strlen(msg.msg));
         break;
       case SERVER_CLIENT_CLOSED:
         if (inGame) {

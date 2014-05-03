@@ -24,6 +24,9 @@ class ClientPlayerActivity : public BaseMultiActivity {
   bool toggleReady( const CEGUI::EventArgs &args );
   bool handleTextSubmitted( const CEGUI::EventArgs &args );
 
+  bool SwitchToPlayerSelectMenu( const CEGUI::EventArgs &args );
+  void handlePlayerSelected(int i);
+
   void handleServerUpdates();
   virtual void handleCrossedFinishLine();
 

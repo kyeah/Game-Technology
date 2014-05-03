@@ -37,10 +37,6 @@ class SinglePlayerActivity : public Activity {
 
   std::string currentLevelName;
 
-  const static int CHARACTER_PENGUIN = 0;
-  const static int CHARACTER_OGRE = 1;
-  const static int CHARACTER_NINJA = 2;
-
   // User Input Variables
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;

@@ -5,9 +5,6 @@
 #include "Activity.h"
 
 class MenuActivity : public Activity {
- private:
-  static std::vector<LevelViewer*> viewerPool;
-
  public:
   MenuActivity(OgreBallApplication *app);
   virtual ~MenuActivity(void);
@@ -27,7 +24,6 @@ class MenuActivity : public Activity {
   virtual void handleGameEnd();
 
   bool SwitchToMainMenu(const CEGUI::EventArgs& e);
-  bool SwitchToLevelSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToServerListMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
@@ -39,10 +35,6 @@ class MenuActivity : public Activity {
   bool CancelPrompt(const CEGUI::EventArgs& e);
   bool CancelHprompt(const CEGUI::EventArgs& e);
 
-  bool SelectPenguin( const CEGUI::EventArgs& e);
-  bool SelectOgre( const CEGUI::EventArgs& e);
-  bool SelectNinja( const CEGUI::EventArgs& e);
-
   bool SwitchToHostSelectMenu( const CEGUI::EventArgs& e);
   bool SinglePlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
   bool MultiPlayerLevelSelectWrapper(const CEGUI::EventArgs& e);
@@ -51,19 +43,12 @@ class MenuActivity : public Activity {
   bool StartMultiPlayerHost( const CEGUI::EventArgs& e);
   bool StartMultiPlayerClient( const CEGUI::EventArgs& e);
 
-  bool ShowLeaderboard( const CEGUI::EventArgs& e );
-  bool handleLSPrev( const CEGUI::EventArgs& e );
-  bool handleLSNext( const CEGUI::EventArgs& e );
-
   bool quit(const CEGUI::EventArgs& e);
   
   CEGUI::Window *mainMenuSheet, *singlePlayerButton,
     *multiPlayerButton, *quitButton;
 
   CEGUI::Window *multiMenuSheet, *hostButton, *clientButton, *returnButton;
-
-  CEGUI::Window *levelSelectorWindow, *lsBack, *lsPrev, *lsNext;
-  CEGUI::Window *lsButtons[8];
 
   CEGUI::Window *serverListWindow, *serverListBack;
   CEGUI::Listbox *serverListbox;
@@ -73,8 +58,4 @@ class MenuActivity : public Activity {
 
   CEGUI::Window *hPromptWindow, *hPromptHeader, *hPromptSubmit, *hPromptCancel;
   CEGUI::Editbox *hPromptInputbox, *hPromptLobbyNameInputbox;
-
-  int selectorStart, selectorRows, selectorColumns;
-  int chosenCharacter;
-  std::vector<LevelViewer*> levelViewers;
 };

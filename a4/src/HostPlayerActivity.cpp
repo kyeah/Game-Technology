@@ -5,6 +5,7 @@
 #include "Networking.h"
 #include "Sounds.h"
 #include "common.h"
+#include "SelectorHelper.h"
 
 HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lobbyName, const char* name, const char* levelName) : BaseMultiActivity(app)
 {
@@ -20,13 +21,62 @@ HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lob
 
   lobbyNamebar->setText(lobbyName);
   lobbyStart->setText("Start");
+  
+  lobbyStart->removeEvent(CEGUI::PushButton::EventClicked);
   lobbyStart->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&HostPlayerActivity::startGame, this));
 
+  lobbySelectCharacter->removeEvent(CEGUI::PushButton::EventClicked);
+  lobbySelectCharacter->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                       CEGUI::Event::Subscriber(&HostPlayerActivity::SwitchToPlayerSelectMenu, this));
+
   lobbySelectLevel->setVisible(true);
+
+  lobbySelectLevel->removeEvent(CEGUI::PushButton::EventClicked);
+  lobbySelectLevel->subscribeEvent(CEGUI::PushButton::EventClicked,
+                                   CEGUI::Event::Subscriber(&HostPlayerActivity::SwitchToLevelSelectMenu, this));
 
   addPlayer(0, name);
   this->lobbyName = std::string(lobbyName, strlen(lobbyName));
+}
+
+bool HostPlayerActivity::SwitchToPlayerSelectMenu( const CEGUI::EventArgs &e ) {
+  SelectorHelper::type_flag = SelectorHelper::TYPE_MULTI_HOST;
+  SelectorHelper::SwitchToPlayerSelectMenu();
+}
+
+void HostPlayerActivity::handlePlayerSelected(int i) {
+  players[myId]->character = i;
+
+  ServerPacket msg;
+  msg.type = SERVER_PLAYER_MESH_CHANGE;
+  msg.clientID = myId;
+  msg.characterChange = i;
+
+  for(int i = 1; i < MAX_PLAYERS; i++) {
+    if(players[i]) {
+      Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+    }
+  }
+}
+
+bool HostPlayerActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs &e ) {
+  SelectorHelper::type_flag = SelectorHelper::TYPE_MULTI_CHANGE;
+  SelectorHelper::SwitchToLevelSelectMenu();
+}
+
+bool HostPlayerActivity::handleLevelSelected( const CEGUI::EventArgs &e ) {
+  CEGUI::String levelName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getName();
+  currentLevelName = std::string(levelName.c_str(), levelName.length());
+
+  ServerPacket msg;
+  msg.type = SERVER_LEVEL_CHANGE;
+  strcpy(msg.msg, levelName.c_str());
+  for(int i = 1; i < MAX_PLAYERS; i++) {
+    if(players[i]) {
+      Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+    }
+  }
 }
 
 HostPlayerActivity::~HostPlayerActivity(void) {
@@ -167,7 +217,7 @@ bool HostPlayerActivity::startGame( const CEGUI::EventArgs& e ) {
   }
 
   for (int i = 1; i < MAX_PLAYERS; i++) {
-    if (players[i]) 
+    if (players[i])
       togglePlayerReady(i);
   }
 
@@ -201,7 +251,7 @@ void HostPlayerActivity::loadLevel(const char* name) {
       ss << "Player" << i;
       std::string playerEnt = ss.str();
       ss << "node";
-
+      
       players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0,
                                        app->mPhysics,
                                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
@@ -436,6 +486,21 @@ void HostPlayerActivity::handleClientEvents(void) {
                   Networking::Send(players[i]->csd, (char*)&closemsg, sizeof(closemsg));
               }
               break;
+            case SERVER_PLAYER_MESH_CHANGE: {
+              players[cmsg.userID]->character = cmsg.characterChange;
+
+              ServerPacket msg;
+              msg.type = SERVER_PLAYER_MESH_CHANGE;
+              msg.clientID = myId;
+              msg.characterChange = cmsg.characterChange;
+
+              for(int i = 1; i < MAX_PLAYERS; i++) {
+                if(players[i] && i != cmsg.characterChange) {
+                  Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+                }
+              }
+              break;
+            }
             case CLIENT_CHAT: {
               addChatMessage(cmsg.msg);
 

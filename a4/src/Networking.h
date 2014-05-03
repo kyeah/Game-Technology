@@ -42,6 +42,8 @@ static const int SEND_TO_CLIENT = 11;
 typedef struct {
   int type;
   int userID;
+  int characterChange;
+
   char msg[512];
   
   OIS::KeyCode keyArg;
@@ -69,6 +71,8 @@ typedef struct {
 typedef struct {
   int type;
   int clientID;
+  int characterChange;
+
   float timeLeft;
   char msg[512];
 
