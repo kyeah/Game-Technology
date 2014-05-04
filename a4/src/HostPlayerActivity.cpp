@@ -286,7 +286,8 @@ void HostPlayerActivity::loadLevel(const char* name) {
     }
   }
 
-  app->mCamera->setPosition(Ogre::Vector3(0,0,0));
+  if (inGame)
+    app->mCamera->setPosition(Ogre::Vector3(0,0,0));
 }
 
 bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {

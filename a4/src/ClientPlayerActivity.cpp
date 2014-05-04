@@ -122,8 +122,10 @@ void ClientPlayerActivity::loadLevel(const char* name) {
     }
   }
 
-  app->mCamera->setPosition(Ogre::Vector3(0,0,0));
-  app->mCameraNode->_setDerivedPosition(app->levelLoader->cameraStartPos);
+  if (inGame) {
+    app->mCamera->setPosition(Ogre::Vector3(0,0,0));
+    app->mCameraNode->_setDerivedPosition(app->levelLoader->cameraStartPos);
+  }
 
   for (int i = 1; i < 4; i++)
     if (players[i])
