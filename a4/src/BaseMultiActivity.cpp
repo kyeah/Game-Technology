@@ -209,6 +209,7 @@ void BaseMultiActivity::handleLobbyState() {
 // handleWaiting()
 
 void BaseMultiActivity::loadLevel(const char* name) {
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
   currentLevelName = std::string(name, std::strlen(name));
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->currObjID = 0;  // VERY IMPORTANT TO ENSURE CONSISTENT OBJECT NAMES ACROSS HOST AND CLIENTS

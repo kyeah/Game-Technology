@@ -216,8 +216,6 @@ void HostPlayerActivity::handleWaiting() {
 }
 
 bool HostPlayerActivity::startGame( const CEGUI::EventArgs& e ) {
-  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume); 
-
   for (int i = 1; i < MAX_PLAYERS; i++) {
     if (players[i] && !players[i]->ready) {
       return true;
