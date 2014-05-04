@@ -229,6 +229,8 @@ void ClientPlayerActivity::handleServerUpdates() {
         break;
       }
       case SERVER_GAME_START:
+        Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+
         inGame = true;
         loadLevel(currentLevelName.c_str());
         CEGUI::System::getSingleton().setGUISheet(guiSheet);
