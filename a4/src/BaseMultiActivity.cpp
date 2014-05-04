@@ -196,6 +196,7 @@ void BaseMultiActivity::start(void) {
 }
 
 bool BaseMultiActivity::SwitchToLobby( const CEGUI::EventArgs& e ) {
+  inGame = false;
   Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", Sounds::volume);
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(lobbySheet);

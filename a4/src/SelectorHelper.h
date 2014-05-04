@@ -36,4 +36,5 @@ class SelectorHelper {
 
   static bool SelectCharacter( const CEGUI::EventArgs &e );
   static bool ShowLeaderboard( const CEGUI::EventArgs &e );
+  static char* CharacterToString(int character);
 };

@@ -43,6 +43,19 @@ void SelectorHelper::frameStarted( float elapsedTime ) {
   }
 }
 
+char* SelectorHelper::CharacterToString( int character ) {
+  switch(character){
+  case SelectorHelper::CHARACTER_PENGUIN:
+    return "penguin.mesh";
+  case SelectorHelper::CHARACTER_OGRE:
+    return "ogrehead.mesh";
+  case SelectorHelper::CHARACTER_NINJA:
+    return "ninja.mesh";
+  default:
+    return "penguin.mesh";
+  }
+}
+
 /*
   ==============================
   = Level Selector Switch
@@ -119,26 +132,31 @@ void SelectorHelper::SwitchToLevelSelectMenu(void) {
     if(type_flag == TYPE_SINGLE_PLAYER || type_flag == TYPE_MULTI_HOST){
       MenuActivity *activity = (MenuActivity*) OgreBallApplication::getSingleton()->activity;
 
-      v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
-      v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
-                                CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, activity));
-
       lsBack->removeEvent(CEGUI::PushButton::EventClicked);
       lsBack->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, activity));
 
-      if (type_flag == TYPE_MULTI_HOST) {
+      if (type_flag == TYPE_SINGLE_PLAYER) {
+        v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
+        v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
+                                  CEGUI::Event::Subscriber(&MenuActivity::StartSinglePlayer, activity));
+
         lsButtons[i % 8]->setVisible(true);
         lsButtons[i % 8]->removeEvent(CEGUI::PushButton::EventMouseClick);
         lsButtons[i % 8]->subscribeEvent(CEGUI::PushButton::EventMouseClick,
                                          &SelectorHelper::ShowLeaderboard);
+      } else {
+        v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
+        v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
+                                  CEGUI::Event::Subscriber(&MenuActivity::StartMultiPlayerHost, activity));
       }
+
     } else if (type_flag == TYPE_MULTI_CHANGE) {
-      HostPlayerActivity *activity = (HostPlayerActivity*) OgreBallApplication::getSingleton()->activity;      
+      HostPlayerActivity *activity = (HostPlayerActivity*) OgreBallApplication::getSingleton()->activity;
       v->window->removeEvent(CEGUI::PushButton::EventMouseClick);
       v->window->subscribeEvent(CEGUI::PushButton::EventMouseClick,
                                 CEGUI::Event::Subscriber(&HostPlayerActivity::handleLevelSelected, activity));
-    } 
+    }
 
     v->setPositionPercent(0.05 + ((i%8)%selectorColumns)*0.9/selectorColumns,
                           0.2 + ((i%8)/selectorColumns)*0.6/selectorRows);
@@ -183,8 +201,8 @@ bool SelectorHelper::SelectCharacter( const CEGUI::EventArgs& e ) {
   CEGUI::Window* ninjaButton = wmgr->getWindow("Menu/Ninja");
 
   if (window == penguinButton) player_flag = CHARACTER_PENGUIN;
-  else if (window == ogreButton) player_flag == CHARACTER_OGRE;
-  else if (window == ninjaButton) player_flag == CHARACTER_NINJA;
+  else if (window == ogreButton) player_flag = CHARACTER_OGRE;
+  else if (window == ninjaButton) player_flag = CHARACTER_NINJA;
 
   if (type_flag == TYPE_SINGLE_PLAYER) {
     MenuActivity *activity = (MenuActivity*) OgreBallApplication::getSingleton()->activity;

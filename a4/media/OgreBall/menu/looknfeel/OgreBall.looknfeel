@@ -447,12 +447,8 @@
     <ImagerySection name="NoFrameLabelshadow">
       <TextComponent>
         <Area>
-          <Dim type="LeftEdge" >
-            <AbsoluteDim value="2" />
-          </Dim>
-          <Dim type="TopEdge" >
-            <AbsoluteDim value="2" />
-          </Dim>
+          <Dim type="LeftEdge" ><AbsoluteDim value="2" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="2" /></Dim>
           <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
           <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
         </Area>
@@ -700,11 +696,13 @@
     <StateImagery name="EnabledFrame">
       <Layer>
         <Section look="OgreBall/StaticShared" section="frame" />
+        <Section look="OgreBall/StaticShared" section="WithFrameLabelshadow" />
       </Layer>
     </StateImagery>
     <StateImagery name="DisabledFrame">
       <Layer>
         <Section look="OgreBall/StaticShared" section="frame" />
+        <Section look="OgreBall/StaticShared" section="NoFrameLabelshadow" />
       </Layer>
     </StateImagery>
     <StateImagery name="WithFrameEnabledBackground">

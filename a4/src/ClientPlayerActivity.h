@@ -15,6 +15,7 @@ class ClientPlayerActivity : public BaseMultiActivity {
   virtual ~ClientPlayerActivity(void);
   virtual void close(void);
 
+  void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );
 
   virtual bool keyPressed( const OIS::KeyEvent &arg );

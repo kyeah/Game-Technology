@@ -21,7 +21,7 @@ HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lob
 
   lobbyNamebar->setText(lobbyName);
   lobbyStart->setText("Start");
-  
+
   lobbyStart->removeEvent(CEGUI::PushButton::EventClicked);
   lobbyStart->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&HostPlayerActivity::startGame, this));
@@ -46,6 +46,7 @@ bool HostPlayerActivity::SwitchToPlayerSelectMenu( const CEGUI::EventArgs &e ) {
 }
 
 void HostPlayerActivity::handlePlayerSelected(int i) {
+  CEGUI::System::getSingleton().setGUISheet(lobbySheet);
   players[myId]->character = i;
 
   ServerPacket msg;
@@ -66,6 +67,7 @@ bool HostPlayerActivity::SwitchToLevelSelectMenu( const CEGUI::EventArgs &e ) {
 }
 
 bool HostPlayerActivity::handleLevelSelected( const CEGUI::EventArgs &e ) {
+  CEGUI::System::getSingleton().setGUISheet(lobbySheet);
   CEGUI::String levelName = static_cast<const CEGUI::MouseEventArgs*>(&e)->window->getName();
   currentLevelName = std::string(levelName.c_str(), levelName.length());
 
@@ -77,10 +79,13 @@ bool HostPlayerActivity::handleLevelSelected( const CEGUI::EventArgs &e ) {
       Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
     }
   }
+
+  loadLevel(currentLevelName.c_str());
 }
 
 HostPlayerActivity::~HostPlayerActivity(void) {
   close();
+  loadLevel(currentLevelName.c_str());
 }
 
 void HostPlayerActivity::close(void) {
@@ -97,6 +102,7 @@ void HostPlayerActivity::close(void) {
 
 void HostPlayerActivity::start(void) {
   BaseMultiActivity::start();
+  loadLevel(currentLevelName.c_str());
 }
 
 bool HostPlayerActivity::handleTextSubmitted( const CEGUI::EventArgs &e ) {
@@ -251,8 +257,10 @@ void HostPlayerActivity::loadLevel(const char* name) {
       ss << "Player" << i;
       std::string playerEnt = ss.str();
       ss << "node";
-      
-      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0,
+
+      char* playerChoice = SelectorHelper::CharacterToString(players[i]->character);
+
+      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), playerChoice,  0,
                                        app->mPhysics,
                                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
                                        btVector3(0,0,0), 16000.0f, 0.5f, btVector3(0,0,0),
@@ -300,7 +308,7 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
     }
   }
 
-  if (countdown == -1) {
+  if (!gameEnded && countdown == -1) {
     timeLeft = std::max(timeLeft - elapsedTime, 0.0f);
 
     if (timeLeft == 0.0f) {
@@ -396,10 +404,6 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 
       // Update Camera Position
       player->mCameraObj->update((Ogre::Vector3)player->getBall()->getPosition(), elapsedTime);
-
-      // This only works in this method, not from CameraObject. DONT ASK JUST ACCEPT
-      player->mCameraNode->lookAt((Ogre::Vector3)player->getBall()->getPosition() + Ogre::Vector3(0,250,0),
-                                  Ogre::SceneNode::TS_WORLD);
 
       // Tilt Camera to simulate level tilt
       if (countdown == -1) {
@@ -541,6 +545,7 @@ void HostPlayerActivity::handleClientEvents(void) {
     }
   }
 }
+
 void HostPlayerActivity::updateClients(void) {
   ServerPacket msg;
 

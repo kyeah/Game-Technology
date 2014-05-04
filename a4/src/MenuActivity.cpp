@@ -299,6 +299,7 @@ bool MenuActivity::StartSinglePlayer( const CEGUI::EventArgs& e ) {
 }
 
 bool MenuActivity::StartMultiPlayerHost( const CEGUI::EventArgs& e ){
+  SelectorHelper::recycleViewers();
   CEGUI::String lobbyname = hPromptLobbyNameInputbox->getText();
   CEGUI::String name = hPromptInputbox->getText();
   if (!lobbyname.length() || !name.length()) return true;

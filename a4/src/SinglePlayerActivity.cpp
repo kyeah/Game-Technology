@@ -149,20 +149,9 @@ void SinglePlayerActivity::loadLevel(const char* name) {
   score = 0;
 
   //Choose the correct mesh for the selected character
-  std::stringstream playerChoice;
-  switch(character){
-  case SelectorHelper::CHARACTER_PENGUIN:
-      playerChoice << "penguin.mesh";
-      break;
-  case SelectorHelper::CHARACTER_OGRE:
-      playerChoice << "ogrehead.mesh";
-      break;
-  case SelectorHelper::CHARACTER_NINJA:
-      playerChoice << "ninja.mesh";
-      break;
-  }
+  char* playerChoice = SelectorHelper::CharacterToString(character); 
 
-  player = new OgreBall(app->mSceneMgr, "player1", "player1", playerChoice.str(), 0, app->mPhysics,
+  player = new OgreBall(app->mSceneMgr, "player1", "player1", playerChoice, 0, app->mPhysics,
                         app->levelLoader->playerStartPositions[0], btVector3(1,1,1), btVector3(0,0,0),
                         16000.0f, 0.5f, btVector3(0,0,0), &app->levelLoader->playerStartRotations[0]);
 

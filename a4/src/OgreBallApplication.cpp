@@ -155,7 +155,6 @@ bool OgreBallApplication::frameStarted( const Ogre::FrameEvent &evt ) {
   Ogre::Real elapsedTime = mTimer->getMilliseconds() - time;
   time = mTimer->getMilliseconds();
 
-
   if (!paused) {
     activity->frameStarted(elapsedTime);
   }

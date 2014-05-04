@@ -32,12 +32,15 @@ ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck 
                               CEGUI::Event::Subscriber(&ClientPlayerActivity::handleTextSubmitted,this));
 }
 
+
+
 bool ClientPlayerActivity::SwitchToPlayerSelectMenu( const CEGUI::EventArgs &e ) {
   SelectorHelper::type_flag = SelectorHelper::TYPE_MULTI_CLIENT;
   SelectorHelper::SwitchToPlayerSelectMenu();
 }
 
 void ClientPlayerActivity::handlePlayerSelected(int i) {
+  CEGUI::System::getSingleton().setGUISheet(lobbySheet);
   players[myId]->character = i;
 
   ClientPacket msg;
@@ -62,6 +65,11 @@ void ClientPlayerActivity::close(void) {
 
   //  delete player;
   //  delete mCameraObj;
+}
+
+void ClientPlayerActivity::start(void) {
+  BaseMultiActivity::start();
+  loadLevel(currentLevelName.c_str());
 }
 
 bool ClientPlayerActivity::handleTextSubmitted( const CEGUI::EventArgs &e ) {
@@ -104,7 +112,9 @@ void ClientPlayerActivity::loadLevel(const char* name) {
       std::string playerEnt = ss.str();
       ss << "node";
 
-      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), "penguin.mesh",  0,
+      char* playerChoice = SelectorHelper::CharacterToString(players[i]->character);
+     
+      players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), playerChoice,  0,
                                        app->mPhysics,
                                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
                                        btVector3(0,0,0), 16000.0f, 0.5f, btVector3(0,0,0),
@@ -251,6 +261,7 @@ void ClientPlayerActivity::handleServerUpdates() {
         break;
       case SERVER_LEVEL_CHANGE:
         currentLevelName = std::string(msg.msg, strlen(msg.msg));
+        loadLevel(currentLevelName.c_str());
         break;
       case SERVER_CLIENT_CLOSED:
         if (inGame) {
