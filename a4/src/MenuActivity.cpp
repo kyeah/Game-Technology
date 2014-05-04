@@ -1,3 +1,4 @@
+#include <OgreOverlayManager.h>
 #include "Interpolator.h"
 #include "LevelViewer.h"
 #include "MenuActivity.h"
@@ -193,7 +194,7 @@ bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
   CEGUI::System::getSingleton().setGUISheet(serverListWindow);
 
   // Ping all known hosts from file
-  vector<PingResponseMessage*> responses = Networking::hostCheck( "data/hosts/hosts.txt" );
+  std::vector<PingResponseMessage*> responses = Networking::hostCheck( "data/hosts/hosts.txt" );
 
   // Display list of active hosts waiting to start a game
   serverListbox->resetList();
@@ -263,7 +264,7 @@ bool MenuActivity::CancelHprompt( const CEGUI::EventArgs& e ) {
   = Player Select Menu
   ====================================================
 */
-bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){  
+bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
   SelectorHelper::type_flag = SelectorHelper::TYPE_SINGLE_PLAYER;
   SelectorHelper::SwitchToPlayerSelectMenu();
 }

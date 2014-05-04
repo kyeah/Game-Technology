@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../libs/MovableTextOverlay.h"
 #include "GameObjectDescription.h"
 #include <btBulletDynamicsCommon.h>
 #include "BaseApplication.h"
@@ -28,6 +29,7 @@ public:
         bool ready;
         bool crossedFinishLine;
         int viewingPlayer;
+        MovableTextOverlay *textOverlay;
 
 private:
 	int id;

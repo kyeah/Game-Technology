@@ -15,7 +15,7 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
   currentLevelName = std::string(levelName, std::strlen(levelName));
   menuActive = false;
   ceguiActive = false;
-  lives = 10;
+  lives = 4;
   character = mCharacter;
 }
 

@@ -2,6 +2,7 @@
 
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
+
 #include "Activity.h"
 #include "CameraObject.h"
 #include "GameObjectDescription.h"

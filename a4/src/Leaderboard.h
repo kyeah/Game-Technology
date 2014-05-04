@@ -71,7 +71,7 @@ class Leaderboard {
 
   string name;
   double minScore;
-  multimap<double, LeaderboardEntry, greater<double> > highscores;
+  std::multimap<double, LeaderboardEntry, greater<double> > highscores;
 
  public:
   static Leaderboard& findLeaderboard(const char* level) {
@@ -106,7 +106,7 @@ class Leaderboard {
 
     // Delete minimum element
     if (highscores.size() == 10) {
-      multimap<double, LeaderboardEntry, greater<double> >::iterator minElem = highscores.find(minScore);
+      std::multimap<double, LeaderboardEntry, greater<double> >::iterator minElem = highscores.find(minScore);
       auto item = minElem->first;
       minElem++;
       highscores.erase(item);
@@ -120,14 +120,14 @@ class Leaderboard {
     // Find new minimum score
     minScore = score;
 
-    multimap<double, LeaderboardEntry>::iterator iter;
+    std::multimap<double, LeaderboardEntry>::iterator iter;
     for (iter = highscores.begin(); iter != highscores.end(); iter++) {
       if (iter->first < minScore)
         minScore = iter->first;
     }
   }
 
-  multimap<double, LeaderboardEntry, greater<double> > getHighscores() {
+  std::multimap<double, LeaderboardEntry, greater<double> > getHighscores() {
     return highscores;
   }
 };

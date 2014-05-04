@@ -1,3 +1,5 @@
+#include <OgreOverlayManager.h>
+
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "ClientPlayerActivity.h"
@@ -160,7 +162,7 @@ void BaseMultiActivity::addChatMessage(const char* msg) {
       else
       {*/
   // Create a new listbox item
-  chatItem = new CEGUI::ListboxTextItem(msg);  
+  chatItem = new CEGUI::ListboxTextItem(msg);
   //  }
 
   chatbox->addItem(chatItem);
@@ -191,7 +193,7 @@ void BaseMultiActivity::close(void) {
 
 void BaseMultiActivity::start(void) {
   CEGUI::MouseCursor::getSingleton().show();
-  CEGUI::System::getSingleton().setGUISheet(lobbySheet);  
+  CEGUI::System::getSingleton().setGUISheet(lobbySheet);
   lobbySheet->addChildWindow(chatWindow);
 }
 
@@ -228,6 +230,9 @@ void BaseMultiActivity::loadLevel(const char* name) {
 
   menuActive = false;
   ceguiActive = false;
+
+  Ogre::OverlayManager::getSingleton().destroyAll();
+  Ogre::OverlayManager::getSingleton().destroyAllOverlayElements();
 }
 
 bool BaseMultiActivity::frameRenderingQueued( const Ogre::FrameEvent& evt ) {

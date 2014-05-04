@@ -264,8 +264,8 @@ bool SelectorHelper::ShowLeaderboard( const CEGUI::EventArgs &e ) {
   OBAnimationManager::startAnimation("SpinPopup", leaderboardNextLevel, 0.5);
   OBAnimationManager::startAnimation("SpinPopup", leaderboardBackToMenu, 0.5);
 
-  multimap<double, LeaderboardEntry, greater<double> > highscores = leaderboard.getHighscores();
-  multimap<double, LeaderboardEntry>::iterator iter;
+  std::multimap<double, LeaderboardEntry, greater<double> > highscores = leaderboard.getHighscores();
+  std::multimap<double, LeaderboardEntry>::iterator iter;
 
   int i = 0;
   for (iter = highscores.begin(); iter != highscores.end(); iter++) {

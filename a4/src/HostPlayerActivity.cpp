@@ -1,3 +1,5 @@
+#include <OgreOverlayManager.h>
+
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "HostPlayerActivity.h"
@@ -6,6 +8,8 @@
 #include "Sounds.h"
 #include "common.h"
 #include "SelectorHelper.h"
+#include "../libs/MovableTextOverlay.h"
+#include "../libs/RectLayoutManager.h"
 
 HostPlayerActivity::HostPlayerActivity(OgreBallApplication *app, const char* lobbyName, const char* name, const char* levelName) : BaseMultiActivity(app)
 {
@@ -91,9 +95,15 @@ HostPlayerActivity::~HostPlayerActivity(void) {
 void HostPlayerActivity::close(void) {
   ServerPacket msg;
   msg.type = SERVER_CLOSED;
-  for(int i = 1; i < MAX_PLAYERS; i++) {
+  for(int i = 0; i < MAX_PLAYERS; i++) {
     if(players[i]) {
-      Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+      if (i != 0)
+        Networking::Send(players[i]->csd, (char*)&msg, sizeof(msg));
+
+      if (players[i]->textOverlay)
+        players[i]->textOverlay->enable(false);
+
+      players[i] = NULL;
     }
   }
 
@@ -251,6 +261,9 @@ bool HostPlayerActivity::startGame( const CEGUI::EventArgs& e ) {
 void HostPlayerActivity::loadLevel(const char* name) {
   BaseMultiActivity::loadLevel(name);
 
+  MovableTextOverlayAttributes *attrs = new MovableTextOverlayAttributes("Attrs1", app->mCamera ,"BlueHighway" , 16,
+                                                                         ColourValue::White,"OgreBall/Transparent");  
+
   for (int i = 0; i < MAX_PLAYERS; i++) {
     if (players[i]) {
       std::stringstream ss;
@@ -281,7 +294,13 @@ void HostPlayerActivity::loadLevel(const char* name) {
       players[i]->mCameraObj = new CameraObject(players[i]->mCameraLookAtNode, players[i]->mCameraNode,
                                                 (Ogre::Vector3)players[i]->getBall()->getPosition(),
                                                 app->levelLoader->cameraStartPos);
+
+      MovableTextOverlay* p = new MovableTextOverlay(ss.str(), players[i]->name, players[i]->getBall()->getEntity(), attrs);
+      p->enable(false); // make it invisible for now
+      p->setUpdateFrequency(3);// set update frequency to 0.01 seconds
+      players[i]->textOverlay = p;
     }
+
   }
 
   if (inGame)
@@ -378,6 +397,11 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
     }
   }
 
+  RectLayoutManager m(0,0, app->mCamera->getViewport()->getActualWidth(),
+                      app->mCamera->getViewport()->getActualHeight());
+
+  m.setDepth(0);
+
   for (int i = 0; i < MAX_PLAYERS; i++) {
     Player *player = players[i];
     if (player) {
@@ -424,6 +448,26 @@ bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
           player->mCameraLookAtNode->rotate(noq);
         }
       }
+
+      MovableTextOverlay *p = player->textOverlay;
+      p->update(elapsedTime);
+      if (p->isOnScreen()) {
+        RectLayoutManager::Rect r(p->getPixelsLeft(),
+                                  p->getPixelsTop(),
+                                  p->getPixelsRight(),
+                                  p->getPixelsBottom());
+
+        RectLayoutManager::RectList::iterator it = m.addData(r);
+        if (it != m.getListEnd())
+          {
+            p->setPixelsTop((*it).getTop());
+            p->enable(true);
+          }
+        else
+          p->enable(false);
+      }
+      else
+        p->enable(false);
     }
   }
 

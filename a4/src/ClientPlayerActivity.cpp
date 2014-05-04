@@ -7,6 +7,9 @@
 #include "Sounds.h"
 #include "SelectorHelper.h"
 
+#include "../libs/MovableTextOverlay.h"
+#include "../libs/RectLayoutManager.h"
+
 ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck *ack) : BaseMultiActivity(app) {
   myId = ack->id;
   currentLevelName = std::string(ack->level, strlen(ack->level));
@@ -63,6 +66,14 @@ void ClientPlayerActivity::close(void) {
   Networking::Send(Networking::client_socket, (char*)&msg, sizeof(msg));
   Networking::Close();
 
+  for(int i = 0; i < MAX_PLAYERS; i++) {
+    if(players[i]) {
+      if (players[i]->textOverlay)
+        players[i]->textOverlay->enable(false);
+      
+      players[i] = NULL;
+    }
+  }
   //  delete player;
   //  delete mCameraObj;
 }
@@ -105,6 +116,9 @@ bool ClientPlayerActivity::toggleReady( const CEGUI::EventArgs& e ) {
 void ClientPlayerActivity::loadLevel(const char* name) {
   BaseMultiActivity::loadLevel(name);
 
+  MovableTextOverlayAttributes *attrs = new MovableTextOverlayAttributes("Attrs1", app->mCamera ,"BlueHighway" , 16,
+                                                                         ColourValue::White,"OgreBall/Transparent");
+
   for (int i = 0; i < MAX_PLAYERS; i++) {
     if (players[i]) {
       std::stringstream ss;
@@ -113,12 +127,17 @@ void ClientPlayerActivity::loadLevel(const char* name) {
       ss << "node";
 
       char* playerChoice = SelectorHelper::CharacterToString(players[i]->character);
-     
+
       players[i]->setBall(new OgreBall(app->mSceneMgr, ss.str(), ss.str(), playerChoice,  0,
                                        app->mPhysics,
                                        app->levelLoader->playerStartPositions[0], btVector3(1,1,1),
                                        btVector3(0,0,0), 16000.0f, 0.5f, btVector3(0,0,0),
                                        &app->levelLoader->playerStartRotations[0]));
+
+      MovableTextOverlay* p = new MovableTextOverlay(ss.str(), players[i]->name, players[i]->getBall()->getEntity(), attrs);
+      p->enable(false); // make it invisible for now
+      p->setUpdateFrequency(1);// set update frequency to 0.01 seconds
+      players[i]->textOverlay = p;
     }
   }
 
