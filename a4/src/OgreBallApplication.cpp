@@ -141,6 +141,7 @@ void OgreBallApplication::loadResources(void) {
   Wmgr->loadWindowLayout("Prompt.layout");
   Wmgr->loadWindowLayout("MultiGameEnd.layout");
   Wmgr->loadWindowLayout("HostPrompt.layout");
+  Wmgr->loadWindowLayout("OptionMenu.layout");
 
   CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("ogreAnims.xml");
 

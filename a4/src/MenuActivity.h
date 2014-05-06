@@ -27,6 +27,7 @@ class MenuActivity : public Activity {
   bool SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e);
   bool SwitchToServerListMenu(const CEGUI::EventArgs& e);
   bool SwitchToMultiMenu(const CEGUI::EventArgs& e);
+  bool SwitchToOptions( const CEGUI::EventArgs& e );
 
   bool JoinServer(const CEGUI::EventArgs& e);
   bool PromptForJoinServer(const CEGUI::EventArgs& e);
@@ -42,13 +43,17 @@ class MenuActivity : public Activity {
   bool StartSinglePlayer( const CEGUI::EventArgs& e );
   bool StartMultiPlayerHost( const CEGUI::EventArgs& e);
   bool StartMultiPlayerClient( const CEGUI::EventArgs& e);
+  bool onSliderValueChanged( const CEGUI::EventArgs& e );
+  bool onSliderSEValueChanged( const CEGUI::EventArgs& e );
 
   bool quit(const CEGUI::EventArgs& e);
   
   CEGUI::Window *mainMenuSheet, *singlePlayerButton,
-    *multiPlayerButton, *quitButton;
+    *multiPlayerButton, *quitButton, *optionsButton;
 
-  CEGUI::Window *multiMenuSheet, *hostButton, *clientButton, *returnButton;
+  CEGUI::Window *multiMenuSheet, *hostButton, *clientButton, *returnButton, *optionsMenuSheet, *returnOptionButton;
+
+  CEGUI::Slider *mSoundSlider, *mSoundEffectSlider;
 
   CEGUI::Window *serverListWindow, *serverListBack;
   CEGUI::Listbox *serverListbox;

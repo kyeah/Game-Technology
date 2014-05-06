@@ -33,7 +33,7 @@ bool MenuActivity::quit( const CEGUI::EventArgs& e ) {
 }
 
 void MenuActivity::start(void) {
-  Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", 64);
+  Sounds::playBackground("media/OgreBall/sounds/Menu.mp3");
 
   // Load a background
   app->levelLoader->loadLevelRand();
@@ -50,6 +50,7 @@ void MenuActivity::start(void) {
   singlePlayerButton = app->Wmgr->getWindow("Menu/SinglePlayer");
   multiPlayerButton = app->Wmgr->getWindow("Menu/MultiPlayer");
   quitButton = app->Wmgr->getWindow("Menu/QuitGame");
+  optionsButton = app->Wmgr->getWindow("Menu/Options");
 
   singlePlayerButton->removeEvent(CEGUI::PushButton::EventClicked);
   singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -63,12 +64,32 @@ void MenuActivity::start(void) {
   quitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
                              CEGUI::Event::Subscriber(&MenuActivity::quit,this));
 
+  optionsButton->removeEvent(CEGUI::PushButton::EventClicked);
+  optionsButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                             CEGUI::Event::Subscriber(&MenuActivity::SwitchToOptions,this));
+
+  optionsMenuSheet = app->Wmgr->getWindow("Menu/OptionBackground");
+  returnOptionButton = app->Wmgr->getWindow("Menu/OptionReturn"); 
+  returnOptionButton->removeEvent(CEGUI::PushButton::EventClicked);
+  returnOptionButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+                               CEGUI::Event::Subscriber(&MenuActivity::SwitchToMainMenu, this));
+
+  mSoundSlider = static_cast<CEGUI::Slider*>(app->Wmgr->getWindow("Menu/Slider"));
+  mSoundSlider->removeEvent(CEGUI::Slider::EventValueChanged);
+  mSoundSlider->subscribeEvent(CEGUI::Slider::EventValueChanged,
+                             CEGUI::Event::Subscriber(&MenuActivity::onSliderValueChanged,this));
+
+  mSoundEffectSlider = static_cast<CEGUI::Slider*>(app->Wmgr->getWindow("Menu/SliderSoundEffect"));
+  mSoundEffectSlider->removeEvent(CEGUI::Slider::EventValueChanged);
+  mSoundEffectSlider->subscribeEvent(CEGUI::Slider::EventValueChanged,
+                             CEGUI::Event::Subscriber(&MenuActivity::onSliderSEValueChanged,this));
   // Multiplayer Base Menu
   multiMenuSheet = app->Wmgr->getWindow("Menu/MultiBackground");
 
   hostButton = app->Wmgr->getWindow("Menu/Host");
   clientButton = app->Wmgr->getWindow("Menu/Client");
   returnButton = app->Wmgr->getWindow("Menu/Return");
+
 
   hostButton->removeEvent(CEGUI::PushButton::EventClicked);
   hostButton->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -137,6 +158,23 @@ bool MenuActivity::frameStarted( Ogre::Real elapsedTime ) {
   return true;
 }
 
+bool MenuActivity::onSliderValueChanged(const CEGUI::EventArgs &e)
+{
+  // The slider moved.
+  Sounds::SoundVolume = mSoundSlider->getCurrentValue() * Sounds::MAX_VOLUME;
+  std::cout << "Sound volume is: " << Sounds::SoundVolume;
+  Sounds::changeSoundVolume();
+  return true;
+}
+
+bool MenuActivity::onSliderSEValueChanged(const CEGUI::EventArgs &e)
+{
+  // The slider moved.
+  Sounds::SoundEffectVolume = mSoundEffectSlider->getCurrentValue() * Sounds::MAX_VOLUME;
+  std::cout << "Sound volume is: " << Sounds::SoundEffectVolume;
+  return true;
+}
+
 /*
   ==========================================================
   = Main Menu
@@ -188,6 +226,10 @@ bool MenuActivity::SwitchToHostSelectMenu( const CEGUI::EventArgs& e){
 
 bool MenuActivity::SwitchToMultiMenu( const CEGUI::EventArgs& e ) {
   CEGUI::System::getSingleton().setGUISheet(multiMenuSheet);
+}
+
+bool MenuActivity::SwitchToOptions( const CEGUI::EventArgs& e ) {
+  CEGUI::System::getSingleton().setGUISheet(optionsMenuSheet);
 }
 
 bool MenuActivity::SwitchToServerListMenu( const CEGUI::EventArgs& e ) {
@@ -268,6 +310,8 @@ bool MenuActivity::SwitchToPlayerSelectMenu(const CEGUI::EventArgs& e){
   SelectorHelper::type_flag = SelectorHelper::TYPE_SINGLE_PLAYER;
   SelectorHelper::SwitchToPlayerSelectMenu();
 }
+
+
 
 /*
   ==========================================================

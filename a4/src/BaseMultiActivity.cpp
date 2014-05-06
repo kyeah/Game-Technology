@@ -199,7 +199,7 @@ void BaseMultiActivity::start(void) {
 
 bool BaseMultiActivity::SwitchToLobby( const CEGUI::EventArgs& e ) {
   inGame = false;
-  Sounds::playBackground("media/OgreBall/sounds/Menu.mp3", Sounds::volume);
+  Sounds::playBackground("media/OgreBall/sounds/Menu.mp3");
   CEGUI::MouseCursor::getSingleton().show();
   CEGUI::System::getSingleton().setGUISheet(lobbySheet);
   lobbySheet->addChildWindow(chatWindow);
@@ -211,7 +211,7 @@ void BaseMultiActivity::handleLobbyState() {
 // handleWaiting()
 
 void BaseMultiActivity::loadLevel(const char* name) {
-  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3");
   currentLevelName = std::string(name, std::strlen(name));
   app->destroyAllEntitiesAndNodes();
   app->levelLoader->currObjID = 0;  // VERY IMPORTANT TO ENSURE CONSISTENT OBJECT NAMES ACROSS HOST AND CLIENTS

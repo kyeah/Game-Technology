@@ -269,7 +269,7 @@ void ClientPlayerActivity::handleServerUpdates() {
         app->mPhysics->getObjects()[msg.clientID]->removeFromSimulator();
         break;
       case SERVER_PLAY_SOUND:
-        Sounds::playSoundEffect(msg.msg, Sounds::volume);
+        Sounds::playSoundEffect(msg.msg);
         break;
       case SERVER_CROSSED_FINISH_LINE:
         handleCrossedFinishLine();

@@ -6,7 +6,8 @@
 #include "Networking.h"
 #include "common.h"
 
-int Sounds::volume = 64;
+int Sounds::SoundVolume = 96;
+int Sounds::SoundEffectVolume = 96;
 int Sounds::enabled = true;
 Mix_Music* Sounds::mBackgroundMusic = NULL;
 
@@ -28,10 +29,7 @@ void Sounds::init(){
 
 }
 
-void Sounds::playBackground(const char* aFilePath, int aVolume){
-  //clamp volume
-  if(aVolume > MAX_VOLUME) aVolume = 128;
-  if(aVolume < MIN_VOLUME) aVolume = 0;
+void Sounds::playBackground(const char* aFilePath){
 
   if (mBackgroundMusic) {
     Mix_FreeMusic(mBackgroundMusic);
@@ -40,10 +38,16 @@ void Sounds::playBackground(const char* aFilePath, int aVolume){
   mBackgroundMusic = NULL;
   mBackgroundMusic = Mix_LoadMUS(aFilePath);
   if(mBackgroundMusic != NULL){
-    Mix_FadeInMusic(mBackgroundMusic, -1, 1500);
-    Mix_VolumeMusic(aVolume);
+    // Mix_FadeInMusic(mBackgroundMusic, -1, 1500);
+    Mix_PlayMusic(mBackgroundMusic, -1);
+    Mix_VolumeMusic(SoundVolume);
     //    Mix_HookMusicFinished(musicDone);
   }
+}
+
+void Sounds::changeSoundVolume(){
+  if(mBackgroundMusic != NULL)
+    Mix_VolumeMusic(SoundVolume);
 }
 
 void Sounds::musicDone() {
@@ -52,16 +56,13 @@ void Sounds::musicDone() {
   mBackgroundMusic = NULL;
 }
 
-void Sounds::playSoundEffect(const char* aFilePath, int aVolume){
-  //clamp volume
-  if(aVolume > MAX_VOLUME) aVolume = 128;
-  if(aVolume < MIN_VOLUME) aVolume = 0;
+void Sounds::playSoundEffect(const char* aFilePath){
 
   Mix_Chunk* soundEffect = NULL;
   soundEffect = Mix_LoadWAV(aFilePath);
   if(soundEffect){
     int channel = Mix_PlayChannel(-1, soundEffect, 0);
-    Mix_Volume(channel, aVolume);
+    Mix_Volume(channel, SoundEffectVolume);
     Mix_ChannelFinished(channelDone);
   }
 

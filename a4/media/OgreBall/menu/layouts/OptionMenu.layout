@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Menu/OptionBackground">
+    <Property Name="UnifiedSize" Value="{{1.0,0},{1.0,0}}" />
+    <Property Name="Alpha" Value="0.0" />
+
+    <Window Type="TaharezLook/StaticImage" Name="Menu/OptionLogo">
+      <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.35,0},{0.8,0},{0.45,0}}" />
+      <Property Name="FrameEnabled" Value="False" />
+      <Property Name="BackgroundEnabled" Value="False" />
+      <Property Name="Image" Value="set:OgreBall image:Logo" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+
+    <Window Type="TaharezLook/StaticText" Name="Menu/SoundText" >
+      <Property Name="Text" Value="                  Sound" />
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0},{0.5,0.0},{0.5,0.0},{0.55,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="0.5" />
+    </Window>
+
+    <Window Type="TaharezLook/Slider" Name="Menu/Slider">
+      <Property Name="CurrentValue" Value=".75" />
+      <Property Name="MaximumValue" Value="1" />
+      <Property Name="ClickStepSize" Value="0.01" />
+      <Property Name="UnifiedAreaRect" Value="{{0.5,0.0},{0.5,0.0},{0.75,0.0},{0.55,0.0}}" />
+      <Property Name="Text" Value="Sound" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+
+    <Window Type="TaharezLook/StaticText" Name="Menu/SoundEffectText" >
+      <Property Name="Text" Value="              Sound Effect" />
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0},{0.55,0.0},{0.5,0.0},{0.6,0.0}}" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="0.5" />
+    </Window>
+
+    <Window Type="TaharezLook/Slider" Name="Menu/SliderSoundEffect">
+      <Property Name="CurrentValue" Value=".75" />
+      <Property Name="MaximumValue" Value="1" />
+      <Property Name="ClickStepSize" Value="0.01" />
+      <Property Name="UnifiedAreaRect" Value="{{0.5,0.0},{0.55,0.0},{0.75,0.0},{0.6,0.0}}" />
+      <Property Name="Text" Value="Sound" />
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+
+    <Window Type="OgreBall/TextButton" Name="Menu/OptionReturn">
+      <Property Name="UnifiedAreaRect" Value="{{0.25,0.0},{0.6,0.0},{0.75,0.0},{0.65,0.0}}" />
+      <Property Name="NormalImage" Value="set:OgreBall/Buttons image:ButtonUp" />
+      <Property Name="HoverImage" Value="set:OgreBall/Buttons image:ButtonDown" />
+      <Property Name="PushedImage" Value="set:TaharezLook image:ButtonMiddlePushed" />
+      <Property Name="PushedTextColour" Value="FFDB6837" />
+      <Property Name="Text" Value="Return to Main Menu" />
+      <Property Name="Tooltip" Value="Exit to Desktop"/>
+      <Property Name="InheritsAlpha" Value="False"/>
+      <Property Name="Alpha" Value="1.0" />
+    </Window>
+  </Window>
+</GUILayout>

@@ -13,7 +13,7 @@ Physics::Physics( btVector3 gravity ) {
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
   dynamicsWorld->setGravity(gravity);
   dynamicsWorld->getSolverInfo().m_splitImpulse = 1;
-  dynamicsWorld->getSolverInfo().m_friction = 3;
+  dynamicsWorld->getSolverInfo().m_friction = 10;
 }
 
 void Physics::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, const Ogre::Real fixedTimeStep) {

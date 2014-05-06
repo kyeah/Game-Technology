@@ -69,7 +69,7 @@ void Collectible::update(float elapsedTime) {
             a->collectibles += 1;
           }
 
-          Sounds::playSoundEffect(mHitSound.c_str(), Sounds::volume);
+          Sounds::playSoundEffect(mHitSound.c_str());
         }
       }
     }

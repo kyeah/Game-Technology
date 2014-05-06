@@ -45,7 +45,7 @@ void Collidable::update(float elapsedTime) {
       if(contexts[i]->object){
         OgreBall *ob = dynamic_cast<OgreBall*>(contexts[i]->object);
         if(ob){
-          Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME));
+          Sounds::playSoundEffect(mHitSound.c_str());
         }
       }
     }

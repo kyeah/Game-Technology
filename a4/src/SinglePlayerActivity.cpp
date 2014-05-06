@@ -39,7 +39,7 @@ bool SinglePlayerActivity::Retry( const CEGUI::EventArgs& e ) {
 }
 
 void SinglePlayerActivity::start(void) {
-  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3", Sounds::volume);
+  Sounds::playBackground("media/OgreBall/sounds/StandardLevel.mp3");
 
   guiSheet = app->Wmgr->getWindow("SinglePlayerHUD");
   guiSheet->removeChildWindow(app->Wmgr->getWindow("ConsoleRoot"));

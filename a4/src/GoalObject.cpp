@@ -69,7 +69,7 @@ void GoalObject::update(float elapsedTime) {
   if(physics->checkCollisions(this)) {
     for (int i = 0; i < contexts.size(); i++) {
       if (contexts[i]->object && dynamic_cast<OgreBall*>(contexts[i]->object)) {
-        Sounds::playSoundEffect(mHitSound.c_str(), (Sounds::MAX_VOLUME / 2));
+        Sounds::playSoundEffect(mHitSound.c_str());
 	leftFlapEntity->setMaterialName("OgreBall/Passed");
         rightFlapEntity->setMaterialName("OgreBall/Passed");
  	swinging = 36;
