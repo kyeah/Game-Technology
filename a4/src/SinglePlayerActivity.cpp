@@ -190,26 +190,30 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   
   if(mGC->connected){
   	mGC->capture();
-	printf("JOYSTICK Y %d\n", mGC->JOYSTICK_Y);  
-	printf("JOYSTICK X %d\n", mGC->JOYSTICK_X);
+//	printf("JOYSTICK Y %d\n", mGC->JOYSTICK_Y);  
+//	printf("JOYSTICK X %d\n", mGC->JOYSTICK_X);
 	int MAX_TIMES = 10;	
-
+	Ogre::Real sideTilt = .0075;
   	if(mGC->JOYSTICK_Y > 0){
 		if(FORWARD < MAX_TIMES){
+//			printf("going forwards\n");
 			tiltDest *= btQuaternion(0, -.01, 0);
   			FORWARD++;
 		}
 	} else if(mGC->JOYSTICK_Y < 0){
 		if(BACKWARD < MAX_TIMES){
+//			printf("going backwards\n");
 			tiltDest *= btQuaternion(0, .01, 0);
   			BACKWARD++;
 		}
 	} else { //if(mGC->JOYSTICK_X == 0)
 		if(FORWARD > 0){
+//			printf("ungoing forwards\n");
 			tiltDest *= btQuaternion(0,.01,0);
 			FORWARD--;
 		}
 		if(BACKWARD > 0){
+//			printf("ungoing backwards\n");
 			tiltDest *= btQuaternion(0,-.01,0);
 			BACKWARD--;
 		}
@@ -217,21 +221,21 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 	}
   	if(mGC->JOYSTICK_X > 0){
 		if(LEFT < MAX_TIMES){
-			tiltDest *= btQuaternion(0, 0, -.01);
+			tiltDest *= btQuaternion(0, 0, -sideTilt);
   			LEFT++;
 		}
 	} else if(mGC->JOYSTICK_X < 0){
 		if(RIGHT < MAX_TIMES){
-			tiltDest *= btQuaternion(0, 0, .01);
+			tiltDest *= btQuaternion(0, 0, sideTilt);
   			RIGHT++;
 		}
 	} else { //if(mGC->JOYSTICK_X == 0)
 		if(LEFT > 0){
-			tiltDest *= btQuaternion(0,0,.01);
+			tiltDest *= btQuaternion(0,0,sideTilt);
 			LEFT--;
 		}
 		if(RIGHT > 0){
-			tiltDest *= btQuaternion(0,0,-.01);
+			tiltDest *= btQuaternion(0,0,-sideTilt);
 			RIGHT--;
 		}
 	

@@ -28,6 +28,7 @@ level guidedPath {
       }
       plane {            
             meshname upPlane
+	    material OgreBall/Checkerboard_small
             rest 0.8
             pos {
                 start 0 0 0
