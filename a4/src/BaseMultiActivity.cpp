@@ -121,6 +121,12 @@ Player* BaseMultiActivity::addPlayer(int userID, const char* name) {
   mPlayer->tiltDest = btQuaternion(0,0,0);
 
   lobbyPlayerWindows[userID]->setText(mPlayer->name);
+
+  if (userID != 0) {
+    mPlayer->ready = false;
+    lobbyPlayerWindows[userID]->setProperty("BackgroundColours", "tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837");
+  }
+
   players[userID] = mPlayer;
   return mPlayer;
 }

@@ -334,7 +334,13 @@ void ClientPlayerActivity::handleServerUpdates() {
           app->mSceneMgr->destroyEntity(players[msg.clientID]->getBall()->getHeadEntity());
         }
         players[msg.clientID] = NULL;
+        break;
+      case SERVER_CLOSED:
+        CEGUI::EventArgs args;
+        ExitToMenu(args);
+        break;
       }
+
     }
   }
 }
