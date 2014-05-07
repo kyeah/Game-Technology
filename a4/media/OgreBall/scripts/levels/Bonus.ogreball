@@ -1,0 +1,176 @@
+level Bonus { 
+	start {
+		skydome Examples/CloudySky 5 8 4000
+		camera {
+			pos 0 500 1000
+			lookAt 0 0 0
+		}
+		player1 {
+			pos 0 100 0
+			rot 0 0 0
+		}
+		Sound {
+			background media/OgreBall/sounds/background.wav
+		}
+	}
+	lights {
+		ambient .5 .5 .5
+		light1 {
+			pos 0 1000 0
+		}
+	}
+	goal { 
+		soundEffect media/OgreBall/sounds/hitGoal.wav
+		pos { 
+			start 0 0 -10000
+		}
+		rot {
+			start 0 0 0 
+		}	
+	}
+	plane {
+		meshname upPlane
+		material OgreBall/Checkerboard_large
+		scale 20 20 20
+		rest 0
+		pos { 
+			start 0 0 0 
+		}
+		rot { 
+			start 0 0 0	
+		}
+	}	
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -9000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -8000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -7000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -6000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -5000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -4000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -3000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -2000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start -1000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 0 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 1000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 2000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 3000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 4000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 5000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 6000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 7000 100 -9000
+            }
+        }
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 8000 100 -9000
+            }
+        }	
+	collectible {
+            meshname sphere.mesh
+            rest 0.8
+            pos {
+                start 9000 100 -9000
+            }
+        }
+}
