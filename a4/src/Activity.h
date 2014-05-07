@@ -9,7 +9,7 @@ class Activity {
  Activity(OgreBallApplication *_app) : app(_app), score(0) {}
   
   virtual ~Activity(void) { }
-  virtual void close(void) { }
+  virtual void closeActivity(void) { }
   
   virtual void start(void) { }
   virtual bool frameStarted( Ogre::Real elapsedTime ) { }

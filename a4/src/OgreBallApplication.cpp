@@ -82,7 +82,7 @@ void OgreBallApplication::destroyAllEntitiesAndNodes(void) {
 //-------------------------------------------------------------------------------------
 void OgreBallApplication::switchActivity(Activity *newActivity) {
   if (activity) {
-    activity->close();
+    activity->closeActivity();
   }
 
   activity = newActivity;

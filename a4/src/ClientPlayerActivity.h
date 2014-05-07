@@ -13,7 +13,7 @@ class ClientPlayerActivity : public BaseMultiActivity {
  public:
   ClientPlayerActivity(OgreBallApplication *app, ConnectAck *ack);
   virtual ~ClientPlayerActivity(void);
-  virtual void close(void);
+  virtual void closeActivity(void);
 
   void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );

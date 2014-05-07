@@ -55,10 +55,10 @@ void ClientPlayerActivity::handlePlayerSelected(int i) {
 }
 
 ClientPlayerActivity::~ClientPlayerActivity(void) {
-  close();
+  closeActivity();
 }
 
-void ClientPlayerActivity::close(void) {
+void ClientPlayerActivity::closeActivity(void) {
   ClientPacket msg;
   msg.type = CLIENT_CLOSE;
   msg.userID = myId;

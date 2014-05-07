@@ -13,7 +13,7 @@ class BaseMultiActivity : public Activity {
  public:
   BaseMultiActivity(OgreBallApplication *app);
   virtual ~BaseMultiActivity(void);
-  virtual void close(void);
+  virtual void closeActivity(void);
 
   virtual void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );

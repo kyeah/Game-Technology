@@ -184,10 +184,10 @@ bool BaseMultiActivity::handleTextSubmitted( const CEGUI::EventArgs &e ) {
 }
 
 BaseMultiActivity::~BaseMultiActivity(void) {
-  close();
+  closeActivity();
 }
 
-void BaseMultiActivity::close(void) {
+void BaseMultiActivity::closeActivity(void) {
   Networking::Close();
 }
 

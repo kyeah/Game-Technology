@@ -11,7 +11,7 @@ class SinglePlayerActivity : public Activity {
  public:
   SinglePlayerActivity(OgreBallApplication *app, const char* levelName, int mCharacter=0);
   virtual ~SinglePlayerActivity(void);
-  virtual void close(void);
+  virtual void closeActivity(void);
 
   void start(void);
   virtual bool frameStarted( Ogre::Real elapsedTime );
@@ -28,6 +28,8 @@ class SinglePlayerActivity : public Activity {
   void handleGameOver();
   bool HandleHighscoreSubmitted( const CEGUI::EventArgs& e );
 
+  bool SetEcho(int dev_tty, bool enable);
+  bool SendInputToTTY(const char* cmd);
   void loadLevel( const char* name );
   bool nextLevel( const CEGUI::EventArgs& e );
   bool Retry( const CEGUI::EventArgs& e );
@@ -35,6 +37,7 @@ class SinglePlayerActivity : public Activity {
   bool ExitToMenu( const CEGUI::EventArgs& e );
   bool togglePauseMenu( const CEGUI::EventArgs& e );
   void togglePauseMenu();
+  void toggleGCPauseMenu();
 
   std::string currentLevelName;
 

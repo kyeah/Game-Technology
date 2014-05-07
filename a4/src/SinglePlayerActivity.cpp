@@ -1,3 +1,14 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/file.h>
+#include <termio.h>
+#include <fcntl.h> 
+#include <linux/input.h> 
+#include <sstream>
+#define STR_SIZE 256
+
 #include "Interpolator.h"
 #include "MenuActivity.h"
 #include "SinglePlayerActivity.h"
@@ -23,10 +34,10 @@ SinglePlayerActivity::SinglePlayerActivity(OgreBallApplication *app, const char*
 
 SinglePlayerActivity::~SinglePlayerActivity(void) {
   mGC->gc_close();
-  close();
+  closeActivity();
 }
 
-void SinglePlayerActivity::close(void) {
+void SinglePlayerActivity::closeActivity(void) {
   delete player;
   delete mCameraObj;
 }
@@ -190,30 +201,24 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   
   if(mGC->connected){
   	mGC->capture();
-//	printf("JOYSTICK Y %d\n", mGC->JOYSTICK_Y);  
-//	printf("JOYSTICK X %d\n", mGC->JOYSTICK_X);
 	int MAX_TIMES = 10;	
 	Ogre::Real sideTilt = .0075;
   	if(mGC->JOYSTICK_Y > 0){
 		if(FORWARD < MAX_TIMES){
-//			printf("going forwards\n");
 			tiltDest *= btQuaternion(0, -.01, 0);
   			FORWARD++;
 		}
 	} else if(mGC->JOYSTICK_Y < 0){
 		if(BACKWARD < MAX_TIMES){
-//			printf("going backwards\n");
 			tiltDest *= btQuaternion(0, .01, 0);
   			BACKWARD++;
 		}
 	} else { //if(mGC->JOYSTICK_X == 0)
 		if(FORWARD > 0){
-//			printf("ungoing forwards\n");
 			tiltDest *= btQuaternion(0,.01,0);
 			FORWARD--;
 		}
 		if(BACKWARD > 0){
-//			printf("ungoing backwards\n");
 			tiltDest *= btQuaternion(0,-.01,0);
 			BACKWARD--;
 		}
@@ -241,8 +246,7 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 	
 	}
 	if(mGC->START_PRESSED){
-		printf("start pressed\n");
-	//	sk.SendKeys("{ESC}");	
+		toggleGCPauseMenu();
 	}
 	lastTilt = currTilt; 
 	currTiltDelay = 0; 
@@ -358,6 +362,24 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
 bool SinglePlayerActivity::togglePauseMenu( const CEGUI::EventArgs& e ) {
   togglePauseMenu();
   return true;
+}
+
+void SinglePlayerActivity::toggleGCPauseMenu(){
+	menuActive = !menuActive;
+	if(menuActive){
+		app->paused = true;
+		CEGUI::MouseCursor::getSingleton().show();
+		CEGUI::System::getSingleton().setGUISheet(pauseMenuSheet);
+		mGC->blockingCapture();
+		if(mGC->START_PRESSED){
+			app->paused = false;
+			CEGUI::MouseCursor::getSingleton().hide();
+			CEGUI::System::getSingleton().setGUISheet(guiSheet);
+		}
+	} else {
+		app->paused = false;
+		CEGUI::System::getSingleton().setGUISheet(guiSheet);
+	}
 }
 
 void SinglePlayerActivity::togglePauseMenu( ) {

@@ -214,7 +214,10 @@ void MovableTextOverlay::update(Real timeSincelastFrame)
 
   Real relTextWidth = mTextWidth / Ogre::OverlayManager::getSingleton().getViewportWidth();
   Real relTextHeight = mAttrs->getCharacterHeight() / Ogre::OverlayManager::getSingleton().getViewportHeight();
-
+  
+//  const Ogre::AxisAlignedBox &AABB = mpMov->getWorldBoundingBox(true);// the AABB of the target
+//  Ogre::Vector3 center = AABB.getCenter(); 
+//  mpOvContainer->setPosition(1-(center[0]/2), 1-(center[1] + 50));
   mpOvContainer->setPosition(1-(min_x + max_x + relTextWidth)/2, 1-max_y);
   mpOvContainer->setDimensions(relTextWidth, relTextHeight);
 }
