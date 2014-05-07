@@ -33,3 +33,49 @@ material OgreBall/Passed
 		}
 	}
 }
+
+material OgreBall/Checkerboard_large
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture MRAMOR6X6.jpg
+				scale 0.025 0.125	
+			}
+		}
+	}
+}
+
+material OgreBall/Checkerboard_small
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture MRAMOR6X6.jpg
+				scale .5 1.4
+			}
+		}
+	}
+}
+
+material OgreBall/Checkerboard_stretch
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture MRAMOR6X6.jpg
+				scale 0.6 0.2	
+			}
+		}
+	}
+}
+	

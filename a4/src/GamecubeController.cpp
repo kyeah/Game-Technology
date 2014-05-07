@@ -21,10 +21,10 @@ GamecubeController::GamecubeController(const char* name){
     prev_cstick_x = -999;
     prev_cstick_y = -999;
  
+
     for(int i = 0; i < 8; i++){
         prev_state[i] = false;
     }
-
     
     JOYSTICK_X_POS = false;
     JOYSTICK_X_NEG = false;
@@ -78,28 +78,19 @@ bool* GamecubeController::getItem(int i){
 
 void GamecubeController::reset(){
 
-    A_PRESSED = false;
-    B_PRESSED = false;
-    X_PRESSED = false;
-    Y_PRESSED = false;
-    START_PRESSED = false;
-    Z_PRESSED = false;
-    L_PRESSED = false;
-    R_PRESSED = false;
-    D_UP = false;
-    D_UP_D_RIGHT = false;
-    D_RIGHT = false;
-    D_RIGHT_D_DOWN = false;
-    D_DOWN = false;
-    D_DOWN_D_LEFT = false;
-    D_LEFT = false;
-    D_LEFT_D_UP = false; 
+    gc_close();
+    for(int i = 0; i < 8; i++){
+        prev_state[i] = false;
+    }
+   
+    connected = false;
+    setAllToFalse();
 
     JOYSTICK_X = 0; 
     JOYSTICK_Y = 0; 
     CSTICK_X = 0; 
     CSTICK_Y = 0; 
- 
+    init();
 }
 
 void GamecubeController::setAllToFalse(){
@@ -187,4 +178,5 @@ void GamecubeController::capture(){
 
 void GamecubeController::gc_close(){
     close(device);
+    connected = false;
 }
