@@ -15,8 +15,11 @@ ClientPlayerActivity::ClientPlayerActivity(OgreBallApplication *app, ConnectAck 
   currentLevelName = std::string(ack->level, strlen(ack->level));
 
   for (int i = 0; i < 4; i++) {
-    if (ack->ids[i])
+    if (ack->ids[i]) {
       addPlayer(i, ack->playerInfo[i].name);
+      players[i]->ready = ack->playerInfo[i].ready;
+      players[i]->character = ack->playerInfo[i].characterChoice;
+    }
   }
 
   lobbyNamebar->setText(ack->level);
@@ -146,9 +149,17 @@ void ClientPlayerActivity::loadLevel(const char* name) {
     app->mCameraNode->_setDerivedPosition(app->levelLoader->cameraStartPos);
   }
 
-  for (int i = 1; i < 4; i++)
-    if (players[i])
-      togglePlayerReady(i);
+  static int first = true;
+  
+  if (first) {
+    first = false; 
+  } else {
+    for (int i = 1; i < 4; i++)
+      if (players[i]) {
+        players[i]->ready = false;
+        lobbyPlayerWindows[i]->setProperty("BackgroundColours", "tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837");
+      }
+  }
 }
 
 bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
@@ -243,10 +254,10 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
                                   p->getPixelsBottom());
 
         RectLayoutManager::RectList::iterator it = m.addData(r);
-        
+
         if (it != m.getListEnd())
           MovableTextOverlay *p = players[i]->textOverlay;
-        
+
         p->update(elapsedTime);
         if (p->isOnScreen()) {
           RectLayoutManager::Rect r(p->getPixelsLeft(),
@@ -334,7 +345,13 @@ void ClientPlayerActivity::handleServerUpdates() {
           app->mSceneMgr->destroyEntity(players[msg.clientID]->getBall()->getHeadEntity());
         }
         players[msg.clientID] = NULL;
+        break;
+      case SERVER_CLOSED:
+        CEGUI::EventArgs args;
+        ExitToMenu(args);
+        break;
       }
+
     }
   }
 }

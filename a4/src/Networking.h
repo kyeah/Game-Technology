@@ -55,6 +55,7 @@ typedef struct {
 typedef struct {
   char name[128];
   int characterChoice;
+  bool ready;
 } PlayerInfo;
 
 typedef struct {

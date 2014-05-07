@@ -85,11 +85,11 @@ std::vector<PingResponseMessage*> Networking::hostCheck( const char* filename ) 
           SDLNet_TCP_Send(client_socket, (char*)&ping, sizeof(ping));
 
           PingResponseMessage *response = new PingResponseMessage();
-          SDLNet_TCP_Recv(client_socket, response, sizeof(*response));
-
-          std::cout << "Received lobby name: " << response->lobbyName << std::endl;
-          strcpy(response->hostName, host.c_str());
-          messages.push_back(response);
+          if (SDLNet_TCP_Recv(client_socket, response, sizeof(*response))) {
+            std::cout << "Received lobby name: " << response->lobbyName << std::endl;
+            strcpy(response->hostName, host.c_str());
+            messages.push_back(response);
+          }
         }
       }
     }

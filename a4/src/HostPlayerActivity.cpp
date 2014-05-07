@@ -195,7 +195,8 @@ void HostPlayerActivity::handleLobbyState(void) {
                 if (players[j]) {
                   ack.ids[j] = 1;
                   strcpy(ack.playerInfo[j].name, players[j]->name);
-                  // ack.playerInfo[j].characterChoice = WHATEVER CHOICE;
+                  ack.playerInfo[j].characterChoice = players[j]->character;
+                  ack.playerInfo[j].ready = players[j]->ready;
                 } else {
                   ack.ids[j] = 0;
                 }
@@ -262,7 +263,7 @@ void HostPlayerActivity::loadLevel(const char* name) {
   BaseMultiActivity::loadLevel(name);
 
   MovableTextOverlayAttributes *attrs = new MovableTextOverlayAttributes("Attrs1", app->mCamera ,"BlueHighway" , 16,
-                                                                         ColourValue::White,"OgreBall/Transparent");  
+                                                                         ColourValue::White,"OgreBall/Transparent");
 
   for (int i = 0; i < MAX_PLAYERS; i++) {
     if (players[i]) {
@@ -305,6 +306,13 @@ void HostPlayerActivity::loadLevel(const char* name) {
 
   if (inGame)
     app->mCamera->setPosition(Ogre::Vector3(0,0,0));
+
+  for (int i = 1; i < 4; i++) {
+    if (players[i]) {
+      players[i]->ready = false;
+      lobbyPlayerWindows[i]->setProperty("BackgroundColours", "tl:FFDB6837 tr:FFDB6837 bl:FFDB6837 br:FFDB6837");
+    }
+  }
 }
 
 bool HostPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
