@@ -31,7 +31,9 @@ bool SelectorHelper::handleLSPrev( const CEGUI::EventArgs& e ) {
 }
 
 bool SelectorHelper::handleLSNext( const CEGUI::EventArgs& evt ) {
+  std::cout << "test" << std::endl;
   if (selectorStart < LevelLoader::getSingleton()->levelNames.size() - 8) {
+    std::cout << "ta" << std::endl;
     selectorStart += 8;
     SwitchToLevelSelectMenu();
   }
