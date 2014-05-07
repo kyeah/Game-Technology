@@ -5,6 +5,7 @@
 #include "Activity.h"
 #include "CameraObject.h"
 #include "GameObjectDescription.h"
+#include "GamecubeController.h"
 
 class SinglePlayerActivity : public Activity {
  public:
@@ -41,8 +42,10 @@ class SinglePlayerActivity : public Activity {
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
+  int FORWARD, BACKWARD, LEFT, RIGHT;
   OgreBall* mOgreBall;  
   CameraObject* mCameraObj;
+  GamecubeController* mGC;
 
   // Menu Variables
   CEGUI::Window *guiSheet, *scoreDisplay, *timeDisplay, 
