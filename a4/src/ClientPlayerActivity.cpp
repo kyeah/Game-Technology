@@ -70,7 +70,7 @@ void ClientPlayerActivity::close(void) {
     if(players[i]) {
       if (players[i]->textOverlay)
         players[i]->textOverlay->enable(false);
-      
+
       players[i] = NULL;
     }
   }
@@ -226,6 +226,49 @@ bool ClientPlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   timess << millis;
 
   timeDisplay->setText(timess.str());
+
+  RectLayoutManager m(0,0, app->mCamera->getViewport()->getActualWidth(),
+                      app->mCamera->getViewport()->getActualHeight());
+
+  m.setDepth(0);
+
+  for (int i = 0; i < MAX_PLAYERS; i++) {
+    if (players[i]) {
+      MovableTextOverlay *p = players[i]->textOverlay;
+      p->update(elapsedTime);
+      if (p->isOnScreen()) {
+        RectLayoutManager::Rect r(p->getPixelsLeft(),
+                                  p->getPixelsTop(),
+                                  p->getPixelsRight(),
+                                  p->getPixelsBottom());
+
+        RectLayoutManager::RectList::iterator it = m.addData(r);
+        
+        if (it != m.getListEnd())
+          MovableTextOverlay *p = players[i]->textOverlay;
+        
+        p->update(elapsedTime);
+        if (p->isOnScreen()) {
+          RectLayoutManager::Rect r(p->getPixelsLeft(),
+                                    p->getPixelsTop(),
+                                    p->getPixelsRight(),
+                                    p->getPixelsBottom());
+
+          RectLayoutManager::RectList::iterator it = m.addData(r);
+          if (it != m.getListEnd())
+            {
+              p->setPixelsTop((*it).getTop());
+              p->enable(true);
+            }
+          else
+            p->enable(false);
+        }
+        else
+          p->enable(false);
+      }
+    }
+  }
+
   return true;
 }
 
