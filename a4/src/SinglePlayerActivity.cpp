@@ -148,10 +148,10 @@ void SinglePlayerActivity::start(void) {
     leaderboardWindows[i] = app->Wmgr->getWindow(ss.str());
   }
 
-  LEFT = 0; 
-  RIGHT = 0; 
-  FORWARD = 0; 
-  BACKWARD = 0;
+  LEFT = false; 
+  RIGHT = false; 
+  FORWARD = false; 
+  BACKWARD = false;
   mGC->reset();
   loadLevel(currentLevelName.c_str());
 }
@@ -203,45 +203,36 @@ bool SinglePlayerActivity::frameStarted( Ogre::Real elapsedTime ) {
   	mGC->capture();
 	int MAX_TIMES = 10;	
 	Ogre::Real sideTilt = .0075;
-  	if(mGC->JOYSTICK_Y > 0){
-		if(FORWARD < MAX_TIMES){
-			tiltDest *= btQuaternion(0, -.01, 0);
-  			FORWARD++;
+  	if(mGC->JOYSTICK_Y > 0 && !FORWARD){
+		tiltDest *= btQuaternion(0, -MAX_TILT, 0);
+		FORWARD = true;
+	} else if(mGC->JOYSTICK_Y < 0 && !BACKWARD){
+		tiltDest *= btQuaternion(0, MAX_TILT, 0);
+		BACKWARD = true;
+	} else if(mGC->JOYSTICK_Y == 0){ //if(mGC->JOYSTICK_Y == 0)
+		if(FORWARD){
+			tiltDest *= btQuaternion(0,MAX_TILT,0);
+			FORWARD = false;
 		}
-	} else if(mGC->JOYSTICK_Y < 0){
-		if(BACKWARD < MAX_TIMES){
-			tiltDest *= btQuaternion(0, .01, 0);
-  			BACKWARD++;
+		if(BACKWARD){
+			tiltDest *= btQuaternion(0,-MAX_TILT,0);
+			BACKWARD = false;
 		}
-	} else { //if(mGC->JOYSTICK_X == 0)
-		if(FORWARD > 0){
-			tiltDest *= btQuaternion(0,.01,0);
-			FORWARD--;
-		}
-		if(BACKWARD > 0){
-			tiltDest *= btQuaternion(0,-.01,0);
-			BACKWARD--;
-		}
-	
 	}
-  	if(mGC->JOYSTICK_X > 0){
-		if(LEFT < MAX_TIMES){
-			tiltDest *= btQuaternion(0, 0, -sideTilt);
-  			LEFT++;
+  	if(mGC->JOYSTICK_X > 0 && !LEFT){
+		tiltDest *= btQuaternion(0, 0, -MAX_TILT);
+		LEFT = true;
+	} else if(mGC->JOYSTICK_X < 0 && !RIGHT){
+		tiltDest *= btQuaternion(0, 0, MAX_TILT);
+  		RIGHT = true;
+	} else if(mGC->JOYSTICK_X == 0){ //if(mGC->JOYSTICK_X == 0)
+		if(LEFT){
+			tiltDest *= btQuaternion(0,0,MAX_TILT);
+			LEFT = false;
 		}
-	} else if(mGC->JOYSTICK_X < 0){
-		if(RIGHT < MAX_TIMES){
-			tiltDest *= btQuaternion(0, 0, sideTilt);
-  			RIGHT++;
-		}
-	} else { //if(mGC->JOYSTICK_X == 0)
-		if(LEFT > 0){
-			tiltDest *= btQuaternion(0,0,sideTilt);
-			LEFT--;
-		}
-		if(RIGHT > 0){
-			tiltDest *= btQuaternion(0,0,-sideTilt);
-			RIGHT--;
+		if(RIGHT){
+			tiltDest *= btQuaternion(0,0,-MAX_TILT);
+			RIGHT = false;
 		}
 	
 	}
@@ -370,14 +361,15 @@ void SinglePlayerActivity::toggleGCPauseMenu(){
 		app->paused = true;
 		CEGUI::MouseCursor::getSingleton().show();
 		CEGUI::System::getSingleton().setGUISheet(pauseMenuSheet);
-		mGC->blockingCapture();
-		if(mGC->START_PRESSED){
-			app->paused = false;
-			CEGUI::MouseCursor::getSingleton().hide();
-			CEGUI::System::getSingleton().setGUISheet(guiSheet);
-		}
+	//	mGC->blockingCapture();
+	//	if(mGC->START_PRESSED){
+	//		app->paused = false;
+	////		CEGUI::MouseCursor::getSingleton().hide();
+	//		CEGUI::System::getSingleton().setGUISheet(guiSheet);
+	//	}
 	} else {
 		app->paused = false;
+		CEGUI::MouseCursor::getSingleton().hide();
 		CEGUI::System::getSingleton().setGUISheet(guiSheet);
 	}
 }
@@ -587,27 +579,28 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
 
   if (OgreBallApplication::debug) return false;
 
+  //printf("tiltDest (%f,%f,%f)\n", tiltDest[0], tiltDest[1], tiltDest[2]);
   switch(arg.key){
   case OIS::KC_D:
-    printf("tilting right\n");
+ //   printf("tilting right\n");
     tiltDest *= btQuaternion(0,0,-MAX_TILT);
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
   case OIS::KC_A:
-    printf("tilting left\n");
+  //  printf("tilting left\n");
     tiltDest *= btQuaternion(0,0,MAX_TILT);
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
   case OIS::KC_W:
-    printf("tilting forward\n");
+  //  printf("tilting forward\n");
     tiltDest *= btQuaternion(0,-MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
   case OIS::KC_S:
-    printf("tilting backwards\n");
+  //:  printf("tilting backwards\n");
     tiltDest *= btQuaternion(0,MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
@@ -618,6 +611,7 @@ bool SinglePlayerActivity::keyPressed( const OIS::KeyEvent &arg )
     return false;
   }
 
+  //printf("tiltDest after (%f,%f,%f)\n", tiltDest[0], tiltDest[1], tiltDest[2]);
   return true;
 }
 
@@ -631,27 +625,29 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
 
   if (OgreBallApplication::debug) return false;
 
+
+  //printf("tiltDest (%f,%f,%f)\n", tiltDest[0], tiltDest[1], tiltDest[2]);
   switch(arg.key){
   case OIS::KC_D:
-    printf("untilting right\n");
+    //printf("untilting right\n");
     tiltDest *= btQuaternion(0,0,MAX_TILT);
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
   case OIS::KC_A:
-    printf("untilting left\n");
+    //printf("untilting left\n");
     tiltDest *= btQuaternion(0,0,-MAX_TILT);
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
   case OIS::KC_W:
-   printf("untilting forwards\n");
+  // printf("untilting forwards\n");
     tiltDest *= btQuaternion(0,MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
     break;
   case OIS::KC_S:
-    printf("untilting backwards\n");
+    //printf("untilting backwards\n");
     tiltDest *= btQuaternion(0,-MAX_TILT,0);
     lastTilt = currTilt;
     currTiltDelay = 0;
@@ -667,6 +663,7 @@ bool SinglePlayerActivity::keyReleased( const OIS::KeyEvent &arg )
     return false;
   }
 
+  //printf("tiltDest after (%f,%f,%f)\n", tiltDest[0], tiltDest[1], tiltDest[2]);
   return true;
 }
 
