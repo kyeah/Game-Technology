@@ -54,7 +54,7 @@ level Roundabout {
       }
       extrudedObject {
                      meshname loop
-                     material OgreBall/Checkerboard
+                     material WoodPallet
                      rest 0.1
                      pos {
                          start 0 -200 -14000

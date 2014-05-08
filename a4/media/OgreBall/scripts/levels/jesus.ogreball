@@ -1,0 +1,166 @@
+level JESUS-CHRIST {
+      start {
+            skydome Examples/CloudySky 5 8 4000
+            camera {
+                   pos 0 500 1200
+                   lookAt 0 0 -7000
+            }
+            player1 {
+                     pos 0 1000 -100
+                     rot 0 0 0
+            }
+	    Sound{
+     		background media/OgreBall/sounds/background.wav
+            }
+      }
+      lights {
+             ambient .5 .5 .5
+             light1 {
+                    pos 20 80 50
+             }
+      }
+      goal {
+	   soundEffect media/OgreBall/sounds/hitGoal.wav
+           pos {
+               start 0 0 -25000
+           }
+           rot {
+               start 0 0 0
+           }
+      }
+      plane {
+            meshname upPlane
+	    material OgreBall/Checkerboard_stretch
+            scale 1 1 2.5
+            rest 0
+            pos {
+                start 0 0 -500
+            }
+            rot {
+                start 0 0 0
+            }
+      }
+      plane {
+            meshname upPlane
+	    material WoodPallet
+            scale 4 1 40
+            rest 0
+            pos {
+                start 0 0 -22000
+            }
+            rot {
+                start 0 0 0
+                rot 500 0 0 30
+                rot 1000 0 0 -30
+                rot 500 0 0 0
+            }
+            collidable{
+	    meshname cube.mesh
+            scale .25 1 .04
+	    rest 10.0
+	    soundEffect media/OgreBall/sounds/bumper.wav
+   	    pos{
+	    start -200 200 350
+	    }
+            }   
+            collidable{
+	    meshname cube.mesh
+            scale .25 1 .04
+	    rest 10.0
+	    soundEffect media/OgreBall/sounds/bumper.wav
+   	    pos{
+	       start 200 200 350
+	    }
+            }
+            collectible {
+                  meshname sphere.mesh
+                  scale .25 1 .025
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 200
+                  }
+            }
+            collectible {
+                  meshname sphere.mesh
+                  scale .25 1 .025
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 150
+                  }
+            }
+            collectible {
+                  meshname sphere.mesh
+                  scale .25 1 .025
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 100
+                  }
+            }
+            collectible {
+                  meshname sphere.mesh
+                  scale .25 1 .025
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 50
+                  }
+            }
+            collectible {
+                  meshname sphere.mesh
+                  scale .25 1 .025
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 0
+                  }
+            }
+            collectible {
+                  meshname sphere.mesh
+                  scale .25 1 .025
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 -50
+                  }
+            }
+
+      }
+      collectible {
+                  meshname sphere.mesh
+		  soundEffect media/OgreBall/sounds/pickup.wav
+                  pos {
+                      start 0 120 -7000
+                  }
+      }
+      decorative {
+                  meshname ogrehead.mesh
+                  scale 20 20 20
+                  pos {
+                      start 0 600 -32000
+                  }
+                  rot {
+                      start 0 0 0
+                      interp 500 90 0 0
+                      interp 500 180 0 0
+                      interp 500 270 0 0
+                      interp 500 360 0 0                      
+                  }
+      }
+      collidable{
+	meshname cube.mesh
+	rest 10.0
+	soundEffect media/OgreBall/sounds/bumper.wav
+   	pos{
+	     start -300 120 -8000
+	}
+      }   
+      collidable{
+	meshname cube.mesh
+	rest 10.0
+	soundEffect media/OgreBall/sounds/bumper.wav
+   	pos{
+	     start 300 120 -8000
+	}
+      }      
+
+}
+
+
+
