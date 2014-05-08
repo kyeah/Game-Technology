@@ -1,4 +1,4 @@
-SUPER OGRE BALL
+SUPER OGRE BALL (TEAM 3-PLUS)
 ======================================================
 Alyssa Sallean, Kevin Yeh, Patrick Grayson, Matt Navarifar
 
