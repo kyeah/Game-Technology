@@ -45,7 +45,7 @@ class SinglePlayerActivity : public Activity {
   btScalar MAX_TILT;
   btQuaternion lastTilt, currTilt, tiltDest;
   float currTiltDelay, tiltDelay;
-  int FORWARD, BACKWARD, LEFT, RIGHT;
+  bool FORWARD, BACKWARD, LEFT, RIGHT;
   OgreBall* mOgreBall;  
   CameraObject* mCameraObj;
   GamecubeController* mGC;
