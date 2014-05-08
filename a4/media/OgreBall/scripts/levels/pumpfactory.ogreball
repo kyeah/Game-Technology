@@ -1,0 +1,190 @@
+level Pump-It {
+      start {
+            skydome Examples/CloudySky 5 8 4000
+            camera {
+                   pos 0 500 1200
+                   lookAt 0 0 -7000
+            }
+            player1 {
+                     pos 0 1000 -100
+                     rot 0 0 0
+            }
+	    Sound{
+     		background media/OgreBall/sounds/background.wav
+            }
+      }
+      lights {
+             ambient .5 .5 .5
+             light1 {
+                    pos 20 80 50
+             }
+      }
+      plane {
+            meshname upPlane
+	    material OgreBall/Checkerboard_stretch
+            scale 1 1 7
+            rest 0
+            pos {
+                start 0 0 -2300
+            }
+            rot {
+                start 0 0 0
+            }
+      }
+      extrudedObject {
+                     meshname angledPillarMesh
+                     rest 0.1
+                     material WoodPallet
+                     pos {
+                         start -900 -500 -7000
+                         interp 500 -900 500 -7000
+                         interp 2000 -900 -500 -7000
+                     }
+                     rot {
+                         start -90 0 0
+                     }
+                     collidable{
+	             meshname cube.mesh
+	             rest 10.0
+	             soundEffect media/OgreBall/sounds/bumper.wav
+   	             pos{
+	             start 400 240 -1000
+	             }
+                     }
+                     collectible {
+                     meshname sphere.mesh
+		     soundEffect media/OgreBall/sounds/pickup.wav
+                     pos {
+                     start -400 240 -1000
+                     }
+                     }
+
+
+
+      }
+      extrudedObject {
+                     meshname angledPillarMesh
+                     rest 0.1
+                     material WoodPallet
+                     pos {
+                         start -900 700 -9000
+                         interp 2000 -900 -500 -9000
+                         interp 500 -900 700 -9000
+                     }
+                     rot {
+                         start -90 0 0
+                     }
+                     collidable{
+	             meshname cube.mesh
+	             rest 10.0
+	             soundEffect media/OgreBall/sounds/bumper.wav
+   	             pos{
+	             start 400 240 -1000
+	             }
+                     }
+                     collectible {
+                     meshname sphere.mesh
+		     soundEffect media/OgreBall/sounds/pickup.wav
+                     pos {
+                     start -400 240 -1000
+                     }
+                     }
+      }
+      extrudedObject {
+                     meshname angledPillarMesh
+                     rest 0.1
+                     material WoodPallet
+                     pos {
+                         start -900 -500 -11000
+                         interp 500 -900 500 -11000
+                         interp 2000 -900 -500 -11000
+                     }
+                     rot {
+                         start -90 0 0
+                     }
+                     collidable{
+	             meshname cube.mesh
+	             rest 10.0
+	             soundEffect media/OgreBall/sounds/bumper.wav
+   	             pos{
+	             start 400 240 -1000
+	             }
+                     }
+                     collectible {
+                     meshname sphere.mesh
+		     soundEffect media/OgreBall/sounds/pickup.wav
+                     pos {
+                     start -400 240 -1000
+                     }
+                     }
+      }
+      extrudedObject {
+                     meshname angledPillarMesh
+                     rest 0.1
+                     material WoodPallet
+                     pos {
+                         start -900 700 -13000
+                         interp 2000 -900 -700 -13000
+                         interp 500 -900 700 -13000
+                     }
+                     rot {
+                         start -90 0 0
+                     }
+                     collidable{
+	             meshname cube.mesh
+	             rest 10.0
+	             soundEffect media/OgreBall/sounds/bumper.wav
+   	             pos{
+	             start 400 240 -1000
+	             }
+                     }
+                     collectible {
+                     meshname sphere.mesh
+		     soundEffect media/OgreBall/sounds/pickup.wav
+                     pos {
+                     start -400 240 -1000
+                     }
+                     }
+      }
+      extrudedObject {
+                     meshname angledPillarMesh
+                     rest 0.1
+                     material WoodPallet
+                     pos {
+                         start -900 -500 -15000
+                         interp 500 -900 500 -15000
+                         interp 2000 -900 -500 -15000
+                     }
+                     rot {
+                         start -90 0 0
+                     }
+                     goal {
+	             soundEffect media/OgreBall/sounds/hitGoal.wav
+                     pos {
+                     start 500 200 -1000
+                     }
+                     rot {
+                     start 90 0 0
+                     }
+      }
+
+                     
+      }
+      decorative {
+                  meshname robot.mesh
+                  scale 20 20 20
+                  pos {
+                      start 0 600 -20000
+                  }
+                  rot {
+                      start 0 0 0
+                      interp 500 90 0 0
+                      interp 500 180 0 0
+                      interp 500 270 0 0
+                      interp 500 360 0 0                      
+                  }
+      }
+}
+
+
+
