@@ -161,7 +161,7 @@ level Pump-It {
                      goal {
 	             soundEffect media/OgreBall/sounds/hitGoal.wav
                      pos {
-                     start 500 200 -1000
+                     start 500 100 -1000
                      }
                      rot {
                      start 90 0 0
